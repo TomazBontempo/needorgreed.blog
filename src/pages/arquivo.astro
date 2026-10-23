@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import { getReviews } from '../lib/reviews';
+import { ROLLS } from '../lib/raridade';
+
+const reviews = await getReviews();
+
+// Agrupa por ano e mês, mantendo a ordem do mais novo para o mais antigo.
+const grupos = new Map<string, typeof reviews>();
+for (const r of reviews) {
+  const chave = r.entry.data.data.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  if (!grupos.has(chave)) grupos.set(chave, []);
+  grupos.get(chave)!.push(r);
+}
+---
+
+<Base titulo="Arquivo" descricao="Todas as reviews, por data.">
+  <section class="container arquivo">
+    <p class="rotulo">Log completo</p>
+    <h1>Arquivo</h1>
+
+    {
+      [...grupos].map(([mes, lista]) => (
+        <section class="mes">
+          <h2 class="mono">{mes}</h2>
+          <ul>
+            {lista.map((r) => (
+              <li class={`r-${r.raridade.id} roll-${r.entry.data.roll}`}>
+                <span class="dia mono">
+                  {r.entry.data.data.toLocaleDateString('pt-BR', { day: '2-digit', timeZone: 'UTC' })}
+                </span>
+                <a href={r.url}>{r.entry.data.titulo}</a>
+                <span class="roll mono">{ROLLS[r.entry.data.roll].nome}</span>
+                <span class="autor mono">{r.autor.nick}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+
+    {reviews.length === 0 && <p class="mono vazio">O log está vazio.</p>}
+  </section>
+</Base>
+
+<style>
+  .arquivo {
+    padding-top: 56px;
+  }
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    margin: 6px 0 32px;
+  }
+  .mes h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ouro);
+    margin: 32px 0 8px;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--borda);
+  }
+  li {
+    display: grid;
+    grid-template-columns: 32px 1fr auto auto;
+    gap: 16px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--borda);
+  }
+  .dia {
+    color: var(--texto-3);
+    font-size: 13px;
+  }
+  li a {
+    color: var(--cor);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  li a:hover {
+    text-decoration: underline;
+  }
+  .roll {
+    color: var(--roll);
+    font-size: 13px;
+  }
+  .autor {
+    color: var(--texto-3);
+    font-size: 13px;
+  }
+  @media (max-width: 560px) {
+    li {
+      grid-template-columns: 32px 1fr auto;
+    }
+    .autor {
+      display: none;
+    }
+  }
+  .vazio {
+    color: var(--texto-3);
+  }
+</style>

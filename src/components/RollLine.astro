@@ -1,0 +1,60 @@
+---
+/**
+ * A assinatura de cada review, no formato de mensagem de sistema do chat de loot:
+ *   Snufupugos rolou Need (94) para [Outer Wilds]
+ */
+import { ROLLS, type RollId, type Raridade } from '../lib/raridade';
+
+interface Props {
+  nick: string;
+  /** slug do autor, usado no link /autores/<slug>/ */
+  autorSlug: string;
+  roll: RollId;
+  valor: number;
+  titulo: string;
+  raridade: Raridade;
+  href?: string;
+}
+
+const { nick, autorSlug, roll, valor, titulo, raridade, href } = Astro.props;
+---
+
+<p class={`roll-line mono roll-${roll} r-${raridade.id}`}>
+  <a class="quem" href={`/autores/${autorSlug}/`}>{nick}</a>{' '}
+  <span class="acao">rolou</span>{' '}
+  <strong class="roll">{ROLLS[roll].nome}</strong>{' '}
+  <span class="valor">({valor})</span>{' '}
+  <span class="acao">para</span>{' '}
+  {href ? <a class="item" href={href}>[{titulo}]</a> : <span class="item">[{titulo}]</span>}
+</p>
+
+<style>
+  .roll-line {
+    margin: 0;
+    font-size: 14px;
+    color: var(--texto-2);
+    line-height: 1.5;
+  }
+  .quem {
+    color: var(--texto);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .quem:hover {
+    text-decoration: underline;
+  }
+  .roll {
+    color: var(--roll);
+  }
+  .valor {
+    color: var(--texto-3);
+  }
+  .item {
+    color: var(--cor);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  a.item:hover {
+    text-decoration: underline;
+  }
+</style>

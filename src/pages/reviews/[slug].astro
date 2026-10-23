@@ -1,0 +1,151 @@
+---
+import { render } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import ItemTooltip from '../../components/ItemTooltip.astro';
+import RollLine from '../../components/RollLine.astro';
+import YouTube from '../../components/YouTube.astro';
+import Comentarios from '../../components/Comentarios.astro';
+import { getReviews, formatarData, type ReviewCompleta } from '../../lib/reviews';
+import { ROLLS } from '../../lib/raridade';
+
+export async function getStaticPaths() {
+  const reviews = await getReviews();
+  return reviews.map((review) => ({ params: { slug: review.slug }, props: { review } }));
+}
+
+interface Props {
+  review: ReviewCompleta;
+}
+
+const { review } = Astro.props;
+const { data } = review.entry;
+const { Content } = await render(review.entry);
+const og = data.capa ? (await getImage({ src: data.capa, width: 1200, format: 'jpg' })).src : undefined;
+---
+
+<Base titulo={data.titulo} descricao={data.frase ?? `${ROLLS[data.roll].nome}: ${data.titulo}`} imagem={og}>
+  <article class={`container review r-${review.raridade.id}`}>
+    {
+      data.capa && (
+        <div class="banner">
+          <Image src={data.capa} alt="" widths={[720, 1120, 1600]} sizes="(max-width: 1152px) 100vw, 1120px" loading="eager" />
+        </div>
+      )
+    }
+
+    <header class="cabecalho">
+      <p class="rotulo">{review.secao === 'jogos' ? 'Jogos' : 'Telas'} · {formatarData(data.data)}</p>
+      <h1>{data.titulo}</h1>
+      <RollLine
+        nick={review.autor.nick}
+        autorSlug={review.autor.slug}
+        roll={data.roll}
+        valor={review.valorRoll}
+        titulo={data.titulo}
+        raridade={review.raridade}
+      />
+    </header>
+
+    <div class="layout">
+      <div class="prosa">
+        <Content components={{ YouTube }} />
+
+        {
+          data.tags.length > 0 && (
+            <ul class="tags">
+              {data.tags.map((t) => (
+                <li class="mono">#{t}</li>
+              ))}
+            </ul>
+          )
+        }
+
+        <p class="assinatura mono">
+          Escrito por <a href={`/autores/${review.autor.slug}/`}>{review.autor.nick}</a>
+          {
+            review.editor && (
+              <>
+                {' '}· editado por <a href={`/autores/${review.editor.slug}/`}>{review.editor.nick}</a>
+              </>
+            )
+          }
+        </p>
+
+        <Comentarios />
+      </div>
+
+      <aside class="lateral">
+        <ItemTooltip review={review} link={false} mostrarCapa={false} />
+      </aside>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .review {
+    padding-top: 32px;
+  }
+  .banner {
+    aspect-ratio: 21 / 8;
+    border-radius: var(--raio);
+    overflow: hidden;
+    border: 1px solid var(--borda);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--cor) 20%, transparent);
+  }
+  .banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .cabecalho {
+    margin: 32px 0 40px;
+  }
+  h1 {
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    margin: 8px 0 12px;
+    color: var(--cor);
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 56px;
+    align-items: start;
+  }
+  .lateral {
+    position: sticky;
+    top: 88px;
+  }
+  @media (max-width: 860px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .lateral {
+      position: static;
+      order: -1;
+    }
+  }
+  .tags {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 32px 0 0;
+  }
+  .tags li {
+    font-size: 13px;
+    color: var(--texto-2);
+    background: var(--bg-2);
+    border: 1px solid var(--borda);
+    padding: 2px 10px;
+    border-radius: 999px;
+  }
+  .assinatura {
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--texto-3);
+  }
+</style>

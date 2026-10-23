@@ -1,0 +1,13 @@
+---
+import Listagem from '../components/Listagem.astro';
+import { getReviews } from '../lib/reviews';
+
+const reviews = (await getReviews()).filter((r) => r.secao === 'jogos');
+---
+
+<Listagem
+  titulo="Jogos"
+  rotulo="Seção"
+  descricao="Tudo que passou pelo controle, teclado ou tela de toque."
+  reviews={reviews}
+/>

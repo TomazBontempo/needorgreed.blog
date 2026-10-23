@@ -1,0 +1,55 @@
+---
+import { TODAS_RARIDADES } from '../lib/raridade';
+---
+
+<ul class="legenda">
+  {
+    TODAS_RARIDADES.map((r) => (
+      <li class={`r-${r.id}`}>
+        <a href={`/raridade/${r.id}/`}>
+          <span class="ponto" />
+          {r.nome}
+          <span class="faixa mono">{r.faixa}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .legenda {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border: 1px solid var(--borda);
+    border-radius: 999px;
+    color: var(--cor);
+    text-decoration: none;
+    font-size: 14px;
+    background: var(--bg-2);
+  }
+  a:hover {
+    border-color: var(--cor);
+    color: var(--cor);
+  }
+  .ponto {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cor);
+    box-shadow: 0 0 8px var(--cor);
+  }
+  .faixa {
+    color: var(--texto-3);
+    font-size: 12px;
+  }
+</style>

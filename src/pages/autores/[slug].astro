@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Listagem from '../../components/Listagem.astro';
+import { getReviews, type ReviewCompleta } from '../../lib/reviews';
+import type { Autor } from '../../lib/autores';
+
+export async function getStaticPaths() {
+  const reviews = await getReviews();
+  const autores = await getCollection('autores');
+
+  // Uma página para cada autor cadastrado e para cada login sem cadastro que já publicou.
+  const slugs = new Set<string>([...autores.map((a) => a.id), ...reviews.map((r) => r.autor.slug)]);
+
+  return [...slugs].map((slug) => {
+    const autor = autores.find((a) => a.id === slug);
+    const doAutor = reviews.filter((r) => r.autor.slug === slug);
+    const login = autor?.data.github ?? doAutor[0]?.autor.login ?? slug;
+    return { params: { slug }, props: { autor, reviews: doAutor, login } };
+  });
+}
+
+interface Props {
+  autor?: Autor;
+  reviews: ReviewCompleta[];
+  login: string;
+}
+
+const { autor, reviews, login } = Astro.props;
+const nick = autor?.data.nick ?? login;
+---
+
+<Listagem titulo={nick} rotulo="Autor" descricao={autor?.data.bio} reviews={reviews}>
+  <div class="perfil">
+    {autor?.data.avatar && <Image src={autor.data.avatar} alt="" width={72} height={72} class="avatar" />}
+    <p class="mono">
+      {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'} · github.com/{login}
+    </p>
+  </div>
+</Listagem>
+
+<style>
+  .perfil {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--texto-3);
+    font-size: 13px;
+  }
+  .perfil p {
+    margin: 0;
+  }
+  .avatar {
+    border-radius: 50%;
+    border: 1px solid var(--borda);
+  }
+</style>

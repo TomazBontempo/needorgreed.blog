@@ -1,0 +1,158 @@
+:root {
+  /* Base: noite de estalagem */
+  --bg: #0f0d0b;
+  --bg-2: #17140f;
+  --painel: #120f0c;
+  --borda: #2c261d;
+  --texto: #e9e2d3;
+  --texto-2: #a89e8a;
+  --texto-3: #6f6656;
+  --ouro: #e3b45c;
+  --frase: #d9b866;
+  --verde-stat: #5fd07a;
+
+  /* Raridades */
+  --r-lixo: #8d8a84;
+  --r-comum: #ece8df;
+  --r-incomum: #3fcf6b;
+  --r-raro: #3f8ef5;
+  --r-epico: #b360f2;
+  --r-lendario: #f28a26;
+  --r-heranca: #4fd3db;
+
+  /* Rolls */
+  --roll-need: #f2c94c;
+  --roll-greed: #9fd36b;
+  --roll-pass: #8d8a84;
+
+  --fonte-titulo: 'Fraunces', Georgia, serif;
+  --fonte-corpo: 'Inter', system-ui, sans-serif;
+  --fonte-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --largura: 1120px;
+  --raio: 6px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #2a1d0e55, transparent 60%),
+    var(--bg);
+  color: var(--texto);
+  font-family: var(--fonte-corpo);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ouro);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: #f3cf86;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.container {
+  width: min(var(--largura), 100% - 32px);
+  margin-inline: auto;
+}
+
+.mono {
+  font-family: var(--fonte-mono);
+}
+
+.rotulo {
+  font-family: var(--fonte-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+/* Cores de raridade como classes utilitárias */
+.r-lixo { --cor: var(--r-lixo); }
+.r-comum { --cor: var(--r-comum); }
+.r-incomum { --cor: var(--r-incomum); }
+.r-raro { --cor: var(--r-raro); }
+.r-epico { --cor: var(--r-epico); }
+.r-lendario { --cor: var(--r-lendario); }
+.r-heranca { --cor: var(--r-heranca); }
+
+.roll-need { --roll: var(--roll-need); }
+.roll-greed { --roll: var(--roll-greed); }
+.roll-pass { --roll: var(--roll-pass); }
+
+/* Texto longo das reviews */
+.prosa {
+  max-width: 68ch;
+}
+
+.prosa p,
+.prosa ul,
+.prosa ol {
+  margin: 0 0 1.1em;
+}
+
+.prosa h2 {
+  margin: 2em 0 0.6em;
+  font-size: 1.6rem;
+}
+
+.prosa h3 {
+  margin: 1.6em 0 0.5em;
+  font-size: 1.25rem;
+}
+
+.prosa blockquote {
+  margin: 1.5em 0;
+  padding: 0.2em 0 0.2em 1.1em;
+  border-left: 3px solid var(--ouro);
+  color: var(--texto-2);
+  font-style: italic;
+}
+
+.prosa img {
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+}
+
+.prosa code {
+  font-family: var(--fonte-mono);
+  font-size: 0.9em;
+  background: var(--bg-2);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.prosa hr {
+  border: 0;
+  border-top: 1px solid var(--borda);
+  margin: 2.5em 0;
+}

@@ -1,0 +1,169 @@
+---
+/**
+ * O "tooltip de item": a ficha de cada review, colorida pela raridade.
+ * Usado nas listagens (com link) e no topo da página da review (sem link).
+ */
+import { Image } from 'astro:assets';
+import type { ReviewCompleta } from '../lib/reviews';
+import { ROLLS, TIPOS } from '../lib/raridade';
+
+interface Props {
+  review: ReviewCompleta;
+  link?: boolean;
+  mostrarCapa?: boolean;
+}
+
+const { review, link = true, mostrarCapa = true } = Astro.props;
+const { data } = review.entry;
+const Tag = link ? 'a' : 'div';
+---
+
+<Tag
+  class={`tooltip r-${review.raridade.id} roll-${data.roll}`}
+  href={link ? review.url : undefined}
+>
+  {
+    mostrarCapa && data.capa && (
+      <div class="capa">
+        <Image src={data.capa} alt="" widths={[360, 720]} sizes="(max-width: 700px) 100vw, 360px" />
+      </div>
+    )
+  }
+  <div class="corpo">
+    <h3 class="nome">{data.titulo}</h3>
+    <p class="raridade">{review.raridade.nome}</p>
+    <p class="linha">
+      <span>{TIPOS[data.tipo].nome}</span>
+      {data.plataforma && <span>{data.plataforma}</span>}
+    </p>
+    {data.duracao && <p class="linha"><span>Duração: {data.duracao}</span></p>}
+
+    {
+      data.atributos.length > 0 && (
+        <ul class="atributos">
+          {data.atributos.map((a) => (
+            <li>
+              <span class="valor">{a.valor}</span> {a.nome}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <p class="veredito">
+      <span class="roll-nome">{ROLLS[data.roll].nome}</span>
+      <span class="nota mono">{data.heranca ? 'fora da escala' : `${data.nota.toFixed(1)} / 10`}</span>
+    </p>
+
+    {data.frase && <p class="frase">"{data.frase}"</p>}
+  </div>
+</Tag>
+
+<style>
+  .tooltip {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #16120e, var(--painel));
+    border: 1px solid color-mix(in srgb, var(--cor) 55%, #000);
+    border-radius: var(--raio);
+    box-shadow:
+      inset 0 0 0 1px #00000080,
+      0 10px 30px -14px #000;
+    color: var(--texto);
+    text-decoration: none;
+    overflow: hidden;
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  a.tooltip:hover {
+    transform: translateY(-2px);
+    border-color: var(--cor);
+    box-shadow:
+      inset 0 0 0 1px #00000080,
+      0 0 0 1px color-mix(in srgb, var(--cor) 35%, transparent),
+      0 14px 34px -14px color-mix(in srgb, var(--cor) 45%, #000);
+    color: var(--texto);
+  }
+  .capa {
+    aspect-ratio: 16 / 9;
+    border-bottom: 1px solid var(--borda);
+    background: var(--bg-2);
+  }
+  .capa img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .corpo {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+  .nome {
+    margin: 0;
+    color: var(--cor);
+    font-size: 1.2rem;
+  }
+  .raridade {
+    margin: 0 0 6px;
+    font-family: var(--fonte-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--cor) 75%, var(--texto-3));
+  }
+  .linha {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--texto-2);
+  }
+  .atributos {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    font-size: 14px;
+  }
+  .atributos .valor {
+    color: var(--verde-stat);
+    font-family: var(--fonte-mono);
+    font-weight: 600;
+  }
+  .atributos li {
+    color: var(--verde-stat);
+  }
+  .veredito {
+    margin: 12px 0 0;
+    padding-top: 10px;
+    border-top: 1px dashed var(--borda);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: auto;
+  }
+  .roll-nome {
+    font-family: var(--fonte-mono);
+    font-weight: 700;
+    color: var(--roll);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .nota {
+    color: var(--texto-2);
+    font-size: 14px;
+  }
+  .frase {
+    margin: 10px 0 0;
+    color: var(--frase);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+</style>

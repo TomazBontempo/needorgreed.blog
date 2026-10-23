@@ -1,0 +1,34 @@
+---
+import ItemTooltip from './ItemTooltip.astro';
+import type { ReviewCompleta } from '../lib/reviews';
+
+interface Props {
+  reviews: ReviewCompleta[];
+  vazio?: string;
+}
+const { reviews, vazio = 'Nenhum loot por aqui ainda.' } = Astro.props;
+---
+
+{
+  reviews.length ? (
+    <div class="grade">
+      {reviews.map((r) => (
+        <ItemTooltip review={r} />
+      ))}
+    </div>
+  ) : (
+    <p class="vazio mono">{vazio}</p>
+  )
+}
+
+<style>
+  .grade {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .vazio {
+    color: var(--texto-3);
+    font-size: 14px;
+  }
+</style>

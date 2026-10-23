@@ -1,0 +1,39 @@
+---
+/**
+ * Uso dentro de uma review .mdx:
+ *   <YouTube id="dQw4w9WgXcQ" />
+ * No painel, é o bloco "Vídeo do YouTube".
+ * Usa youtube-nocookie para não rastrear o leitor antes do play.
+ */
+interface Props {
+  id: string;
+  titulo?: string;
+}
+const { id, titulo = 'Vídeo' } = Astro.props;
+---
+
+<div class="video">
+  <iframe
+    src={`https://www.youtube-nocookie.com/embed/${id}`}
+    title={titulo}
+    loading="lazy"
+    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen></iframe>
+</div>
+
+<style>
+  .video {
+    aspect-ratio: 16 / 9;
+    margin: 1.5em 0;
+    border-radius: var(--raio);
+    overflow: hidden;
+    border: 1px solid var(--borda);
+    background: #000;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+</style>
