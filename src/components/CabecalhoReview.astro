@@ -1,11 +1,12 @@
 ---
 /**
  * Topo de uma review: linha de roll, motivo colado nela, título e meta.
- * Usado no destaque da home (título com link) e na página da review (título como h1).
+ * Usado no destaque da home (título com link) e na página da review (título como h1). Nos dois, título primeiro.
  */
 import LinhaRoll from './LinhaRoll.astro';
 import { dicionario, formatarData, url, type Idioma } from '../i18n';
 import { minutosDeLeitura, type ReviewCompleta, type VersaoReview } from '../lib/reviews';
+import { notaFormatada } from '../lib/raridade';
 
 interface Props {
   idioma: Idioma;
@@ -24,7 +25,7 @@ const Titulo = href ? 'h3' : 'h1';
 ---
 
 <header class:list={['cab-review', { 'titulo-primeiro': tituloPrimeiro }]}>
-  {tituloPrimeiro && <Titulo class="titulo">{data.titulo}</Titulo>}
+  {tituloPrimeiro && <Titulo class="titulo">{href ? <a href={href}>{data.titulo}</a> : data.titulo}</Titulo>}
   <LinhaRoll
     idioma={idioma}
     nick={review.autor.nick}
@@ -37,6 +38,15 @@ const Titulo = href ? 'h3' : 'h1';
   {data.motivoRoll && <p class="motivo">{data.motivoRoll}</p>}
   {!tituloPrimeiro && <Titulo class="titulo">{href ? <a href={href}>{data.titulo}</a> : data.titulo}</Titulo>}
   <p class="meta">
+    {
+      /* No celular a lateral do veredito some: a raridade e a nota vêm para a meta, como no pé da ficha. */
+      !href && (
+        <span class:list={['raridade-celular', `r-${review.raridade.id}`]}>
+          <span class="sr-only">{t.review.raridade}: </span>
+          {t.raridades[review.raridade.id].nome} · {notaFormatada(data.nota)}
+        </span>
+      )
+    }
     <time datetime={data.data.toISOString().slice(0, 10)}>{formatarData(idioma, data.data)}</time>
     <span>{t.review.leitura(minutosDeLeitura(versao.entry.body))}</span>
     <span>
@@ -104,6 +114,15 @@ const Titulo = href ? 'h3' : 'h1';
     font-family: var(--mono);
     font-size: 0.75rem;
     color: var(--texto-3);
+  }
+  .raridade-celular {
+    display: none;
+    color: var(--cor);
+  }
+  @media (max-width: 900px) {
+    .raridade-celular {
+      display: inline;
+    }
   }
   .meta a {
     color: var(--texto-2);

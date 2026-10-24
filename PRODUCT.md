@@ -12,7 +12,7 @@ Secondary: Brazilian and Portuguese readers (served in pt-BR) and English speake
 Writers: Snufupugos (Tomaz) and, later, invited partners who post through Keystatic or the IDE.
 
 ## Product Purpose
-A review blog where every work is treated as an MMO loot drop. Success in year one: people read reviews to the end and discuss them in the comments.
+A review blog where every work is treated as MMO loot. Success in year one: people read reviews to the end and discuss them in the comments.
 
 ## Positioning
 Two independent axes, rarity (how good it is) and roll (Need, Greed or Pass: is it worth your time and money right now). They are designed to diverge, and the site must make that divergence legible: an Epic that is still a Greed, an Uncommon that is a Need. Neighbouring review sites collapse this into one score.

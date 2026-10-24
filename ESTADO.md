@@ -47,7 +47,7 @@ No fim de 2026-10-24 (commits `d81f94b` em diante):
   `components/TituloDoTexto.astro`; fichas logo abaixo do h1 viram h2) e o motivo do roll sem repetir na
   lateral da review. O resto ficou em "Problemas abertos". Screenshots e medidas em `.impeccable/review/`
   (fora do git).
-- **Hero novo:** uma frase ("Cada obra é um loot.", em inglês "Every work is a loot."), explicação em duas linhas e o link "Saiba mais sobre
+- **Hero novo:** uma frase ("Cada obra é um loot.", em inglês "Every work is loot."), explicação em duas linhas e o link "Saiba mais sobre
   nossas notas" na quarta linha. Respiro de até 65px que empurra a página em vez de espremer o destaque,
   com limite no título de "Mais loot" e 32px de ficha (`--espiar-minimo` em `views/Home.astro`). Testamos
   alinhar o hero com o destaque; o Tomaz preferiu o alinhamento com o logo do header.
@@ -119,12 +119,21 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 
 - **Vocabulário em espanhol a revisar** por alguém que fale espanhol: "Pantallas", "Acerca", nomes das
   raridades e a linha de roll ("Snufupugos tiró Need (94) por [Outer Wilds]").
-- **Progresso de leitura** mostra "100% lido" logo de cara numa review curta que cabe na tela, e "1% lido"
-  no topo de uma review longa (P3 da crítica).
-- **Review no celular sem raridade nem nota** (P1 da crítica, medido): a lateral do veredito some abaixo de
-  900px e só sobra a cor do nome na linha de roll. O Tomaz disse "veremos depois".
 - **Ficha com rodapé desigual** quando aparece a marca "read" de review já lida (P3 da crítica).
-- **Filtros do Arquivo** com 21px de altura de toque (mínimo do WCAG 2.2 é 24px; P3 da crítica).
+  O Tomaz quer ver a proposta antes de mudar.
+- **Adiados pelo Tomaz (resolver mais à frente):** a auditoria da Impeccable (`audit`) e o `DESIGN.md`;
+  a revisão do mobile; o logo (o d100 de traço ainda é placeholder).
+- **Decidido não mexer:** o progresso de leitura mostra "1% lido" no topo de review longa e "100% lido"
+  de cara em review curta. Fica como está (decisão do Tomaz).
+- Resolvidos depois da crítica: raridade e nota no celular (na meta da review, abaixo de 900px), os
+  filtros do Arquivo com 24px de altura de toque e a marca de "lido" (virou carimbo na capa).
+- **Pé da ficha ainda quebra em duas linhas** quando o nome da raridade é longo ("Lixo de vendedor · 2.1"
+  em 1280; "Lendário · 10.0" na ficha em linha do celular). Não tem a ver com o "lido".
+- **Plataforma e duração** somem da review no celular junto com a lateral (só raridade e nota foram trazidas).
+- **Action de tradução** ainda em `checkout@v4` e `setup-node@v4` (ver acima); o Tomaz perguntou se vale fazer
+  agora: vale, falta o OK.
+- **Bio traduzida** (2026-10-24): implementada e testada com `--mock`; a primeira tradução de verdade sai
+  na Action quando houver token.
 - **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
   Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", carrossel, sitemap, RSS):
   fazer antes de apagar os exemplos (item 1 do checklist).

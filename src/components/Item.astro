@@ -5,7 +5,8 @@
  *
  * variante "grande": a ficha completa.
  * variante "bolso":  a ficha nas listagens ("Mais loot", Jogos, Telas...), com link e hover.
- * variante "mini":   a ficha completa em tamanho pequeno, no tooltip do loot log.
+ * variante "mini":   a mesma ficha do bolso em tamanho pequeno, no tooltip do loot log.
+ * Bolso e mini mostram exatamente os mesmos dados; só o tamanho muda.
  *
  * Os estilos ficam em src/styles/item.css (globais, com prefixo it-), porque a mini é
  * carregada sob demanda dentro do tooltip, em páginas que não renderizam nenhuma ficha.
@@ -42,7 +43,7 @@ const Titulo = variante === 'bolso' ? (`h${nivel}` as const) : 'p';
   class:list={['it', `it--${variante}`, `r-${raridade.id}`, `roll-${data.roll}`]}
   data-slug={review.slug}
 >
-  <div class="it-capa">
+  <div class="it-capa" data-lido={t.log.lido}>
     <Image
       src={data.capa}
       alt=""
@@ -63,7 +64,7 @@ const Titulo = variante === 'bolso' ? (`h${nivel}` as const) : 'p';
     </p>
 
     {
-      variante !== 'bolso' && data.atributos.length > 0 && (
+      data.atributos.length > 0 && (
         <ul class="it-atributos mono">
           {data.atributos.map((a) => (
             <li class={a.valor.trim().startsWith('-') ? 'it-neg' : 'it-pos'}>
@@ -81,13 +82,13 @@ const Titulo = variante === 'bolso' ? (`h${nivel}` as const) : 'p';
         <p class="it-roll mono">
           <MarcaRoll roll={data.roll} />
           {t.rolls[data.roll].nome}
-          {variante === 'mini' && <span class="it-valor"> ({review.valorRoll})</span>}
+          <span class="it-valor"> ({review.valorRoll})</span>
         </p>
       )
     }
 
     <p class="it-pe mono">
-      <span class="it-numero" data-lido={t.log.lido}>{t.item.numero} {numero} · {set}</span>
+      <span class="it-numero">{t.item.numero} {numero} · {set}</span>
       <span class="it-raridade">
         {nomeRaridade} · {notaFormatada(data.nota)}
       </span>

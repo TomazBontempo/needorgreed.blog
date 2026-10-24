@@ -134,12 +134,13 @@ export default config({
         }),
         atributos: fields.array(
           fields.object({
-            nome: fields.text({ label: 'Atributo', description: 'Ex.: Nostalgia' }),
-            valor: fields.text({ label: 'Valor', description: 'Ex.: +12 ou -4' }),
+            nome: fields.text({ label: 'Atributo', description: 'Ex.: Nostalgia', validation: { isRequired: true } }),
+            valor: fields.text({ label: 'Valor', description: 'Ex.: +12 ou -4', validation: { isRequired: true } }),
           }),
           {
             label: 'Atributos',
-            description: 'Positivos em verde, negativos em vermelho.',
+            description: 'Sempre dois. Positivos em verde, negativos em vermelho.',
+            validation: { length: { min: 2, max: 2 } },
             itemLabel: (p) => `${p.fields.valor.value} ${p.fields.nome.value}`.trim() || 'Atributo',
           },
         ),
@@ -236,6 +237,16 @@ export default config({
           publicPath: '../../assets/autores/',
         }),
         bio: fields.text({ label: 'Bio', multiline: true }),
+        idioma: fields.select({
+          label: 'Idioma da bio',
+          description: 'A língua em que você escreveu a bio. As outras são traduzidas sozinhas, como as reviews.',
+          options: [
+            { label: 'Português', value: 'pt' },
+            { label: 'Inglês', value: 'en' },
+            { label: 'Espanhol', value: 'es' },
+          ],
+          defaultValue: 'pt',
+        }),
       },
     }),
   },

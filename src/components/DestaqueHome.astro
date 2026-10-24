@@ -42,7 +42,7 @@ const comentarios = await contarComentarios(review.slug);
 >
   <h2 class="topo-destaque" id="titulo-destaque">{t.review.destaque}</h2>
   <div class="janela" tabindex="0" role="region" aria-label={t.review.janela(data.titulo)}>
-    <CabecalhoReview idioma={idioma} review={review} versao={versao} href={href} />
+    <CabecalhoReview idioma={idioma} review={review} versao={versao} href={href} tituloPrimeiro />
     <AvisoTraducao idioma={idioma} versao={versao} slug={review.slug} />
     <Prosa>
       <Content components={componentesMdx} />

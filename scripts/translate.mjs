@@ -7,6 +7,10 @@
  *   src/content/reviews/<slug>/index.en.mdx   tradução gerada aqui
  *   src/content/reviews/<slug>/index.es.mdx   tradução gerada aqui
  *
+ * E a bio de cada autor, com as mesmas regras:
+ *   src/content/autores/<slug>.json                 original (campo idioma; padrão pt)
+ *   src/content/autores/traducoes/<slug>.en.json    tradução gerada aqui
+ *
  * Regras:
  *  - A tradução guarda o hash do original (origemHash). Só retraduz quando o original muda.
  *  - Tradução com `revisado: true` nunca é sobrescrita. Se o original mudou depois, só avisa.
@@ -22,16 +26,17 @@
  * Opções:
  *   --mock          tradutor de mentira, para testar sem token (marca `modelo: mock`)
  *   --force         retraduz mesmo com hash igual (nunca passa por cima de `revisado: true`)
- *   <slug> ...      só essas reviews
+ *   <slug> ...      só essas reviews (as bios ficam de fora)
  */
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { readFile, readdir, writeFile, appendFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile, appendFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import YAML from 'yaml';
 
 const RAIZ = new URL('..', import.meta.url).pathname;
 const PASTA = join(RAIZ, 'src/content/reviews');
+const PASTA_AUTORES = join(RAIZ, 'src/content/autores');
 const MODELO_PADRAO = '@cf/google/gemma-4-26b-a4b-it';
 /** Línguas do site (mesma lista de src/i18n/rotas.ts) e como o modelo deve chamar cada uma. */
 const IDIOMAS = ['en', 'pt', 'es'];
@@ -331,6 +336,44 @@ async function traduzirPara(tradutor, slug, orig, dados, corpo, de, para, origem
 }
 
 // ---------------------------------------------------------------------------------------------
+// Bios dos autores
+// ---------------------------------------------------------------------------------------------
+
+async function traduzirBio(tradutor, arquivo) {
+  const slug = arquivo.replace(/\.json$/, '');
+  const autor = JSON.parse(await readFile(join(PASTA_AUTORES, arquivo), 'utf8'));
+  if (!autor.bio?.trim()) return 'sem-bio';
+  const de = IDIOMAS.includes(autor.idioma) ? autor.idioma : 'pt';
+  // A língua entra no hash: trocar só o idioma da bio também pede tradução nova.
+  const origemHash = hash(`${de}\n${autor.bio}`);
+  const resultados = [];
+  for (const para of IDIOMAS.filter((l) => l !== de)) {
+    const alvo = join(PASTA_AUTORES, 'traducoes', `${slug}.${para}.json`);
+    let resultado = 'traduzida';
+    if (existsSync(alvo)) {
+      const atual = JSON.parse(await readFile(alvo, 'utf8'));
+      const ehMock = atual.modelo === 'mock' && !MOCK;
+      if (atual.revisado) {
+        if (atual.origemHash !== origemHash) {
+          aviso(`bio de ${slug}: a original mudou, mas a tradução (${para}) foi revisada à mão e não será sobrescrita. Revise traducoes/${slug}.${para}.json.`);
+        }
+        resultado = 'revisada';
+      } else if (atual.origemHash === origemHash && !FORCE && !ehMock) {
+        resultado = 'em-dia';
+      }
+    }
+    if (resultado === 'traduzida') {
+      const bio = semTravessao((await tradutor.traduzir(autor.bio.trim(), de, para)).trim());
+      await mkdir(join(PASTA_AUTORES, 'traducoes'), { recursive: true });
+      // Editou à mão? Mude "revisado" para true e o script nunca mais sobrescreve.
+      await writeFile(alvo, JSON.stringify({ bio, origemHash, revisado: false, modelo: tradutor.modelo }, null, 2) + '\n');
+    }
+    resultados.push(`${para} ${resultado}`);
+  }
+  return resultados.join(', ');
+}
+
+// ---------------------------------------------------------------------------------------------
 
 async function main() {
   const tradutor = MOCK ? mock() : workersAi();
@@ -345,6 +388,7 @@ async function main() {
     : (await readdir(PASTA, { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name).sort();
 
   const contagem = {};
+  let cotaEsgotada = false;
   for (const slug of slugs) {
     let resultado;
     try {
@@ -352,6 +396,7 @@ async function main() {
     } catch (erro) {
       if (erro instanceof CotaEsgotada) {
         aviso(`Cota diária do Workers AI esgotada em "${slug}". O resto fica para o próximo run. (${erro.message})`);
+        cotaEsgotada = true;
         break;
       }
       resultado = 'erro';
@@ -359,6 +404,26 @@ async function main() {
     }
     for (const r of resultado.split(', ')) contagem[r] = (contagem[r] ?? 0) + 1;
     info(`  ${slug}: ${resultado}`);
+  }
+
+  // Bios dos autores (só no run completo, sem slugs na linha de comando).
+  if (!SO.length && !cotaEsgotada) {
+    const arquivos = (await readdir(PASTA_AUTORES)).filter((a) => a.endsWith('.json')).sort();
+    for (const arquivo of arquivos) {
+      let resultado;
+      try {
+        resultado = await traduzirBio(tradutor, arquivo);
+      } catch (erro) {
+        if (erro instanceof CotaEsgotada) {
+          aviso(`Cota diária do Workers AI esgotada na bio de "${arquivo}". O resto fica para o próximo run. (${erro.message})`);
+          break;
+        }
+        resultado = 'erro';
+        aviso(`bio de ${arquivo}: tradução falhou, a página vai mostrar a original. ${erro.message}`);
+      }
+      for (const r of resultado.split(', ')) contagem[`bio ${r}`] = (contagem[`bio ${r}`] ?? 0) + 1;
+      info(`  bio ${arquivo}: ${resultado}`);
+    }
   }
 
   info(`Resumo: ${Object.entries(contagem).map(([k, v]) => `${v} ${k}`).join(', ') || 'nada a fazer'}`);

@@ -145,7 +145,7 @@ const pt: Dicionario = {
   },
 
   rodape: {
-    assinatura: 'Rolado à mão. Nenhum drop patrocinado.',
+    assinatura: 'Rolado à mão. Nenhum loot patrocinado.',
     rss: 'Feed RSS',
   },
 

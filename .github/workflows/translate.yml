@@ -1,4 +1,4 @@
-# Traduz as reviews para a outra língua e commita o resultado no repositório.
+# Traduz as reviews e as bios dos autores para as outras línguas e commita o resultado no repositório.
 # A tradução fica versionada, revisável e editável, e não é refeita a cada build.
 name: Tradução das reviews
 
@@ -9,6 +9,7 @@ on:
     paths:
       - 'src/content/reviews/*/index.mdx'
       - 'src/content/reviews/*/index.md'
+      - 'src/content/autores/*.json'
   # Repescagem diária, logo depois que a cota grátis do Workers AI zera (meia-noite UTC).
   schedule:
     - cron: '30 0 * * *'
@@ -46,9 +47,9 @@ jobs:
         env:
           RELATORIO: ${{ runner.temp }}/relatorio.md
         run: |
-          # O script só escreve traduções (index.<língua>.mdx). Listar padrões por língua quebrava quando uma
-          # língua não tinha nenhum arquivo (git add falha com padrão que não encontra nada).
-          git add -A -- src/content/reviews
+          # O script só escreve traduções (index.<língua>.mdx e autores/traducoes/). Listar padrões por língua
+          # quebrava quando uma língua não tinha nenhum arquivo (git add falha com padrão que não encontra nada).
+          git add -A -- src/content/reviews src/content/autores
           if git diff --cached --quiet; then
             echo "Nenhuma tradução nova."
             exit 0
@@ -56,7 +57,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           {
-            echo "Tradução automática das reviews"
+            echo "Tradução automática das reviews e bios"
             echo
             git diff --cached --name-only | sed 's/^/- /'
             if [ -s "$RELATORIO" ]; then

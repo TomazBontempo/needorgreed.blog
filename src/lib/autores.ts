@@ -10,8 +10,9 @@
  *      mas sem ele o limite é de 60 requisições por hora).
  *   2. SITE.autorPadrao, para desenvolvimento local ou se a API falhar.
  */
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { SITE } from '../site.config';
+import type { Idioma } from '../i18n';
 
 export interface Autoria {
   /** Login do GitHub de quem criou o arquivo. */
@@ -120,4 +121,16 @@ export interface AutorResolvido {
 export async function autorDoLogin(login: string): Promise<AutorResolvido> {
   const autor = (await mapaDeAutores()).get(login.toLowerCase());
   return { nick: autor?.data.nick ?? login, login, slug: autor?.id ?? login.toLowerCase(), autor };
+}
+
+/**
+ * A bio do autor numa língua do site: a tradução, se existir, ou a original (com a língua dela,
+ * para o atributo lang). Sem bio, undefined.
+ */
+export async function bioEm(autor: Autor | undefined, idioma: Idioma): Promise<{ texto: string; idioma: Idioma } | undefined> {
+  if (!autor?.data.bio) return undefined;
+  const original = { texto: autor.data.bio, idioma: autor.data.idioma };
+  if (autor.data.idioma === idioma) return original;
+  const traducao = await getEntry('biosTraduzidas', `${autor.id}/${idioma}`);
+  return traducao ? { texto: traducao.data.bio, idioma } : original;
 }

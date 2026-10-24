@@ -24,7 +24,10 @@ const camposReview = ({ image }: SchemaContext) =>
     /** Frase de efeito em itálico no pé do tooltip. */
     frase: z.string().optional(),
     /** Atributos do item, ex.: { nome: "Nostalgia", valor: "+12" }. */
-    atributos: z.array(z.object({ nome: z.string(), valor: z.string() })).default([]),
+    /** Sempre dois atributos: a ficha tem lugar fixo para eles (regra do Tomaz). */
+    atributos: z
+      .array(z.object({ nome: z.string().min(1), valor: z.string().min(1) }))
+      .length(2, 'Toda review tem exatamente 2 atributos.'),
     tags: z.array(z.string()).default([]),
     rascunho: z.boolean().default(false),
     /** Língua em que o arquivo está escrito. No original, é a língua da review. */
@@ -79,7 +82,29 @@ const autores = defineCollection({
       github: z.string(),
       avatar: image().optional(),
       bio: z.string().optional(),
+      /** Língua em que a bio foi escrita. As outras são traduzidas pelo npm run translate. */
+      idioma: z.enum(['pt', 'en', 'es']).default('pt'),
     }),
 });
 
-export const collections = { reviews, traducoes, autores };
+/**
+ * Bios traduzidas: uma por autor e língua, geradas pelo npm run translate, como as reviews.
+ *   src/content/autores/traducoes/snufupugos.en.json   -> id "snufupugos/en"
+ */
+const biosTraduzidas = defineCollection({
+  loader: glob({
+    pattern: '*.{pt,en,es}.json',
+    base: './src/content/autores/traducoes',
+    generateId: ({ entry }) => entry.replace(/\.(pt|en|es)\.json$/, '/$1'),
+  }),
+  schema: z.object({
+    bio: z.string(),
+    /** Hash da bio original (com a língua) quando foi traduzida. */
+    origemHash: z.string(),
+    /** Revisada à mão: o script nunca sobrescreve. */
+    revisado: z.boolean().default(false),
+    modelo: z.string().optional(),
+  }),
+});
+
+export const collections = { reviews, traducoes, autores, biosTraduzidas };

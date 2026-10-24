@@ -229,10 +229,22 @@
   }
 }
 
-/* Já lida (marcado no navegador do leitor, ver Base.astro) */
-.it.lido .it-capa {
+/* Já lida (marcado no navegador do leitor, ver Base.astro): capa apagada e um carimbo no canto.
+   No pé ela quebrava a linha e deixava as fichas com alturas diferentes. */
+.it.lido .it-capa img {
   filter: saturate(0.35) brightness(0.8);
 }
-.it.lido .it-numero::after {
-  content: ' · ' attr(data-lido);
+.it.lido .it-capa::after {
+  content: attr(data-lido);
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 2px 6px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto);
+  background: rgb(15 13 11 / 0.85);
+  border: 1px solid var(--borda-forte);
 }

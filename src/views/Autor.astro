@@ -8,7 +8,7 @@ import LootLog from '../components/LootLog.astro';
 import { dicionario, formatarData, idiomaDe } from '../i18n';
 import { getReviews, versaoEm } from '../lib/reviews';
 import { getLootLog } from '../lib/lootlog';
-import type { Autor } from '../lib/autores';
+import { bioEm, type Autor } from '../lib/autores';
 import { ATRIBUTOS_LINK_EXTERNO, relCom } from '../lib/links-externos';
 
 interface Props {
@@ -24,15 +24,16 @@ const reviews = (await getReviews()).filter((r) => r.autor.slug === slug);
 const itens = await Promise.all(reviews.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma) })));
 const eventos = (await getLootLog()).eventos.filter((e) => e.autor.slug === slug);
 const entrada = eventos.findLast((e) => e.tipo === 'autor');
+const bio = await bioEm(autor, idioma);
 ---
 
-<Base titulo={nick} descricao={autor?.data.bio}>
+<Base titulo={nick} descricao={bio?.texto}>
   <div class="container">
     <TopoPagina titulo={nick}>
       <div class="perfil">
         {autor?.data.avatar && <Image src={autor.data.avatar} alt="" width={72} height={72} class="avatar" />}
         <div>
-          {autor?.data.bio && <p class="bio" lang="pt-BR">{autor.data.bio}</p>}
+          {bio && <p class="bio" lang={dicionario(bio.idioma).hreflang}>{bio.texto}</p>}
           <p class="meta mono">
             <span>{t.paginas.contagem(reviews.length)}</span>
             {entrada && <span>{t.autor.desde(formatarData(idioma, entrada.data))}</span>}

@@ -8,12 +8,15 @@ import MarcaRoll from '../components/MarcaRoll.astro';
 import { dicionario, idiomaDe, url } from '../i18n';
 import { RARIDADES, ROLL_IDS, valorDoRoll } from '../lib/raridade';
 import { getReviews } from '../lib/reviews';
+import { bioEm } from '../lib/autores';
 
 const idioma = idiomaDe(Astro);
 const t = dicionario(idioma);
 const s = t.sobre;
 const reviews = await getReviews();
-const autores = await getCollection('autores');
+const autores = await Promise.all(
+  (await getCollection('autores')).map(async (a) => ({ ...a, bio: await bioEm(a, idioma) })),
+);
 const contagem = (slug: string) => reviews.filter((r) => r.autor.slug === slug).length;
 /** Faixa do número do roll de cada raridade: "70 a 89". A última (Lendário) é só "100". */
 const faixaRoll = (min: number, i: number) => {
@@ -112,7 +115,7 @@ const faixaRoll = (min: number, i: number) => {
                   {a.data.nick}
                 </a>
                 <span class="mono n">{t.paginas.contagem(contagem(a.id))}</span>
-                {a.data.bio && <p lang="pt-BR">{a.data.bio}</p>}
+                {a.bio && <p lang={dicionario(a.bio.idioma).hreflang}>{a.bio.texto}</p>}
               </div>
             </li>
           ))

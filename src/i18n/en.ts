@@ -10,11 +10,11 @@ const en = {
   hreflang: 'en',
 
   site: {
-    descricao: 'Reviews of games, films, series and anime. Every work is a loot drop: Need, Greed or Pass.',
+    descricao: 'Reviews of games, films, series and anime. Every work is loot: Need, Greed or Pass.',
   },
 
   hero: {
-    titulo: 'Every work is a loot.',
+    titulo: 'Every work is loot.',
     descricao1: 'Reviews of games, films, series and anime.',
     descricao2: 'Rarity says how good the work is, and the roll says if it is worth your time.',
     saibaMais: 'More about our ratings',
@@ -74,7 +74,7 @@ const en = {
     para: 'for',
     rerolou: 're-rolled',
     entrou: 'joined the party',
-    vazio: 'Nothing dropped yet.',
+    vazio: 'No loot yet.',
     verTudo: 'Full log',
     lido: 'read',
   },
@@ -127,11 +127,11 @@ const en = {
   paginas: {
     jogos: 'Games',
     telas: 'Screens',
-    jogosDescricao: 'Every game that dropped, newest first.',
+    jogosDescricao: 'Every game reviewed, newest first.',
     telasDescricao: 'Films, series and anime. Newest first.',
     filtroTipo: 'Show',
     filtroTodos: 'All',
-    vazio: 'Nothing dropped here yet.',
+    vazio: 'No loot here yet.',
     contagem: (n: number) => (n === 1 ? '1 review' : `${n} reviews`),
     raridades: 'Rarities',
     faixaNota: (faixa: string) => `Score ${faixa}.`,
@@ -148,12 +148,12 @@ const en = {
   },
 
   rodape: {
-    assinatura: 'Rolled by hand. No sponsored drops.',
+    assinatura: 'Rolled by hand. No sponsored loot.',
     rss: 'RSS feed',
   },
 
   erro404: {
-    titulo: 'Nothing dropped here',
+    titulo: 'No loot here',
     texto: 'This page despawned, or never existed.',
     linhaSistema: 'The system rolled Pass (0) for [this page]',
     voltar: 'Back to the loot',
@@ -183,7 +183,7 @@ const en = {
   sobre: {
     titulo: 'How the loot works',
     intro:
-      'Every work reviewed here is treated like an item that dropped in an MMO raid. It gets two verdicts, and they are not the same thing: how good it is, and whether it is worth your time right now.',
+      'Every work reviewed here is treated like loot from an MMO raid. It gets two verdicts, and they are not the same thing: how good it is, and whether it is worth your time right now.',
     raridadeTitulo: 'Rarity: how good it is',
     raridadeTexto:
       'Comes straight from the score, 0 to 10 with one decimal. The colour of the item name tells you the rarity at a glance, anywhere on the site.',

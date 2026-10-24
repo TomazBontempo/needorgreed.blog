@@ -215,6 +215,8 @@ O Tomaz escreve em português; parceiros podem escrever em inglês ou espanhol. 
     guardado em secret da GitHub Action, nunca no repositório nem no front.
   - Nunca sugira subir para o Workers Paid nem trocar para serviço pago. Se a cota não der conta, avise o Tomaz.
 - Os comentários (Giscus) são compartilhados entre todas as versões da mesma review (mapear pelo slug, não pela URL).
+- **A bio dos autores é traduzida do mesmo jeito**: campo `idioma` no JSON do autor, traduções em
+  `src/content/autores/traducoes/<slug>.<língua>.json` (hash, `revisado: true`), lidas por `bioEm()` em `src/lib/autores.ts`.
 
 ---
 
@@ -264,7 +266,8 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
 ### Padrões estabelecidos (seguir)
 
 - **Uma ficha só.** `Item.astro` com variantes `grande`, `bolso` (listagens e carrossel) e `mini` (tooltip
-  do log). Nunca crie outro desenho de card. Estilos em `src/styles/item.css`, globais, prefixo `it-`.
+  do log). Bolso e mini mostram exatamente os mesmos dados (atributos, frase, roll com número, pé); só o
+  tamanho muda. Toda review tem **exatamente 2 atributos** (schema e painel exigem). Nunca crie outro desenho de card. Estilos em `src/styles/item.css`, globais, prefixo `it-`.
   Hover do bolso: sobe 4px, escala 1.02, borda na cor da raridade, sombra suave, 180ms, só em `(hover: hover)`;
   com movimento reduzido, só a cor da borda.
 - **Header fixo** (sticky, z-index 20) com container próprio: `--largura-cabecalho` (1600px), igual em todas
@@ -353,13 +356,15 @@ Tomadas (não reabrir sem o Tomaz pedir):
 - **Direção visual: "Fichário de Loot"**, sem nada de card game (nada de foil, holográfico ou carta de TCG:
   o Tomaz vetou). Cada review é uma ficha de item com número de coleção (Nº 009), borda na cor da raridade
   e uma segunda borda solta por fora.
-- **Copy do hero:** "Every work is a loot." / "Cada obra é um loot." / "Cada obra es un loot.";
+- **Copy do hero:** "Every work is loot." / "Cada obra é um loot." / "Cada obra es un loot.";
   depois "Reviews of games, films, series and anime." e "Rarity says how good the work is, and the roll
   says if it is worth your time." em duas linhas; uma linha em branco; o link "More about our ratings" /
   "Saiba mais sobre nossas notas" / "Más sobre nuestras notas".
 - **Sem raridade Herança** (removida pelo Tomaz em 2026-10-24: não fazia sentido fora da escala).
   Obra de valor afetivo se avisa no texto da review.
 - **"Loot" também em espanhol** (nada de "botín"): "Más loot", "Cómo funciona el loot".
+- **Destaque da home com o título primeiro**, igual à página da review (consistência entre a prévia e a página).
+- **Review já lida:** capa apagada e carimbo "lido" no canto da capa (nunca no pé da ficha, que quebrava a linha).
 - **Número do roll:** nota vezes 10 (0 a 100), sempre dentro da faixa da raridade. `valorDoRoll()`.
 - **Tipografia:** Big Shoulders (display), Literata (texto), Fragment Mono (sistema), via API de fontes
   do Astro (`fonts` no astro.config, baixadas no build).
@@ -373,9 +378,6 @@ Tomadas (não reabrir sem o Tomaz pedir):
 Em aberto:
 - **Logo.** O d100 de traço é placeholder.
 - **Home mobile:** hoje é um carrossel de fichas (ver "Padrões"). O Tomaz disse que vai rever o mobile depois.
-- **Destaque da home:** na página da review o título vem antes da linha de roll; no destaque da home ainda
-  vem depois. Perguntar se deve seguir a página da review.
-- **Bio de autor em inglês:** só existe `bio` (em português). Um campo `bio_en` resolveria.
 - **Fechamento da Impeccable:** a crítica rodou em 2026-10-24 (ver ESTADO.md); falta a auditoria (`audit`)
   e o `DESIGN.md` gerado do site pronto.
 
