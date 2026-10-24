@@ -46,7 +46,9 @@ jobs:
         env:
           RELATORIO: ${{ runner.temp }}/relatorio.md
         run: |
-          git add 'src/content/reviews/*/index.en.mdx' 'src/content/reviews/*/index.pt.mdx' 'src/content/reviews/*/index.es.mdx'
+          # O script só escreve traduções (index.<língua>.mdx). Listar padrões por língua quebrava quando uma
+          # língua não tinha nenhum arquivo (git add falha com padrão que não encontra nada).
+          git add -A -- src/content/reviews
           if git diff --cached --quiet; then
             echo "Nenhuma tradução nova."
             exit 0
