@@ -120,17 +120,15 @@ os filtros do Arquivo em fileiras. O desktop foi conferido pixel a pixel e não 
 
 - **Vocabulário em espanhol a revisar** por alguém que fale espanhol: "Pantallas", "Acerca", nomes das
   raridades e a linha de roll ("Snufupugos tiró Need (94) por [Outer Wilds]").
-- **Ficha com rodapé desigual** quando aparece a marca "read" de review já lida (P3 da crítica).
-  O Tomaz quer ver a proposta antes de mudar.
 - **Adiados pelo Tomaz (resolver mais à frente):** a auditoria da Impeccable (`audit`) e o `DESIGN.md`;
-  a revisão do mobile; o logo (o d100 de traço ainda é placeholder).
+  o logo (o d100 de traço ainda é placeholder). O mobile já foi revisto (ver "Onde paramos").
 - **Decidido não mexer:** o progresso de leitura mostra "1% lido" no topo de review longa e "100% lido"
   de cara em review curta. Fica como está (decisão do Tomaz).
 - Resolvidos depois da crítica: raridade e nota no celular (na meta da review, abaixo de 900px), os
-  filtros do Arquivo com 24px de altura de toque e a marca de "lido" (virou carimbo na capa).
-- **Pé da ficha ainda quebra em duas linhas** quando o nome da raridade é longo ("Lixo de vendedor · 2.1"
-  em 1280; "Lendário · 10.0" na ficha em linha do celular). Não tem a ver com o "lido".
-- **Plataforma e duração** somem da review no celular junto com a lateral (só raridade e nota foram trazidas).
+  filtros do Arquivo com 24px de altura de toque e a marca de "lido" (virou carimbo na capa). No celular,
+  o veredito compacto da review também traz plataforma e duração.
+- **Pé da ficha no desktop** ainda quebra em duas linhas quando o nome da raridade é longo ("Lixo de vendedor
+  · 2.1" em 1280). No celular já fica sempre numa linha.
 - **Bio traduzida** (2026-10-24): implementada e testada com `--mock`; a primeira tradução de verdade sai
   na Action quando houver token.
 - **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
