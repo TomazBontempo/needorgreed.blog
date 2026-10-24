@@ -28,7 +28,7 @@ const camposReview = ({ image }: SchemaContext) =>
     tags: z.array(z.string()).default([]),
     rascunho: z.boolean().default(false),
     /** Língua em que o arquivo está escrito. No original, é a língua da review. */
-    idioma: z.enum(['pt', 'en']).default('pt'),
+    idioma: z.enum(['pt', 'en', 'es']).default('pt'),
   });
 
 /**
@@ -52,9 +52,9 @@ const reviews = defineCollection({
  */
 const traducoes = defineCollection({
   loader: glob({
-    pattern: '*/index.{pt,en}.mdx',
+    pattern: '*/index.{pt,en,es}.mdx',
     base: './src/content/reviews',
-    generateId: ({ entry }) => entry.replace(/\/index\.(pt|en)\.mdx$/, '/$1'),
+    generateId: ({ entry }) => entry.replace(/\/index\.(pt|en|es)\.mdx$/, '/$1'),
   }),
   schema: (ctx) =>
     camposReview(ctx).extend({

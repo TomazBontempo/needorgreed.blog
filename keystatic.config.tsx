@@ -98,10 +98,11 @@ export default config({
         }),
         idioma: fields.select({
           label: 'Idioma do texto',
-          description: 'A versão na outra língua é traduzida automaticamente depois do Salvar.',
+          description: 'As versões nas outras línguas são traduzidas automaticamente depois do Salvar.',
           options: [
             { label: 'Português', value: 'pt' },
             { label: 'Inglês', value: 'en' },
+            { label: 'Espanhol', value: 'es' },
           ],
           defaultValue: 'pt',
         }),

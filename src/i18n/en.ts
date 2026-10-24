@@ -1,6 +1,6 @@
 /**
  * Textos de interface em inglês. É o idioma padrão e define o formato do dicionário:
- * src/i18n/pt.ts precisa ter exatamente as mesmas chaves.
+ * src/i18n/pt.ts e src/i18n/es.ts precisam ter exatamente as mesmas chaves.
  */
 const en = {
   idioma: 'en',
@@ -28,11 +28,20 @@ const en = {
     pularParaConteudo: 'Skip to content',
   },
 
-  idiomaToggle: {
-    /** Nome do OUTRO idioma, escrito nele mesmo, para quem não lê este. */
-    rotulo: 'Ler em português',
-    curto: 'PT',
-    atual: 'English',
+  seletor: {
+    rotulo: 'Language',
+    aria: 'Choose the site language',
+  },
+
+  /** Nome de cada língua, escrito nesta língua (usado na faixa de sugestão). */
+  nomesIdiomas: { en: 'English', pt: 'Portuguese', es: 'Spanish' },
+
+  /** Faixa de sugestão: escrita na língua sugerida, para quem lê essa língua. */
+  sugestao: {
+    rotulo: 'Language suggestion',
+    texto: 'This page is also available in English.',
+    ir: 'Read in English',
+    ficar: (nome: string) => `Stay in ${nome}`,
   },
 
   raridades: {
@@ -60,7 +69,7 @@ const en = {
 
   log: {
     titulo: 'Loot log',
-    // "Snufupugos rolled Need (94) for [Outer Wilds]". A ordem é a mesma nas duas línguas.
+    // "Snufupugos rolled Need (94) for [Outer Wilds]". A ordem é a mesma nas três línguas.
     rolou: 'rolled',
     para: 'for',
     atualizou: 'updated',
@@ -98,9 +107,17 @@ const en = {
     tags: 'Tags',
     plataforma: 'Platform',
     duracao: 'Length',
-    traduzidoDe: { pt: 'Machine translated from Portuguese.', en: 'Machine translated from English.' },
+    traduzidoDe: {
+      pt: 'Machine translated from Portuguese.',
+      en: 'Machine translated from English.',
+      es: 'Machine translated from Spanish.',
+    },
     verOriginal: 'Read the original',
-    semTraducao: { pt: 'Not translated yet, showing the Portuguese original.', en: 'Not translated yet, showing the English original.' },
+    semTraducao: {
+      pt: 'Not translated yet, showing the Portuguese original.',
+      en: 'Not translated yet, showing the English original.',
+      es: 'Not translated yet, showing the Spanish original.',
+    },
   },
 
   paginas: {
@@ -184,9 +201,9 @@ const en = {
     logTitulo: 'The loot log',
     logTexto:
       'The column of system messages records what happens on the site: a review rolled, a review updated, someone new joining the party. The archive keeps the full log.',
-    traducaoTitulo: 'Two languages',
+    traducaoTitulo: 'Three languages',
     traducaoTexto:
-      'Reviews are written in Portuguese or English and the other version is machine translated, with a note at the top and a link to the original. Comments are shared between both versions.',
+      'Reviews are written in English, Portuguese or Spanish, and the other versions are machine translated, with a note at the top and a link to the original. Comments are shared between all versions.',
     quemTitulo: 'Who rolls the dice',
     quemTexto: 'Each review is signed by the GitHub account that created it. Nobody gets to pick their own byline.',
     verRaridade: (nome: string) => `All ${nome} reviews`,

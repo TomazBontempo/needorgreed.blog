@@ -104,8 +104,9 @@
 }
 .it-pe {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 8px;
+  gap: 2px 8px;
   margin: 0;
   padding-top: 8px;
   border-top: 1px solid var(--borda);
@@ -113,8 +114,13 @@
   color: var(--texto-3);
 }
 .it-raridade {
+  margin-left: auto;
   color: var(--cor);
   text-align: right;
+}
+/* Cada metade do rodapé quebra inteira (em espanhol "N.º 005 · Pantallas" e "Poco común · 6.2" são longos). */
+.it-pe > span {
+  white-space: nowrap;
 }
 
 /* Bolso: a ficha nas listagens. A ficha inteira é clicável: o link do nome cobre o item todo. */

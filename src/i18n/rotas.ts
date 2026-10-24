@@ -1,14 +1,15 @@
 /**
- * Rotas por idioma. Inglês na raiz, português em /pt/.
+ * Rotas por idioma. Inglês na raiz; as outras línguas com prefixo (/pt/, /es/).
  *
  *   en  /games/            /rarity/epic/        /reviews/outer-wilds/
  *   pt  /pt/jogos/         /pt/raridade/epico/  /pt/reviews/outer-wilds/
+ *   es  /es/juegos/        /es/rareza/epico/    /es/reviews/outer-wilds/
  *
  * Este arquivo não importa nada do Astro: o Worker (src/worker.ts) usa as mesmas funções
  * para mandar o leitor para a versão certa de cada página.
  */
 
-export const IDIOMAS = ['en', 'pt'] as const;
+export const IDIOMAS = ['en', 'pt', 'es'] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 export const IDIOMA_PADRAO: Idioma = 'en';
 
@@ -17,26 +18,26 @@ export function ehIdioma(valor: unknown): valor is Idioma {
 }
 
 export const SECOES = {
-  jogos: { en: 'games', pt: 'jogos' },
-  telas: { en: 'screens', pt: 'telas' },
-  arquivo: { en: 'archive', pt: 'arquivo' },
-  sobre: { en: 'about', pt: 'sobre' },
-  raridade: { en: 'rarity', pt: 'raridade' },
-  autores: { en: 'authors', pt: 'autores' },
-  reviews: { en: 'reviews', pt: 'reviews' },
+  jogos: { en: 'games', pt: 'jogos', es: 'juegos' },
+  telas: { en: 'screens', pt: 'telas', es: 'pantallas' },
+  arquivo: { en: 'archive', pt: 'arquivo', es: 'archivo' },
+  sobre: { en: 'about', pt: 'sobre', es: 'acerca' },
+  raridade: { en: 'rarity', pt: 'raridade', es: 'rareza' },
+  autores: { en: 'authors', pt: 'autores', es: 'autores' },
+  reviews: { en: 'reviews', pt: 'reviews', es: 'reviews' },
 } as const satisfies Record<string, Record<Idioma, string>>;
 
 export type Secao = keyof typeof SECOES;
 
 /** Slug de cada raridade na URL. A chave é o id interno (src/lib/raridade.ts). */
 export const SLUGS_RARIDADE = {
-  lixo: { en: 'vendor-trash', pt: 'lixo' },
-  comum: { en: 'common', pt: 'comum' },
-  incomum: { en: 'uncommon', pt: 'incomum' },
-  raro: { en: 'rare', pt: 'raro' },
-  epico: { en: 'epic', pt: 'epico' },
-  lendario: { en: 'legendary', pt: 'lendario' },
-  heranca: { en: 'heirloom', pt: 'heranca' },
+  lixo: { en: 'vendor-trash', pt: 'lixo', es: 'basura' },
+  comum: { en: 'common', pt: 'comum', es: 'comun' },
+  incomum: { en: 'uncommon', pt: 'incomum', es: 'poco-comun' },
+  raro: { en: 'rare', pt: 'raro', es: 'raro' },
+  epico: { en: 'epic', pt: 'epico', es: 'epico' },
+  lendario: { en: 'legendary', pt: 'lendario', es: 'legendario' },
+  heranca: { en: 'heirloom', pt: 'heranca', es: 'herencia' },
 } as const satisfies Record<string, Record<Idioma, string>>;
 
 const prefixo = (idioma: Idioma) => (idioma === IDIOMA_PADRAO ? '' : `/${idioma}`);
@@ -49,12 +50,13 @@ export function url(idioma: Idioma, secao?: Secao, param?: string): string {
   return `${prefixo(idioma)}/${SECOES[secao][idioma]}/${p ? `${p}/` : ''}`;
 }
 
-/** Idioma de um caminho: tudo que começa com /pt é português. */
+/** Idioma de um caminho pelo prefixo: /pt/... é português, /es/... é espanhol, o resto é inglês. */
 export function idiomaDoCaminho(pathname: string): Idioma {
-  return pathname === '/pt' || pathname.startsWith('/pt/') ? 'pt' : 'en';
+  const primeiro = pathname.split('/')[1];
+  return ehIdioma(primeiro) && primeiro !== IDIOMA_PADRAO ? primeiro : IDIOMA_PADRAO;
 }
 
-/** O mesmo caminho na outra língua. Caminhos desconhecidos só trocam o prefixo. */
+/** O mesmo caminho em outra língua. Caminhos desconhecidos só trocam o prefixo. */
 export function caminhoEm(pathname: string, para: Idioma): string {
   const de = idiomaDoCaminho(pathname);
   const semPrefixo = de === IDIOMA_PADRAO ? pathname : pathname.slice(de.length + 1) || '/';

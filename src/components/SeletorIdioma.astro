@@ -1,0 +1,138 @@
+---
+/**
+ * Seletor de idioma do header: o idioma atual e, ao abrir, as três línguas, cada uma escrita
+ * nela mesma (quem não lê a língua atual ainda acha a sua). Sem bandeira: bandeira é país.
+ *
+ * <details> abre e fecha sem JavaScript. Cada link leva ?lang=xx: o Worker grava o cookie e
+ * redireciona para a mesma página na outra língua. O script do Base.astro também grava o cookie
+ * no clique, para funcionar onde o Worker não roda (astro dev).
+ */
+import { AUTONIMOS, IDIOMAS, destinoDaTroca, dicionario, type Idioma } from '../i18n';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const t = dicionario(idioma);
+---
+
+<details class="seletor-idioma" data-seletor-idioma>
+  <summary aria-label={`${t.seletor.aria}: ${AUTONIMOS[idioma]}`}>
+    <span class="codigo">{idioma.toUpperCase()}</span>
+    <span class="nome">{AUTONIMOS[idioma]}</span>
+    <svg class="seta" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+      <path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+    </svg>
+  </summary>
+  <ul>
+    {
+      IDIOMAS.map((l) => (
+        <li>
+          <a
+            href={`${destinoDaTroca(Astro.url.pathname, l)}?lang=${l}`}
+            hreflang={dicionario(l).hreflang}
+            lang={dicionario(l).hreflang}
+            data-idioma={l}
+            aria-current={l === idioma ? 'true' : undefined}
+          >
+            <span class="codigo">{l.toUpperCase()}</span>
+            {AUTONIMOS[l]}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</details>
+
+<script>
+  // Fecha com Esc (devolvendo o foco ao botão) e com clique fora.
+  document.querySelectorAll<HTMLDetailsElement>('[data-seletor-idioma]').forEach((d) => {
+    d.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && d.open) {
+        d.open = false;
+        d.querySelector('summary')?.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (d.open && !d.contains(e.target as Node)) d.open = false;
+    });
+  });
+</script>
+
+<style>
+  .seletor-idioma {
+    position: relative;
+  }
+  summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--borda-forte);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    color: var(--texto-2);
+    white-space: nowrap;
+    cursor: pointer;
+    list-style: none;
+    transition:
+      border-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover,
+  .seletor-idioma[open] summary {
+    border-color: var(--ouro);
+    color: var(--texto);
+  }
+  .codigo {
+    color: var(--ouro);
+  }
+  .seta {
+    transition: transform 0.2s var(--ease);
+  }
+  .seletor-idioma[open] .seta {
+    transform: rotate(180deg);
+  }
+  ul {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 30;
+    min-width: 100%;
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+    background: var(--painel);
+    border: 1px solid var(--borda-forte);
+    box-shadow: 0 12px 28px -10px rgb(0 0 0 / 0.7);
+  }
+  ul a {
+    display: flex;
+    gap: 10px;
+    padding: 8px 14px;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--texto-2);
+    text-decoration: none;
+    white-space: nowrap;
+    border-left: 2px solid transparent;
+  }
+  ul a:hover,
+  ul a:focus-visible {
+    color: var(--texto);
+    background: var(--painel-fundo);
+  }
+  ul a[aria-current='true'] {
+    color: var(--texto);
+    border-left-color: var(--ouro);
+  }
+  @media (max-width: 720px) {
+    summary .nome {
+      display: none;
+    }
+  }
+</style>

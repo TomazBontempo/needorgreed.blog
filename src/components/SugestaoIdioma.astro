@@ -1,0 +1,129 @@
+---
+/**
+ * Faixa de sugestão de idioma: "Esta página também está em português. Ler em português · Continuar em inglês".
+ *
+ * Só aparece quando o leitor ainda não escolheu um idioma (sem cookie) e o idioma do navegador
+ * (navigator.languages) é uma das nossas línguas, diferente da página. Nunca redireciona.
+ * Cada faixa é escrita na língua sugerida, para quem lê essa língua. Fica fixa no pé da tela
+ * para não empurrar a página depois de carregar.
+ *
+ * "Ler em ..." leva ?lang=xx (o Worker grava o cookie). "Continuar em ..." grava o idioma da página.
+ */
+import { IDIOMAS, destinoDaTroca, dicionario, type Idioma } from '../i18n';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const outras = IDIOMAS.filter((l) => l !== idioma);
+---
+
+{
+  outras.map((l) => {
+    const t = dicionario(l);
+    return (
+      <aside class="sugestao-idioma" data-sugestao={l} lang={t.hreflang} aria-label={t.sugestao.rotulo} hidden>
+        <p>{t.sugestao.texto}</p>
+        <div class="acoes">
+          <a href={`${destinoDaTroca(Astro.url.pathname, l)}?lang=${l}`} hreflang={t.hreflang} data-idioma={l}>
+            {t.sugestao.ir}
+          </a>
+          <button type="button" data-ficar={idioma}>
+            {t.sugestao.ficar(t.nomesIdiomas[idioma])}
+          </button>
+        </div>
+      </aside>
+    );
+  })
+}
+
+<script>
+  import { idiomaDoNavegador } from '../i18n/preferencia';
+  import { idiomaDoCaminho } from '../i18n/rotas';
+
+  const temEscolha = /(?:^|;\s*)lang=/.test(document.cookie);
+  const atual = idiomaDoCaminho(location.pathname);
+  const preferido = idiomaDoNavegador(navigator.languages ?? [navigator.language]);
+  const faixa = document.querySelector<HTMLElement>(`[data-sugestao="${preferido}"]`);
+
+  if (!temEscolha && preferido !== atual && faixa) {
+    faixa.hidden = false;
+    faixa.querySelector<HTMLButtonElement>('[data-ficar]')?.addEventListener('click', (e) => {
+      const lang = (e.currentTarget as HTMLButtonElement).dataset.ficar!;
+      const umAno = 60 * 60 * 24 * 365;
+      document.cookie = `lang=${lang}; Path=/; Max-Age=${umAno}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+      try {
+        localStorage.setItem('lang', lang);
+      } catch {}
+      faixa.hidden = true;
+    });
+  }
+</script>
+
+<style>
+  .sugestao-idioma {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 40;
+    max-width: min(440px, calc(100vw - 32px));
+    padding: 14px 16px;
+    background: var(--painel);
+    border: 1px solid var(--ouro);
+    outline: 1px solid var(--borda);
+    outline-offset: 3px;
+    box-shadow: 0 16px 36px -12px rgb(0 0 0 / 0.8);
+    animation: entrar 220ms var(--ease) both;
+  }
+  .sugestao-idioma[hidden] {
+    display: none;
+  }
+  p {
+    margin: 0 0 10px;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+  .acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+  }
+  .acoes a::after {
+    content: ' \2192';
+  }
+  button {
+    padding: 0;
+    background: none;
+    border: 0;
+    font: inherit;
+    color: var(--texto-2);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+  button:hover {
+    color: var(--texto);
+  }
+  @keyframes entrar {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sugestao-idioma {
+      animation: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .sugestao-idioma {
+      right: 16px;
+      left: 16px;
+      bottom: 16px;
+      max-width: none;
+    }
+  }
+</style>

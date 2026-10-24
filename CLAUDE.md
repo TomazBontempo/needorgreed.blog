@@ -108,7 +108,7 @@ O nick vem do autor, o item é colorido pela raridade, o roll pela cor do roll.
 
 Desktop (tudo isso cabe na primeira tela; ver "Padrões estabelecidos"):
 
-1. **Header:** logo à esquerda; Jogos, Telas, Arquivo, Sobre e o toggle de idioma à direita. Fixo no topo.
+1. **Header:** logo à esquerda; Jogos, Telas, Arquivo, Sobre e o seletor de idioma à direita. Fixo no topo.
 2. **Hero:** três linhas (as duas frases da tagline e a descrição), sem fundo próprio nem bordas.
 3. **Destaque: a review mais recente, estilo post do Reddit**, sob o título "Última crítica". O texto
    **completo**, numa janela de altura fixa com rolagem interna, sem a ficha do item. No fim, o link
@@ -141,41 +141,55 @@ Mobile: header compacto, só a descrição do hero e um carrossel de fichas em o
 
 ---
 
-## Idiomas (inglês e português)
+## Idiomas (inglês, português e espanhol)
 
-### Regra de idioma para o leitor
+O site existe em **inglês** (padrão, na raiz), **português do Brasil** (`/pt/`) e **espanhol neutro da
+América Latina** (`/es/`, es-419: "tú", nunca "vosotros", sem regionalismos da Espanha). Portugal e os
+outros países lusófonos recebem o português do Brasil.
 
-1. **Preferência salva vence tudo.** Se o leitor já escolheu um idioma no toggle, use esse.
-2. **Sem preferência salva:** visitante do **Brasil ou de Portugal** vê **português**. Qualquer outro país vê **inglês**.
-3. **Toggle de idioma** sempre visível no header. Em português, ele precisa deixar óbvio como voltar para o inglês.
-   A escolha é salva no navegador e respeitada em todas as visitas seguintes, sem o leitor precisar trocar de novo.
+### Regra de idioma para o leitor (decisão do Tomaz, baseada no que o Google e a Wikipedia fazem)
 
-Portugal recebe o português do Brasil (não existe versão pt-PT).
+1. **Escolha salva vence tudo.** Se o leitor escolheu um idioma (seletor ou faixa de sugestão), essa escolha
+   vale em qualquer página, em todas as visitas.
+2. **Sem escolha salva, só a home (`/`) redireciona**, pelo **idioma do navegador** (`Accept-Language`):
+   navegador em português vai para `/pt/`, em espanhol para `/es/`, qualquer outro fica no inglês.
+3. **Qualquer outro link abre na língua do próprio link.** Uma review compartilhada em `/pt/` abre em
+   português para qualquer pessoa. Se o navegador do leitor for de outra das nossas línguas, aparece a
+   **faixa de sugestão** ("Esta página também está em português. Ler em português · Continuar em inglês"),
+   escrita na língua sugerida. Nunca redirecionar uma página com conteúdo por palpite.
+4. **O país não decide nada.** IP diz onde a pessoa está, não o que ela lê. Não volte a usar `cf.country`.
+5. **Seletor de idioma** sempre visível no header, com as línguas escritas nelas mesmas (English, Português,
+   Español) e sem bandeiras (bandeira é país, não língua).
 
 ### Como implementar
 
-- **URLs por idioma:** inglês na raiz (`/`, `/reviews/<slug>/`) e português em `/pt/` (`/pt/reviews/<slug>/`).
-  As duas versões são páginas estáticas geradas no build. Use o i18n nativo do Astro.
-- **Detecção no edge:** o Worker da Cloudflare lê o país em `request.cf.country` e a preferência num **cookie**
-  (`lang`), e redireciona para a versão certa **antes** de servir a página, sem flash de idioma errado.
-  Cookie e não só `localStorage`, porque o servidor precisa ler a escolha. Pode espelhar em `localStorage`.
-  - Atenção: na Cloudflare Workers, arquivos estáticos são servidos **sem passar pelo Worker** por padrão.
-    Configure `assets.run_worker_first` (no `wrangler.jsonc`) para as rotas HTML, deixando `/_astro/*` e imagens
-    fora, e confirme com `npx wrangler dev` que o redirecionamento acontece.
-  - Só redirecione quando não houver cookie e o idioma da URL não bater com o país. Depois que o leitor escolher,
-    nunca force outro idioma. Links diretos para `/pt/...` compartilhados por alguém devem funcionar.
-  - Não redirecione bots de busca. Coloque `hreflang` (en, pt-BR, x-default) e `canonical` em todas as páginas.
-- **Textos de interface:** dicionários `src/i18n/en.ts` e `src/i18n/pt.ts` (nav, rótulos, nomes de raridade,
-  datas, 404, Sobre). Nomes de raridade em inglês: Vendor Trash, Common, Uncommon, Rare, Epic, Legendary, Heirloom.
-  Need, Greed e Pass ficam iguais nas duas línguas. Datas formatadas com o locale do idioma.
+- **URLs por idioma:** inglês na raiz, `/pt/` e `/es/`, com os nomes das seções traduzidos (tabela em
+  `src/i18n/rotas.ts`). Todas as versões são páginas estáticas geradas no build, com o i18n nativo do Astro.
+- **Decisão no edge:** `src/worker.ts` chama `decidir()` (`src/i18n/deteccao.ts`) antes de servir a página.
+  A leitura do idioma do navegador fica em `src/i18n/preferencia.ts`, usada também pela faixa no navegador
+  (`navigator.languages`). Escolha salva num **cookie** `lang` (o servidor precisa ler), espelhada em `localStorage`.
+  - Na Cloudflare Workers, arquivos estáticos são servidos **sem passar pelo Worker** por padrão. O
+    `assets.run_worker_first` (no `wrangler.jsonc`) cobre as rotas HTML, deixando `/_astro/*`, imagens, vídeos
+    e `/fichas/` fora. Confirme com `npx wrangler dev`.
+  - A home responde com `Vary: Accept-Language, Cookie`. Redirecionamentos são 302 com `Cache-Control: private, no-store`.
+  - Não redirecione bots de busca (o Googlebot nem manda `Accept-Language` e rastreia de IPs dos EUA).
+- **SEO:** `hreflang` (en, pt-BR, es, x-default em inglês) e `canonical` em todas as páginas, e o mesmo
+  conjunto no `sitemap.xml` (`src/pages/sitemap.xml.ts`), citado no `robots.txt`.
+- **Textos de interface:** dicionários `src/i18n/en.ts`, `pt.ts` e `es.ts` (nav, rótulos, nomes de raridade,
+  datas, 404, Sobre, seletor, faixa). Nomes de raridade em inglês: Vendor Trash, Common, Uncommon, Rare, Epic,
+  Legendary, Heirloom; em espanhol: Basura de vendedor, Común, Poco común, Raro, Épico, Legendario, Herencia.
+  Need, Greed e Pass ficam iguais nas três línguas. Datas formatadas com o locale do idioma.
+- **Nova língua no futuro:** `IDIOMAS` em `rotas.ts` (e no `scripts/translate.mjs`), um dicionário novo,
+  as seções e os slugs de raridade em `rotas.ts`, as rotas em `src/pages/<código>/`, o locale no
+  `astro.config.mjs` e a opção no campo "Idioma do texto" do `keystatic.config.tsx`.
 
 ### Tradução automática das reviews
 
-O Tomaz escreve em português; parceiros podem escrever em inglês. A outra versão é **gerada automaticamente**.
+O Tomaz escreve em português; parceiros podem escrever em inglês ou espanhol. As outras versões são **geradas automaticamente**.
 
-- Cada review tem o campo `idioma` (`pt` ou `en`, padrão `pt`) indicando a língua original.
-- Um script (`npm run translate`) gera a versão na outra língua como arquivo ao lado do original:
-  `src/content/reviews/<slug>/index.mdx` (original) e `index.en.mdx` ou `index.pt.mdx` (tradução).
+- Cada review tem o campo `idioma` (`pt`, `en` ou `es`, padrão `pt`) indicando a língua original.
+- Um script (`npm run translate`) gera as versões nas outras línguas como arquivos ao lado do original:
+  `src/content/reviews/<slug>/index.mdx` (original) e `index.en.mdx`, `index.pt.mdx`, `index.es.mdx` (traduções).
   Traduz: corpo, `frase`, `motivoRoll`, nomes dos `atributos` e `tags`. Mantém: título da obra, números,
   datas, imagens, componentes MDX (`<YouTube />`) e formatação Markdown intactos.
 - O script roda numa **GitHub Action** a cada push que mexe em reviews e **commita a tradução** no repositório.
@@ -199,7 +213,7 @@ O Tomaz escreve em português; parceiros podem escrever em inglês. A outra vers
   - A Action chama a API REST do Workers AI com um token da Cloudflare com permissão só de Workers AI,
     guardado em secret da GitHub Action, nunca no repositório nem no front.
   - Nunca sugira subir para o Workers Paid nem trocar para serviço pago. Se a cota não der conta, avise o Tomaz.
-- Os comentários (Giscus) são compartilhados entre as duas versões da mesma review (mapear pelo slug, não pela URL).
+- Os comentários (Giscus) são compartilhados entre todas as versões da mesma review (mapear pelo slug, não pela URL).
 
 ---
 
@@ -228,12 +242,14 @@ O Tomaz escreve em português; parceiros podem escrever em inglês. A outra vers
 ### Estrutura (o protótipo já foi substituído; não existe mais pasta de protótipo)
 
 ```
-src/worker.ts              Worker: idioma (cookie, país, ?lang=) e depois o handler do Astro
-src/i18n/                  en.ts e pt.ts (dicionários), rotas.ts (URLs por idioma), deteccao.ts (regra de idioma)
+src/worker.ts              Worker: idioma (?lang=, cookie, Accept-Language só na home) e depois o handler do Astro
+src/i18n/                  en.ts, pt.ts, es.ts (dicionários), rotas.ts (URLs por idioma), deteccao.ts (regra),
+                           preferencia.ts (idioma do navegador, usado no Worker e na faixa)
 src/views/                 páginas de verdade: Home, Review, Secao (Jogos/Telas), Raridade, Autor, Arquivo, Sobre, NaoEncontrado
 src/pages/                 rotas finas por idioma: games.astro chama views/Secao; pt/jogos.astro idem
 src/components/            Item (a ficha), LootLog, DestaqueHome, ReviewCompleta, LateralReview, CabecalhoReview,
-                           LinhaRoll, MarcaRoll, Fichario, Prosa, Figure, Clipe, YouTube, mdx.ts (mapa do MDX)
+                           LinhaRoll, MarcaRoll, Fichario, Prosa, Figure, Clipe, YouTube, mdx.ts (mapa do MDX),
+                           SeletorIdioma (header), SugestaoIdioma (faixa fixa no pé da tela)
 src/lib/                   reviews (versaoEm por idioma), lootlog + lootlog-eventos (puro, testável), autores,
                            comentarios (contagem Giscus), caminhos (getStaticPaths), rss, raridade
 src/integrations/          limite-arquivos.ts: barra arquivo > 25 MB e imagem estragada pelo painel
@@ -275,7 +291,8 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   as mesmas chaves. Plural sempre por função do dicionário, nunca por troca de número no texto.
 - **Testes visuais:** Playwright com o Chromium já instalado em `~/.cache/ms-playwright`, rodando fora do
   repositório. Para servir o build estático: `python3 -m http.server 4400 -d dist/client`. Para o Worker:
-  `npm run build && npx wrangler dev`, simulando o país com o header `cf-ipcountry`.
+  `npm run build && npx wrangler dev`, simulando o navegador com o header `Accept-Language`. No Playwright,
+  `locale: 'es-MX'` no contexto muda o `navigator.languages` (para testar a faixa de sugestão).
 - **Não use `pkill -f` com padrões que aparecem no próprio comando** (mata o shell). Guarde o PID.
 
 ---
@@ -328,7 +345,10 @@ Tomadas (não reabrir sem o Tomaz pedir):
   do Astro (`fonts` no astro.config, baixadas no build).
 - **URLs traduzidas:** `/games/` e `/pt/jogos/`, `/rarity/epic/` e `/pt/raridade/epico/`, `/archive/`,
   `/about/`, `/authors/`. Só `/reviews/<slug>/` é igual nas duas. Tabela em `src/i18n/rotas.ts`.
-- **Modelo de tradução:** `@cf/google/gemma-4-26b-a4b-it` (Workers AI Free, ~150 neurons por review).
+- **Modelo de tradução:** `@cf/google/gemma-4-26b-a4b-it` (Workers AI Free, ~150 neurons por review e por língua).
+- **Três línguas:** inglês, português do Brasil e espanhol neutro da América Latina. Idioma pelo navegador,
+  não pelo país; só a home redireciona; faixa de sugestão fixa no pé da tela (no topo ela empurraria a
+  página depois de carregar). Ver "Idiomas".
 
 Em aberto:
 - **Logo.** O d100 de traço é placeholder.
@@ -351,6 +371,6 @@ npm run translate               # traduz as reviews (precisa do token; --mock pa
 ```
 
 Antes de dizer que algo está pronto: `npm run build` sem erros, páginas checadas no navegador
-nas duas larguras e nos dois idiomas, redirecionamento por país e toggle testados com `npx wrangler dev`
-(simule o país com o header `cf-ipcountry` ou um override local), nenhum travessão em texto novo
+nas duas larguras e nas três línguas, redirecionamento da home e seletor testados com `npx wrangler dev`
+(simule o navegador com o header `Accept-Language`), nenhum travessão em texto novo
 (`grep -rn "—" src`).

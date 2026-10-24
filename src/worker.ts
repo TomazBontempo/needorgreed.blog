@@ -13,27 +13,32 @@ type Handle = typeof handle;
 export default {
   async fetch(request: Request, env: Parameters<Handle>[1], ctx: Parameters<Handle>[2]) {
     const url = new URL(request.url);
-    const cf = (request as Request & { cf?: { country?: string } }).cf;
 
     const decisao = decidir({
       method: request.method,
       url,
       cookie: request.headers.get('cookie'),
       userAgent: request.headers.get('user-agent'),
-      // A Cloudflare sobrescreve cf-ipcountry em produção; no wrangler dev, dá para simular o país com ele.
-      pais: request.headers.get('cf-ipcountry') ?? cf?.country ?? null,
+      acceptLanguage: request.headers.get('accept-language'),
     });
 
     if (decisao.tipo === 'redirecionar') {
       const headers = new Headers({
         Location: decisao.para,
         'Cache-Control': 'private, no-store',
-        Vary: 'Cookie',
+        Vary: 'Accept-Language, Cookie',
       });
       if (decisao.gravarCookie) headers.append('Set-Cookie', cookieDeIdioma(decisao.gravarCookie));
       return new Response(null, { status: 302, headers });
     }
 
-    return handle(request, env, ctx);
+    const resposta = await handle(request, env, ctx);
+    // A home pode redirecionar conforme o idioma do navegador: nenhum cache pode guardar uma versão só.
+    if (url.pathname === '/') {
+      const r = new Response(resposta.body, resposta);
+      r.headers.set('Vary', 'Accept-Language, Cookie');
+      return r;
+    }
+    return resposta;
   },
 };

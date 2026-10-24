@@ -44,7 +44,7 @@ tipo: jogo            # jogo | filme | serie | anime
 nota: 9.2             # 0 a 10, define a raridade
 roll: need            # need | greed | pass
 motivoRoll: Uma linha explicando o roll. Essencial no Greed.
-idioma: pt            # pt | en: a língua em que você escreveu (a outra é traduzida sozinha)
+idioma: pt            # pt | en | es: a língua em que você escreveu (as outras são traduzidas sozinhas)
 data: 2026-10-23
 plataforma: Switch
 duracao: 45h
@@ -82,20 +82,26 @@ Cores e faixas ficam em `src/lib/raridade.ts` e `src/styles/global.css`.
 
 ## Idiomas
 
-Inglês na raiz (`/`, `/reviews/<slug>/`) e português em `/pt/`. As duas versões são estáticas.
+Inglês na raiz (`/`, `/reviews/<slug>/`), português em `/pt/` e espanhol (América Latina) em `/es/`.
+Todas as versões são estáticas.
 
 - **Quem decide o idioma é o Worker** (`src/worker.ts` + `src/i18n/deteccao.ts`), antes de servir a página:
-  `?lang=` do toggle grava o cookie `lang`; cookie vence tudo; sem cookie, Brasil e Portugal veem português
-  e o resto, inglês. Bots nunca são redirecionados.
+  - `?lang=xx` (seletor do header ou faixa de sugestão) grava o cookie `lang`;
+  - com cookie, a escolha vale em qualquer página;
+  - sem cookie, só a home (`/`) redireciona, pelo idioma do navegador (`Accept-Language`);
+  - qualquer outro link abre na língua do link; se o navegador for de outra das nossas línguas, aparece a
+    faixa de sugestão no pé da tela. O país não decide nada. Bots nunca são redirecionados.
 - `wrangler.jsonc` liga `assets.run_worker_first` para as rotas HTML. Sem isso a Cloudflare serve o HTML
   direto e o Worker nem é chamado.
-- Testar local: `npm run build && npx wrangler dev` e simular o país com o header `cf-ipcountry`:
-  `curl -I -A Firefox -H 'cf-ipcountry: BR' http://localhost:8787/`
-- Textos de interface: `src/i18n/en.ts` e `src/i18n/pt.ts`. Rotas por idioma: `src/i18n/rotas.ts`.
+- Testar local: `npm run build && npx wrangler dev` e simular o navegador com o header `Accept-Language`:
+  `curl -I -A Firefox -H 'Accept-Language: es-MX,es;q=0.9' http://localhost:8787/` (deve dar 302 para `/es/`).
+- Textos de interface: `src/i18n/en.ts`, `pt.ts` e `es.ts`. Rotas por idioma: `src/i18n/rotas.ts`.
+- SEO: `hreflang` e `canonical` em todas as páginas, e `sitemap.xml` com as três línguas.
 
 ## Tradução automática das reviews
 
-`npm run translate` gera `index.en.mdx` (ou `index.pt.mdx`) ao lado de cada original, com o hash do original.
+`npm run translate` gera as versões nas outras línguas (`index.en.mdx`, `index.pt.mdx`, `index.es.mdx`) ao lado
+de cada original, com o hash do original.
 Só retraduz quando o original muda. Arquivo com `revisado: true` nunca é sobrescrito (o script só avisa).
 A Action `.github/workflows/translate.yml` roda a cada push em reviews e uma vez por dia, e commita o resultado.
 

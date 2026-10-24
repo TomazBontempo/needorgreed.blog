@@ -6,7 +6,7 @@ interface Props {
 }
 const { idioma } = Astro.props;
 const t = dicionario(idioma);
-const rss = idioma === 'en' ? '/rss.xml' : '/pt/rss.xml';
+const rss = idioma === 'en' ? '/rss.xml' : `/${idioma}/rss.xml`;
 ---
 
 <footer class="rodape">

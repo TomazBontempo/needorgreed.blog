@@ -2,6 +2,7 @@
 import { Font } from 'astro:assets';
 import Cabecalho from '../components/Cabecalho.astro';
 import Rodape from '../components/Rodape.astro';
+import SugestaoIdioma from '../components/SugestaoIdioma.astro';
 import { alternativas, dicionario, idiomaDe } from '../i18n';
 import '../styles/global.css';
 import '../styles/item.css';
@@ -26,7 +27,7 @@ const tituloCompleto = titulo ? `${titulo} · Need or Greed` : 'Need or Greed';
 const site = Astro.site ?? new URL('https://needorgreed.blog');
 const { canonical, links } = alternativas(Astro.url.pathname, site);
 const imagemAbs = imagem ? new URL(imagem, site).href : undefined;
-const rss = idioma === 'en' ? '/rss.xml' : '/pt/rss.xml';
+const rss = idioma === 'en' ? '/rss.xml' : `/${idioma}/rss.xml`;
 
 // Contrato da direção visual (Impeccable). Fica como comentário no HTML publicado.
 const contrato = `
@@ -75,6 +76,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       <slot />
     </main>
     <Rodape idioma={idioma} />
+    <SugestaoIdioma idioma={idioma} />
 
     <script>
       // Escolha de idioma: grava cookie (o Worker lê) e espelha no localStorage.

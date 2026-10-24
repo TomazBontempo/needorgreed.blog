@@ -5,7 +5,7 @@ name: Tradução das reviews
 on:
   push:
     branches: [main]
-    # Só os originais. Os commits desta Action mexem em index.en.mdx/index.pt.mdx e não disparam de novo.
+    # Só os originais. Os commits desta Action mexem em index.<língua>.mdx e não disparam de novo.
     paths:
       - 'src/content/reviews/*/index.mdx'
       - 'src/content/reviews/*/index.md'
@@ -46,7 +46,7 @@ jobs:
         env:
           RELATORIO: ${{ runner.temp }}/relatorio.md
         run: |
-          git add 'src/content/reviews/*/index.en.mdx' 'src/content/reviews/*/index.pt.mdx'
+          git add 'src/content/reviews/*/index.en.mdx' 'src/content/reviews/*/index.pt.mdx' 'src/content/reviews/*/index.es.mdx'
           if git diff --cached --quiet; then
             echo "Nenhuma tradução nova."
             exit 0

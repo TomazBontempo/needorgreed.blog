@@ -3,7 +3,7 @@
 Documento de passagem para o próximo agente. Leia o `CLAUDE.md` primeiro (regras, decisões e padrões);
 este arquivo diz **onde paramos**, **o que falta** e **o que já deu errado**. Atualize-o ao fim de cada sessão.
 
-Última atualização: 2026-10-23.
+Última atualização: 2026-10-24.
 
 ---
 
@@ -22,10 +22,22 @@ O redesign seguiu um plano de 8 passos pedido pelo Tomaz:
 | 7 | Jogos, Telas, Raridade, Autor, Arquivo, Sobre, 404, RSS | feito |
 | 8 | Auditoria e crítica da Impeccable, build, teste completo no `wrangler dev` | **falta** |
 
-**Próximo passo: o 8.** Rodar `critique` e `audit` da Impeccable no site todo, corrigir o que aparecer,
-`npm run build`, e testar com `npx wrangler dev`: redirecionamento simulando Brasil, Portugal e outro país
-(header `cf-ipcountry`), e o toggle de idioma persistindo entre visitas (cookie `lang`). Depois, gerar o
-`DESIGN.md` (documenter da Impeccable) a partir do site pronto. Mostrar o resultado ao Tomaz.
+Depois do passo 7, a sessão de 2026-10-24 fez:
+- **Espanhol** (América Latina) como terceira língua, em `/es/`, com seletor de idioma no header,
+  faixa de sugestão, sitemap com as três línguas e tradução automática para N línguas.
+- **Regra de idioma nova** (decisão do Tomaz, depois de pesquisa sobre Google, Wikipedia e comunidades):
+  idioma do navegador em vez do país, só a home redireciona, links diretos nunca. Detalhes no CLAUDE.md.
+- Hero novo ("Cada obra é um loot: / Need, Greed ou Pass." + a descrição), nome do repositório corrigido
+  para `TomazBontempo/needorgreed.blog`, README atualizado.
+
+**Próximo passo: o 8.** Rodar `critique` e `audit` da Impeccable no site todo (agora nas três línguas),
+corrigir o que aparecer, `npm run build`, e testar com `npx wrangler dev`: redirecionamento da home com
+`Accept-Language` em português, espanhol e outra língua, links diretos sem redirecionamento, e o seletor
+persistindo entre visitas (cookie `lang`). Depois, gerar o `DESIGN.md` (documenter da Impeccable) a partir
+do site pronto. Mostrar o resultado ao Tomaz.
+
+**Bug conhecido, ainda não corrigido (ver "Problemas abertos"):** capa escrita como `./capa.jpg` é
+apagada se a review for salva pelo painel.
 
 O **mobile** foi deixado de lado de propósito: o Tomaz disse que vai rever depois. Hoje a home mobile é um
 carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à esquerda) abaixo de 640px.
@@ -34,23 +46,45 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 
 ## O que existe e funciona
 
-- **Páginas (inglês na raiz, português em `/pt/`):** home, review, Jogos (`/games/`), Telas (`/screens/`,
-  com filtro por tipo), Raridade (`/rarity/<slug>/`), Autor (`/authors/<slug>/`), Arquivo (`/archive/`,
-  loot log completo por mês com filtros de evento e roll), Sobre (`/about/`), 404 por idioma, RSS por idioma
-  (`/rss.xml` e `/pt/rss.xml`). Fragmentos `/fichas/<idioma>/<slug>/` para o tooltip do log (noindex).
-- **Idioma:** o Worker (`src/worker.ts`) decide antes de servir: `?lang=` do toggle grava o cookie, cookie
-  vence tudo, sem cookie Brasil e Portugal vão para `/pt/`, bots nunca são redirecionados. Testado no
-  `wrangler dev` (passo 4). `hreflang` e `canonical` em todas as páginas.
+- **Páginas (inglês na raiz, português em `/pt/`, espanhol em `/es/`):** home, review, Jogos (`/games/`),
+  Telas (`/screens/`, com filtro por tipo), Raridade (`/rarity/<slug>/`), Autor (`/authors/<slug>/`),
+  Arquivo (`/archive/`, loot log completo por mês com filtros de evento e roll), Sobre (`/about/`), 404 e
+  RSS por idioma. Fragmentos `/fichas/<idioma>/<slug>/` para o tooltip do log (noindex). 96 páginas no build.
+- **Idioma:** o Worker (`src/worker.ts`) decide antes de servir: `?lang=` (seletor ou faixa) grava o cookie;
+  com cookie, vale em qualquer página; sem cookie, só a home redireciona, pelo `Accept-Language`; bots nunca.
+  Nas outras páginas, a faixa de sugestão (fixa no pé da tela) oferece a troca. Testado no `wrangler dev` e
+  no Playwright (com `locale` no contexto) em 2026-10-24.
+- **SEO:** `hreflang` (en, pt-BR, es, x-default) e `canonical` em todas as páginas; `sitemap.xml` com 66 URLs
+  (22 páginas x 3 línguas) citado no `robots.txt`.
 - **Tradução:** `npm run translate` (Workers AI, modelo Gemma 4 26B), hash do original, respeita
   `revisado: true`, traduz legendas e descrições dos componentes, trata cota esgotada sem quebrar.
+  Traduz o original para todas as outras línguas (en, pt, es; espanhol neutro da América Latina).
   Action em `.github/workflows/translate.yml`. Testado só com `--mock` (sem token ainda).
 - **Loot log:** vem do histórico de commits do GitHub no build (`src/lib/lootlog.ts`), com fallback nas
-  próprias reviews. Hoje roda sempre no fallback, porque o repositório ainda não existe no GitHub.
+  próprias reviews. Com o nome do repositório corrigido, o build já consulta o GitHub de verdade: as reviews
+  que estão em algum commit enviado aparecem com a data do commit; as outras, com a data da própria review.
 - **Mídia nas reviews:** imagens otimizadas, `<Figure>` com legenda, `<YouTube>`, `<Clipe>` (mp4/webm).
   Testado pelo painel (abrir e salvar) e pela IDE. O build barra arquivo acima de 25 MB e imagem que o
   painel estragou.
-- **Checagens que passavam no fim da sessão:** `npx astro check` com 0 erros, `npm run build` sem erros,
-  1.600 links internos do build sem nenhum quebrado, detector da Impeccable sem achados, nenhum travessão.
+- **Checagens que passavam no fim da sessão de 2026-10-24:** `npx astro check` com 0 erros, `npm run build`
+  sem erros, 2.678 links internos do build sem nenhum quebrado, detector da Impeccable sem achados,
+  nenhum travessão.
+
+---
+
+## Problemas abertos
+
+- **Capa `./capa.jpg` é apagada pelo painel** (testado em 2026-10-24 com a review do Frieren). O campo
+  "Capa" aparece vazio no painel e, ao salvar, a linha `capa:` some do arquivo, sem erro no build: a review
+  perde a capa no site. O painel só reconhece capas em `src/assets/reviews/<slug>/` escritas como
+  `../../../assets/reviews/<slug>/capa.jpg` (como a do Outer Wilds). Hoje só o Frieren usa `./capa.jpg`
+  (no original e nas traduções), e o exemplo do README ensina esse formato. Opções, decisão do Tomaz:
+  1. mudar o campo de capa para a pasta da própria review (`../<slug>/capa.jpg`, igual às imagens do texto);
+  2. manter `src/assets/reviews/<slug>/`, corrigir o Frieren e o README;
+  3. em qualquer caso, fazer o build falhar quando uma capa estiver num formato que o painel não reconhece.
+- **Vocabulário em espanhol a revisar** por alguém que fale espanhol: "Pantallas", "Acerca", nomes das
+  raridades e a linha de roll ("Snufupugos tiró Need (94) por [Outer Wilds]").
+- **Progresso de leitura** mostra "100% lido" logo de cara numa review curta que cabe na tela.
 
 ---
 
@@ -58,8 +92,8 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 
 Nada disso dá para fazer sem o Tomaz. Instruções completas no `README.md`.
 
-- **Repositório no GitHub** `TomazBontempo/needorgreed`: ainda não existe (a API devolve 404). Sem ele, o
-  loot log e a autoria usam o fallback, e a Action de tradução não roda.
+- **Repositório no GitHub:** existe, é `TomazBontempo/needorgreed.blog` (público), e o código já aponta para
+  ele. Falta só o push dos commits locais (ver "Git").
 - **Token da Cloudflare para tradução:** Workers AI Read + Workers AI Edit. Secrets da Action:
   `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_TOKEN`. Plano Free, sem cartão (regra inegociável do CLAUDE.md).
 - **Giscus:** `repoId` e `categoryId` vazios em `src/site.config.ts`. Enquanto isso, a página da review
@@ -76,7 +110,8 @@ Todas as reviews em `src/content/reviews/` são exemplos, marcadas com um aviso 
 títulos fictícios (Abyssal Tax Office, Os Últimos Dias de Verão, Starfall Remastered, Detetive Kumo,
 Lighthouse Keeper '98, Cidade de Concreto); Outer Wilds, Frieren e Survival Genérico 3 vieram do protótipo.
 
-- As traduções `index.en.mdx` dos exemplos foram escritas à mão (`modelo: exemplo`), não pelo script.
+- As traduções `index.en.mdx` e `index.es.mdx` dos exemplos foram escritas à mão (`modelo: exemplo`), não
+  pelo script; o script as reconhece como em dia.
 - Capas de exemplo em `src/assets/reviews/<slug>/capa.jpg`; imagens de teste em
   `src/content/reviews/outer-wilds/` (`fogueira.jpg`, `nave.jpg`); clipe em `public/videos/outer-wilds/`.
 - O avatar `src/assets/autores/snufupugos.png` é um placeholder ("S").
@@ -86,11 +121,12 @@ Lighthouse Keeper '98, Cidade de Concreto); Outer Wilds, Frieren e Survival Gen�
 
 ## Git
 
-**Nada do redesign foi commitado.** O único commit é o do protótipo (`e7687cb`). Todo o trabalho está
-como alteração não commitada na raiz do repositório (esta pasta). O Tomaz não autorizou commits ainda:
-pergunte antes do primeiro, e proponha commits por rodada a partir daí (ele pede reversões com frequência).
+- `e7687cb`: protótipo (o único commit que está no GitHub).
+- `6bac050`: redesign completo (2026-10-23 e começo de 2026-10-24).
+- Commit seguinte: espanhol, regra de idioma nova, seletor, faixa de sugestão, sitemap e este arquivo.
 
-O projeto foi movido para esta pasta no fim da sessão; a pasta antiga do protótipo foi apagada.
+Os commits do redesign ainda **não foram enviados** ao GitHub: o Tomaz faz o push. O Tomaz autoriza
+commits pedindo; proponha um commit ao fim de cada rodada aprovada (ele pede reversões com frequência).
 
 ---
 
@@ -102,14 +138,16 @@ npx astro check                                   # tipos: 0 erros
 npm run build                                     # build de produção
 python3 -m http.server 4400 -d dist/client        # build estático (sem Worker) em http://localhost:4400
 npm run build && npx wrangler dev                 # com o Worker, em http://localhost:8787
-curl -I -A Firefox -H 'cf-ipcountry: BR' http://localhost:8787/    # deve dar 302 para /pt/
+curl -I -A Firefox -H 'Accept-Language: es-MX,es;q=0.9' http://localhost:8787/   # 302 para /es/
+curl -I -A Firefox -H 'Accept-Language: es-MX' http://localhost:8787/reviews/frieren/   # 200, sem redirecionar
 npm run translate -- --mock                       # tradutor de mentira
 npx astro dev --background                        # dev + painel em /keystatic
 ```
 
 Screenshots e medidas foram feitos com Playwright (instalado fora do repositório) usando o Chromium que já
 está em `~/.cache/ms-playwright/chromium-1243`. A versão nova do pacote `playwright` pede outro build do
-Chromium: passe `executablePath` apontando para o instalado.
+Chromium: passe `executablePath` apontando para o instalado. Para testar a faixa de sugestão, crie o contexto
+com `locale: 'es-MX'` (ou `pt-BR`): isso muda o `navigator.languages`.
 
 ---
 
@@ -117,21 +155,26 @@ Chromium: passe `executablePath` apontando para o instalado.
 
 - **`npx astro check` trava** se `@astrojs/check` não estiver instalado (fica esperando confirmação).
   Já está nas devDependencies; rode com `< /dev/null` em scripts.
-- **No `wrangler dev`, `request.cf.country` vem com o país real da máquina.** Por isso o Worker lê o header
-  `cf-ipcountry` primeiro (em produção a Cloudflare sobrescreve esse header).
+- **O país não é mais usado** para escolher o idioma (era `request.cf.country`). Não reintroduzir: a regra
+  é o idioma do navegador. Ver CLAUDE.md, "Idiomas".
 - **`pkill -f "wrangler dev"` mata o próprio shell** quando o padrão aparece no comando. Guarde o PID.
 - **Fonte:** no Google Fonts a família é "Big Shoulders" (não "Big Shoulders Display").
 - **Keystatic:**
   - um atributo no `.mdx` que o bloco do painel não declara faz o painel recusar a review inteira (foi o
     `titulo` do YouTube);
   - imagem escrita `./foto.jpg` aparece como texto no painel e é escapada ao salvar;
-  - arquivos de bloco (`fields.file`) só são reconhecidos em `<directory>/<slug>/`.
+  - arquivos de bloco (`fields.file`) só são reconhecidos em `<directory>/<slug>/`;
+  - a capa (`fields.image` no frontmatter) também: `./capa.jpg` aparece vazia e é apagada ao salvar.
 - **Chromium headless esconde barras de rolagem** nos screenshots: use `ignoreDefaultArgs: ['--hide-scrollbars']`.
 - **Swipe em teste:** `Input.synthesizeScrollGesture` não move scroll-snap no headless; use
   `Input.dispatchTouchEvent` (touchStart, touchMove em passos, touchEnd).
 - **Estilos da ficha precisam ser globais** (`src/styles/item.css`): a variante mini entra via `innerHTML`
   no tooltip, em páginas que não renderizam ficha nenhuma.
 - **Classes genéricas colidem:** o loot log usa `.item` nos links; por isso a ficha usa o prefixo `it-`.
+- **`hreflang` não aceita `es-419`** (o Google só aceita país de duas letras como região): o espanhol usa
+  `es`. O espanhol latino-americano fica garantido no texto e no prompt de tradução.
+- **O scratchpad do Playwright é apagado entre sessões:** reinstale com `npm i playwright` numa pasta fora
+  do repositório antes de tirar screenshots.
 
 ---
 
@@ -142,5 +185,7 @@ Chromium: passe `executablePath` apontando para o instalado.
 - O contrato da direção visual está como comentário HTML no começo do `<body>` (`src/layouts/Base.astro`),
   com a seed `763e2d68`.
 - **Faltam:** a revisão final (finish reviewer) e o `DESIGN.md`. Os dois fazem parte do passo 8.
+- O seletor de idioma e a faixa de sugestão foram construídos sem mockup (o Tomaz dispensou); a crítica do
+  passo 8 deve olhar os dois.
 - Há uma versão mais nova da Impeccable (v4.7.0; instalada v4.1.1). Atualizar só se o Tomaz pedir
   (`npx impeccable update`, vale a partir da sessão seguinte).

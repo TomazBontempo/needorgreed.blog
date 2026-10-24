@@ -1,20 +1,22 @@
 /**
  * Qual idioma servir para cada visita. Roda no Worker, antes da página.
  *
- *   1. ?lang=pt ou ?lang=en (o toggle): grava o cookie e manda para a página nessa língua.
+ *   1. ?lang=xx (o seletor ou a faixa de sugestão): grava o cookie e manda para a página nessa língua.
  *   2. Bots de busca: nunca redireciona. Cada idioma tem a própria URL, hreflang e canonical.
- *   3. Cookie `lang`: a escolha do leitor vence tudo, em todas as visitas.
- *   4. Sem cookie: Brasil e Portugal veem português; o resto do mundo, inglês.
- *      País desconhecido: serve o que a URL pediu.
+ *   3. Cookie `lang`: a escolha do leitor vence tudo, em qualquer página, em todas as visitas.
+ *   4. Sem cookie, só a home (/) redireciona, pelo idioma do navegador (Accept-Language).
+ *      Qualquer outro link abre na língua do próprio link; lá, a faixa de sugestão oferece a troca.
  *
+ * O país não decide nada: o idioma do navegador diz o que a pessoa lê, o IP só diz onde ela está.
  * Função pura (sem APIs da Cloudflare) para dar para testar.
  */
 import { caminhoEm, ehIdioma, idiomaDoCaminho, type Idioma } from './rotas';
+import { idiomaDoNavegador, listaDoAcceptLanguage } from './preferencia';
+
+export { idiomaDoNavegador, listaDoAcceptLanguage } from './preferencia';
 
 export const COOKIE = 'lang';
 const UM_ANO = 60 * 60 * 24 * 365;
-
-const PAISES_PORTUGUES = new Set(['BR', 'PT']);
 
 const BOTS =
   /bot|crawl|spider|slurp|bingpreview|mediapartners|facebookexternalhit|embedly|quora link preview|whatsapp|telegram|discord|slack|vkshare|pinterest|lighthouse|headless|preview/i;
@@ -24,8 +26,8 @@ export interface Visita {
   url: URL;
   cookie: string | null;
   userAgent: string | null;
-  /** Header cf-ipcountry ou request.cf.country. */
-  pais: string | null;
+  /** Header Accept-Language do navegador. */
+  acceptLanguage: string | null;
 }
 
 export type Decisao = { tipo: 'seguir' } | { tipo: 'redirecionar'; para: string; gravarCookie?: Idioma };
@@ -48,18 +50,13 @@ function ehPagina(pathname: string): boolean {
   return !ultimo.includes('.') || ultimo.endsWith('.html');
 }
 
-export function idiomaDoPais(pais: string | null): Idioma | undefined {
-  if (!pais || pais === 'XX' || pais === 'T1') return undefined;
-  return PAISES_PORTUGUES.has(pais.toUpperCase()) ? 'pt' : 'en';
-}
-
 export function decidir(v: Visita): Decisao {
   if (v.method !== 'GET' && v.method !== 'HEAD') return { tipo: 'seguir' };
   if (!ehPagina(v.url.pathname)) return { tipo: 'seguir' };
 
   const atual = idiomaDoCaminho(v.url.pathname);
 
-  // 1. O toggle pediu um idioma.
+  // 1. O leitor escolheu um idioma.
   const pedido = v.url.searchParams.get('lang');
   if (ehIdioma(pedido)) {
     const destino = new URL(v.url);
@@ -71,10 +68,14 @@ export function decidir(v: Visita): Decisao {
   // 2. Bots e visitas sem user agent.
   if (!v.userAgent || BOTS.test(v.userAgent)) return { tipo: 'seguir' };
 
-  // 3 e 4. Preferência salva, ou o país.
+  // 3. Escolha salva: vale para qualquer página.
   const salvo = lerCookie(v.cookie);
-  const desejado = ehIdioma(salvo) ? salvo : idiomaDoPais(v.pais);
-  if (!desejado || desejado === atual) return { tipo: 'seguir' };
+  if (ehIdioma(salvo)) {
+    return salvo === atual ? { tipo: 'seguir' } : { tipo: 'redirecionar', para: caminhoEm(v.url.pathname, salvo) + v.url.search };
+  }
 
-  return { tipo: 'redirecionar', para: caminhoEm(v.url.pathname, desejado) + v.url.search };
+  // 4. Sem escolha: só a home, pelo idioma do navegador.
+  if (v.url.pathname !== '/') return { tipo: 'seguir' };
+  const desejado = idiomaDoNavegador(listaDoAcceptLanguage(v.acceptLanguage));
+  return desejado === atual ? { tipo: 'seguir' } : { tipo: 'redirecionar', para: caminhoEm('/', desejado) + v.url.search };
 }

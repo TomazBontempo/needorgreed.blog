@@ -1,0 +1,14 @@
+---
+import Review from '../../../views/Review.astro';
+import { getReviews, type ReviewCompleta } from '../../../lib/reviews';
+
+export async function getStaticPaths() {
+  return (await getReviews()).map((review) => ({ params: { slug: review.slug }, props: { review } }));
+}
+
+interface Props {
+  review: ReviewCompleta;
+}
+---
+
+<Review review={Astro.props.review} />

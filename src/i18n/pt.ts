@@ -28,10 +28,18 @@ const pt: Dicionario = {
     pularParaConteudo: 'Pular para o conteúdo',
   },
 
-  idiomaToggle: {
-    rotulo: 'Read in English',
-    curto: 'EN',
-    atual: 'Português',
+  seletor: {
+    rotulo: 'Idioma',
+    aria: 'Escolher o idioma do site',
+  },
+
+  nomesIdiomas: { en: 'inglês', pt: 'português', es: 'espanhol' },
+
+  sugestao: {
+    rotulo: 'Sugestão de idioma',
+    texto: 'Esta página também está em português.',
+    ir: 'Ler em português',
+    ficar: (nome: string) => `Continuar em ${nome}`,
   },
 
   raridades: {
@@ -96,9 +104,17 @@ const pt: Dicionario = {
     tags: 'Tags',
     plataforma: 'Plataforma',
     duracao: 'Duração',
-    traduzidoDe: { pt: 'Traduzido automaticamente do português.', en: 'Traduzido automaticamente do inglês.' },
+    traduzidoDe: {
+      pt: 'Traduzido automaticamente do português.',
+      en: 'Traduzido automaticamente do inglês.',
+      es: 'Traduzido automaticamente do espanhol.',
+    },
     verOriginal: 'Ler o original',
-    semTraducao: { pt: 'Ainda sem tradução, mostrando o original em português.', en: 'Ainda sem tradução, mostrando o original em inglês.' },
+    semTraducao: {
+      pt: 'Ainda sem tradução, mostrando o original em português.',
+      en: 'Ainda sem tradução, mostrando o original em inglês.',
+      es: 'Ainda sem tradução, mostrando o original em espanhol.',
+    },
   },
 
   paginas: {
@@ -182,9 +198,9 @@ const pt: Dicionario = {
     logTitulo: 'O loot log',
     logTexto:
       'A coluna de mensagens de sistema registra o que acontece no site: uma review rolada, uma review atualizada, alguém novo entrando no grupo. O arquivo guarda o log inteiro.',
-    traducaoTitulo: 'Duas línguas',
+    traducaoTitulo: 'Três línguas',
     traducaoTexto:
-      'As reviews são escritas em português ou inglês e a outra versão é traduzida automaticamente, com um aviso no topo e o link para o original. Os comentários são os mesmos nas duas versões.',
+      'As reviews são escritas em português, inglês ou espanhol, e as outras versões são traduzidas automaticamente, com um aviso no topo e o link para o original. Os comentários são os mesmos em todas as versões.',
     quemTitulo: 'Quem rola o dado',
     quemTexto: 'Cada review é assinada pela conta do GitHub que criou o arquivo. Ninguém escolhe a própria assinatura.',
     verRaridade: (nome: string) => `Todas as reviews de raridade ${nome}`,

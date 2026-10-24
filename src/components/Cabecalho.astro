@@ -1,5 +1,5 @@
 ---
-import IdiomaToggle from './IdiomaToggle.astro';
+import SeletorIdioma from './SeletorIdioma.astro';
 import { dicionario, url, type Idioma, type Secao } from '../i18n';
 
 interface Props {
@@ -45,7 +45,7 @@ const atual = Astro.url.pathname;
         </ul>
       </nav>
 
-      <IdiomaToggle idioma={idioma} />
+      <SeletorIdioma idioma={idioma} />
     </div>
   </div>
 </header>
@@ -136,7 +136,7 @@ const atual = Astro.url.pathname;
       width: 22px;
       height: 22px;
     }
-    .cabecalho :global(.idioma-toggle) {
+    .cabecalho :global(.seletor-idioma summary) {
       padding: 4px 8px;
     }
     nav {

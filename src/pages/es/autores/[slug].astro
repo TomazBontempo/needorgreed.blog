@@ -1,0 +1,15 @@
+---
+import Autor from '../../../views/Autor.astro';
+import { caminhosDeAutor } from '../../../lib/caminhos';
+import type { Autor as AutorEntry } from '../../../lib/autores';
+
+export const getStaticPaths = caminhosDeAutor;
+
+interface Props {
+  slug: string;
+  login: string;
+  autor?: AutorEntry;
+}
+---
+
+<Autor {...Astro.props} />

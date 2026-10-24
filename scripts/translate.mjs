@@ -2,9 +2,10 @@
 /**
  * npm run translate
  *
- * Gera a versão de cada review na outra língua, ao lado do original:
- *   src/content/reviews/<slug>/index.mdx      original (idioma: pt, padrão)
+ * Gera a versão de cada review nas outras línguas do site, ao lado do original:
+ *   src/content/reviews/<slug>/index.mdx      original (idioma: pt, en ou es; padrão pt)
  *   src/content/reviews/<slug>/index.en.mdx   tradução gerada aqui
+ *   src/content/reviews/<slug>/index.es.mdx   tradução gerada aqui
  *
  * Regras:
  *  - A tradução guarda o hash do original (origemHash). Só retraduz quando o original muda.
@@ -32,7 +33,13 @@ import YAML from 'yaml';
 const RAIZ = new URL('..', import.meta.url).pathname;
 const PASTA = join(RAIZ, 'src/content/reviews');
 const MODELO_PADRAO = '@cf/google/gemma-4-26b-a4b-it';
-const NOMES = { pt: 'Brazilian Portuguese', en: 'English' };
+/** Línguas do site (mesma lista de src/i18n/rotas.ts) e como o modelo deve chamar cada uma. */
+const IDIOMAS = ['en', 'pt', 'es'];
+const NOMES = {
+  pt: 'Brazilian Portuguese',
+  en: 'English',
+  es: 'neutral Latin American Spanish (es-419: use "tú", never "vosotros", no Spain-only slang)',
+};
 /** Tamanho máximo de cada pedaço do texto mandado de uma vez para o modelo. */
 const MAX_CHUNK = 6000;
 
@@ -285,10 +292,20 @@ async function traduzirReview(tradutor, slug) {
   const { dados, corpo } = separar(orig.texto);
   if (dados.rascunho) return 'rascunho';
 
-  const de = dados.idioma === 'en' ? 'en' : 'pt';
-  const para = de === 'pt' ? 'en' : 'pt';
-  const alvo = join(PASTA, slug, `index.${para}.mdx`);
+  const de = IDIOMAS.includes(dados.idioma) ? dados.idioma : 'pt';
   const origemHash = hash(orig.texto);
+  const resultados = [];
+
+  // Uma tradução para cada língua que não é a do original. Uma cota esgotada no meio
+  // interrompe tudo (CotaEsgotada sobe para o main); o que já foi gravado fica.
+  for (const para of IDIOMAS.filter((l) => l !== de)) {
+    resultados.push(`${para} ${await traduzirPara(tradutor, slug, orig, dados, corpo, de, para, origemHash)}`);
+  }
+  return resultados.join(', ');
+}
+
+async function traduzirPara(tradutor, slug, orig, dados, corpo, de, para, origemHash) {
+  const alvo = join(PASTA, slug, `index.${para}.mdx`);
 
   if (existsSync(alvo)) {
     const atual = separar(await readFile(alvo, 'utf8')).dados;
@@ -340,7 +357,7 @@ async function main() {
       resultado = 'erro';
       aviso(`${slug}: tradução falhou, a página vai mostrar o original. ${erro.message}`);
     }
-    contagem[resultado] = (contagem[resultado] ?? 0) + 1;
+    for (const r of resultado.split(', ')) contagem[r] = (contagem[r] ?? 0) + 1;
     info(`  ${slug}: ${resultado}`);
   }
 

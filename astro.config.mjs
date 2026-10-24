@@ -31,11 +31,11 @@ export default defineConfig({
   // Não usamos sessões do Astro; evita provisionar KV na Cloudflare.
   session: false,
 
-  // Inglês na raiz, português em /pt/. As páginas de cada idioma são geradas no build.
+  // Inglês na raiz, português em /pt/, espanhol em /es/. As páginas de cada idioma são geradas no build.
   // Quem escolhe o idioma do leitor é o Worker (src/worker.ts), nunca o Astro: por isso
   // nenhum redirecionamento automático aqui.
   i18n: {
-    locales: ['en', 'pt'],
+    locales: ['en', 'pt', 'es'],
     defaultLocale: 'en',
     routing: { prefixDefaultLocale: false, redirectToDefaultLocale: false },
   },
