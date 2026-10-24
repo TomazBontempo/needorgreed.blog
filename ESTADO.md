@@ -130,15 +130,13 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 - **Pé da ficha ainda quebra em duas linhas** quando o nome da raridade é longo ("Lixo de vendedor · 2.1"
   em 1280; "Lendário · 10.0" na ficha em linha do celular). Não tem a ver com o "lido".
 - **Plataforma e duração** somem da review no celular junto com a lateral (só raridade e nota foram trazidas).
-- **Action de tradução** ainda em `checkout@v4` e `setup-node@v4` (ver acima); o Tomaz perguntou se vale fazer
-  agora: vale, falta o OK.
 - **Bio traduzida** (2026-10-24): implementada e testada com `--mock`; a primeira tradução de verdade sai
   na Action quando houver token.
 - **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
   Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", carrossel, sitemap, RSS):
   fazer antes de apagar os exemplos (item 1 do checklist).
-- **Action de tradução usa versões antigas** de `actions/checkout@v4` e `actions/setup-node@v4` (Node 20,
-  descontinuado no GitHub; hoje roda forçado no Node 24). Atualizar para a v5.
+- **Action de tradução** atualizada para `checkout@v7` e `setup-node@v7` em 2026-10-24 (testada no GitHub,
+  sem aviso de Node 20).
 
 ---
 
@@ -206,6 +204,9 @@ Repositório: `TomazBontempo/needorgreed.blog` (público). Tudo enviado; `main` 
 - `35155b5` correção do passo de commit da Action de tradução
 - `9bc7efe` ESTADO atualizado (domínio e checklist de estreia)
 - `d81f94b` hero novo, títulos, re-roll no log, glossário e fim da Herança
+- `57fcc8d` sem glossário e sem "drop" no hero
+- `a1196f6` ficha única com 2 atributos, bio traduzida, ajustes da crítica
+- `81b8f4f` Action em checkout e setup-node v7
 - `0726790` re-roll no Arquivo, "loot" no espanhol e documentos atualizados
 
 O Tomaz autoriza commits e pushes pedindo; proponha um commit ao fim de cada rodada aprovada (ele pede
