@@ -14,7 +14,7 @@ const idioma = idiomaDe(Astro);
 const t = dicionario(idioma);
 const versao = await versaoEm(review, idioma);
 const { data } = versao;
-const og = data.capa ? (await getImage({ src: data.capa, width: 1200, format: 'jpg' })).src : undefined;
+const og = (await getImage({ src: data.capa, width: 1200, format: 'jpg' })).src;
 const descricao = data.motivoRoll ?? data.frase ?? `${t.rolls[data.roll].nome}: ${data.titulo}`;
 ---
 

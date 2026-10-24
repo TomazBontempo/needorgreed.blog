@@ -36,8 +36,10 @@ corrigir o que aparecer, `npm run build`, e testar com `npx wrangler dev`: redir
 persistindo entre visitas (cookie `lang`). Depois, gerar o `DESIGN.md` (documenter da Impeccable) a partir
 do site pronto. Mostrar o resultado ao Tomaz.
 
-**Bug conhecido, ainda não corrigido (ver "Problemas abertos"):** capa escrita como `./capa.jpg` é
-apagada se a review for salva pelo painel.
+Ainda em 2026-10-24: **regras de mídia novas** (pedido do Tomaz). Tudo da review na pasta dela
+(`capa.<ext>`, `imagens/`, `videos/`), capa obrigatória e nenhum erro silencioso: o build para em qualquer
+violação. Testado no painel (abrir, enviar imagem, salvar, reabrir) e com reviews quebradas de propósito.
+Isso resolveu o bug da capa `./capa.jpg` apagada pelo painel.
 
 O **mobile** foi deixado de lado de propósito: o Tomaz disse que vai rever depois. Hoje a home mobile é um
 carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à esquerda) abaixo de 640px.
@@ -63,9 +65,12 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 - **Loot log:** vem do histórico de commits do GitHub no build (`src/lib/lootlog.ts`), com fallback nas
   próprias reviews. Com o nome do repositório corrigido, o build já consulta o GitHub de verdade: as reviews
   que estão em algum commit enviado aparecem com a data do commit; as outras, com a data da própria review.
-- **Mídia nas reviews:** imagens otimizadas, `<Figure>` com legenda, `<YouTube>`, `<Clipe>` (mp4/webm).
-  Testado pelo painel (abrir e salvar) e pela IDE. O build barra arquivo acima de 25 MB e imagem que o
-  painel estragou.
+- **Mídia nas reviews:** tudo na pasta da review (`capa.<ext>` obrigatória, `imagens/`, `videos/`), caminhos
+  `../<slug>/...`. Imagens otimizadas, `<Figure>` com legenda, `<YouTube>`, `<Clipe>` (mp4/webm publicado em
+  `/_astro/`). O painel limpa o nome no upload e exige texto alternativo. `src/integrations/midia.ts` para o
+  build em capa ausente ou fora do formato, mídia fora da pasta, arquivo inexistente, imagem sem texto
+  alternativo, clipe sem descrição, imagem escapada pelo painel e arquivo acima de 25 MB; avisa sobre nomes
+  genéricos e arquivos soltos ou sem uso. Testado em 2026-10-24.
 - **Checagens que passavam no fim da sessão de 2026-10-24:** `npx astro check` com 0 erros, `npm run build`
   sem erros, 2.678 links internos do build sem nenhum quebrado, detector da Impeccable sem achados,
   nenhum travessão.
@@ -74,17 +79,12 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 
 ## Problemas abertos
 
-- **Capa `./capa.jpg` é apagada pelo painel** (testado em 2026-10-24 com a review do Frieren). O campo
-  "Capa" aparece vazio no painel e, ao salvar, a linha `capa:` some do arquivo, sem erro no build: a review
-  perde a capa no site. O painel só reconhece capas em `src/assets/reviews/<slug>/` escritas como
-  `../../../assets/reviews/<slug>/capa.jpg` (como a do Outer Wilds). Hoje só o Frieren usa `./capa.jpg`
-  (no original e nas traduções), e o exemplo do README ensina esse formato. Opções, decisão do Tomaz:
-  1. mudar o campo de capa para a pasta da própria review (`../<slug>/capa.jpg`, igual às imagens do texto);
-  2. manter `src/assets/reviews/<slug>/`, corrigir o Frieren e o README;
-  3. em qualquer caso, fazer o build falhar quando uma capa estiver num formato que o painel não reconhece.
 - **Vocabulário em espanhol a revisar** por alguém que fale espanhol: "Pantallas", "Acerca", nomes das
   raridades e a linha de roll ("Snufupugos tiró Need (94) por [Outer Wilds]").
 - **Progresso de leitura** mostra "100% lido" logo de cara numa review curta que cabe na tela.
+- **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
+  Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", carrossel, sitemap, RSS):
+  fazer antes de apagar os exemplos.
 
 ---
 
@@ -112,8 +112,8 @@ Lighthouse Keeper '98, Cidade de Concreto); Outer Wilds, Frieren e Survival Gen�
 
 - As traduções `index.en.mdx` e `index.es.mdx` dos exemplos foram escritas à mão (`modelo: exemplo`), não
   pelo script; o script as reconhece como em dia.
-- Capas de exemplo em `src/assets/reviews/<slug>/capa.jpg`; imagens de teste em
-  `src/content/reviews/outer-wilds/` (`fogueira.jpg`, `nave.jpg`); clipe em `public/videos/outer-wilds/`.
+- Capas de exemplo em `src/content/reviews/<slug>/capa.jpg`; imagens de teste em
+  `src/content/reviews/outer-wilds/imagens/`; clipe em `src/content/reviews/outer-wilds/videos/`.
 - O avatar `src/assets/autores/snufupugos.png` é um placeholder ("S").
 - O YouTube dos exemplos usa um id de teste (`dQw4w9WgXcQ`).
 
@@ -164,7 +164,13 @@ com `locale: 'es-MX'` (ou `pt-BR`): isso muda o `navigator.languages`.
     `titulo` do YouTube);
   - imagem escrita `./foto.jpg` aparece como texto no painel e é escapada ao salvar;
   - arquivos de bloco (`fields.file`) só são reconhecidos em `<directory>/<slug>/`;
-  - a capa (`fields.image` no frontmatter) também: `./capa.jpg` aparece vazia e é apagada ao salvar.
+  - a capa (`fields.image` no frontmatter) também: `./capa.jpg` aparece vazia e é apagada ao salvar
+    (resolvido: tudo usa `../<slug>/...` e o build barra o formato errado);
+  - o painel não pede texto alternativo no upload por padrão (agora o campo é obrigatório no painel e no build);
+  - a imagem entra onde está o cursor: com uma imagem selecionada, o upload a substitui (e o painel apaga
+    o arquivo antigo, que ficou sem uso).
+- **`git checkout -- <arquivo>` para desfazer um teste** volta ao último commit e apaga mudanças não
+  commitadas. Para desfazer teste, guarde uma cópia antes e restaure dela.
 - **Chromium headless esconde barras de rolagem** nos screenshots: use `ignoreDefaultArgs: ['--hide-scrollbars']`.
 - **Swipe em teste:** `Input.synthesizeScrollGesture` não move scroll-snap no headless; use
   `Input.dispatchTouchEvent` (touchStart, touchMove em passos, touchEnd).

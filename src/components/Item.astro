@@ -41,22 +41,14 @@ const Titulo = variante === 'bolso' ? 'h3' : 'p';
   data-slug={review.slug}
 >
   <div class="it-capa">
-    {
-      data.capa ? (
-        <Image
-          src={data.capa}
-          alt=""
-          widths={variante === 'grande' ? [400, 640] : [320, 560]}
-          sizes={variante === 'mini' ? '240px' : variante === 'bolso' ? '(max-width: 640px) 112px, 300px' : '(max-width: 900px) 92vw, 272px'}
-          loading={prioridade ? 'eager' : 'lazy'}
-          fetchpriority={prioridade ? 'high' : undefined}
-        />
-      ) : (
-        <span class="it-sem-capa" aria-hidden="true">
-          {numero}
-        </span>
-      )
-    }
+    <Image
+      src={data.capa}
+      alt=""
+      widths={variante === 'grande' ? [400, 640] : [320, 560]}
+      sizes={variante === 'mini' ? '240px' : variante === 'bolso' ? '(max-width: 640px) 112px, 300px' : '(max-width: 900px) 92vw, 272px'}
+      loading={prioridade ? 'eager' : 'lazy'}
+      fetchpriority={prioridade ? 'high' : undefined}
+    />
   </div>
 
   <div class="it-dados">

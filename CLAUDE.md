@@ -252,7 +252,7 @@ src/components/            Item (a ficha), LootLog, DestaqueHome, ReviewCompleta
                            SeletorIdioma (header), SugestaoIdioma (faixa fixa no pé da tela)
 src/lib/                   reviews (versaoEm por idioma), lootlog + lootlog-eventos (puro, testável), autores,
                            comentarios (contagem Giscus), caminhos (getStaticPaths), rss, raridade
-src/integrations/          limite-arquivos.ts: barra arquivo > 25 MB e imagem estragada pelo painel
+src/integrations/          midia.ts: capa obrigatória, mídia na pasta certa, texto alternativo, 25 MB, sem erro silencioso
 src/styles/                global.css (tokens) e item.css (a ficha, global com prefixo it-)
 scripts/translate.mjs      npm run translate (Workers AI, --mock para testar)
 .github/workflows/         translate.yml: traduz e commita a cada push em reviews e uma vez por dia
@@ -283,10 +283,13 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   atraso, Esc fecha, foco do teclado abre, não existe em toque.
 - **Página da review:** título, linha de roll, motivo. Lateral esquerda fixa (veredito, progresso de leitura,
   sumário com a seção atual), texto no centro, loot log à direita. No celular, só a coluna do centro.
-- **Mídia nas reviews:** imagem na pasta da review escrita como `../<slug>/foto.jpg` (o único formato que
-  o painel reconhece; `./foto.jpg` é estragado se salvo pelo painel). Clipes em `public/videos/<slug>/`.
-  `<Figure legenda>` envolve uma imagem Markdown. Limite de 25 MB por arquivo (Cloudflare Workers).
-  Detalhes no README.
+- **Mídia nas reviews (regras do Tomaz):** 1) tudo na pasta da review: `capa.<ext>` na raiz, imagens em
+  `imagens/`, clipes e seus quadros em `videos/`; 2) **capa obrigatória** (schema, painel e build; não existe
+  ficha sem imagem); 3) **nenhum erro silencioso**. Caminhos sempre `../<slug>/...` (o único formato que o
+  painel reconhece: `./foto.jpg` é apagado ou escapado ao salvar pelo painel). O painel limpa o nome do arquivo
+  no upload (`src/lib/nomes-de-arquivo.ts`) e exige texto alternativo; o `<Clipe>` exige `descricao`.
+  `src/integrations/midia.ts` faz o build parar em qualquer violação e avisa sobre nomes genéricos e arquivos
+  soltos ou sem uso. Limite de 25 MB por arquivo (Cloudflare Workers). Detalhes no README.
 - **Texto de interface só nos dicionários**, inclusive o Sobre. O TypeScript obriga en.ts e pt.ts a terem
   as mesmas chaves. Plural sempre por função do dicionário, nunca por troca de número no texto.
 - **Testes visuais:** Playwright com o Chromium já instalado em `~/.cache/ms-playwright`, rodando fora do

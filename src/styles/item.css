@@ -32,17 +32,6 @@
   height: 100%;
   object-fit: cover;
 }
-.it-sem-capa {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--display);
-  font-weight: 800;
-  font-size: clamp(3rem, 9vw, 5.5rem);
-  letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--cor) 35%, var(--borda));
-}
 
 .it-dados {
   padding: 0 2px;
@@ -189,9 +178,6 @@
 .it--mini .it-capa {
   aspect-ratio: 16 / 9;
 }
-.it--mini .it-sem-capa {
-  font-size: 2.5rem;
-}
 .it--mini .it-nome {
   margin-top: 8px;
   font-size: 1.25rem;
@@ -230,9 +216,6 @@
     flex: none;
     width: 104px;
     aspect-ratio: 3 / 4;
-  }
-  .it--bolso .it-sem-capa {
-    font-size: 2rem;
   }
   .it--bolso .it-nome {
     margin-top: 2px;

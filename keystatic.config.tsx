@@ -1,5 +1,6 @@
 import { config, collection, fields } from '@keystatic/core';
 import { block, wrapper } from '@keystatic/core/content-components';
+import { limparNome } from './src/lib/nomes-de-arquivo';
 
 /**
  * Painel de escrita em /keystatic.
@@ -11,29 +12,33 @@ import { block, wrapper } from '@keystatic/core/content-components';
 const REPO = 'TomazBontempo/needorgreed.blog';
 
 /**
- * Clipes curtos: servidos como arquivo estático, por isso ficam em public/.
- * O painel guarda em public/videos/<slug>/ e escreve src="/videos/<slug>/arquivo.mp4".
+ * Tudo de uma review fica na pasta dela (src/content/reviews/<slug>/):
+ *   capa.jpg            a capa (o painel sempre chama de "capa")
+ *   imagens/<nome>      imagens do texto
+ *   videos/<nome>       clipes e o quadro de capa de cada clipe
+ * O painel escreve os caminhos como ../<slug>/..., o único formato que ele reconhece ao reabrir.
+ * No upload, o nome que o autor deu ao arquivo é mantido, só limpo (minúsculas, sem acento, hífens).
  */
-const videos = {
-  directory: 'public/videos',
-  publicPath: '/videos/',
-};
-
-/** Capa: guardada em src/assets/reviews/<slug>/. */
-const imagensReviews = {
-  directory: 'src/assets/reviews',
-  // Caminho relativo a partir de src/content/reviews/<slug>/index.mdx
-  publicPath: '../../../assets/reviews/',
-};
-
-/**
- * Imagens do texto: guardadas na pasta da própria review (src/content/reviews/<slug>/),
- * escritas como ../<slug>/foto.jpg. O painel só reconhece imagens nesse formato:
- * um ./foto.jpg escrito à mão aparece como texto no painel e é estragado se salvar por lá.
- */
-const imagensTexto = {
+const pastaDaReview = {
   directory: 'src/content/reviews',
   publicPath: '../',
+};
+
+const videos = {
+  ...pastaDaReview,
+  transformFilename: (nome: string) => `videos/${limparNome(nome)}`,
+};
+
+const imagensTexto = {
+  ...pastaDaReview,
+  transformFilename: (nome: string) => `imagens/${limparNome(nome)}`,
+  schema: {
+    alt: fields.text({
+      label: 'Texto alternativo',
+      description: 'Obrigatório. Descreva o que a imagem mostra: é o que o leitor de tela lê e o que o Google usa.',
+      validation: { length: { min: 1 } },
+    }),
+  },
 };
 
 export default config({
@@ -109,7 +114,12 @@ export default config({
         data: fields.date({ label: 'Data', defaultValue: { kind: 'today' }, validation: { isRequired: true } }),
         plataforma: fields.text({ label: 'Plataforma / onde assistiu', description: 'Ex.: PC, Switch, Netflix, Crunchyroll' }),
         duracao: fields.text({ label: 'Duração', description: 'Ex.: 40h, 2 temporadas, 1h52' }),
-        capa: fields.image({ label: 'Capa', ...imagensReviews }),
+        capa: fields.image({
+          label: 'Capa',
+          description: 'Obrigatória: é a imagem da ficha em todas as listagens.',
+          validation: { isRequired: true },
+          ...pastaDaReview,
+        }),
         frase: fields.text({
           label: 'Frase de efeito',
           description: 'Aparece em itálico no pé do tooltip, como texto de item.',
@@ -146,7 +156,8 @@ export default config({
             }),
             Clipe: block({
               label: 'Clipe curto / GIF',
-              description: 'Vídeo curto em mp4 ou webm, toca sozinho e sem som, em loop. Máximo 25 MB. Vídeo longo: use o bloco do YouTube.',
+              description:
+                'Vídeo curto em mp4 ou webm, toca sozinho e sem som, em loop. Máximo 25 MB. Vídeo longo: use o bloco do YouTube. Renomeie o arquivo antes de enviar para um nome que diga o que ele mostra.',
               schema: {
                 src: fields.file({
                   label: 'Vídeo (.mp4 ou .webm, até 25 MB)',
@@ -156,11 +167,15 @@ export default config({
                 }),
                 poster: fields.image({
                   label: 'Imagem de capa do clipe',
-                  description: 'Aparece antes do vídeo carregar.',
+                  description: 'Aparece antes do vídeo carregar. Sugestão de nome: o nome do vídeo com -capa (pouso-ruim-capa.jpg).',
                   ...videos,
                 }),
                 legenda: fields.text({ label: 'Legenda' }),
-                descricao: fields.text({ label: 'Descrição para leitor de tela' }),
+                descricao: fields.text({
+                  label: 'Descrição para leitor de tela',
+                  description: 'Obrigatória. O que acontece no vídeo.',
+                  validation: { length: { min: 1 } },
+                }),
               },
             }),
             YouTube: block({

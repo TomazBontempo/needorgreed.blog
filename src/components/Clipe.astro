@@ -2,36 +2,56 @@
 /**
  * Clipe curto ou GIF em vídeo (mp4/webm): toca sozinho, sem som, em loop, com controles.
  *
- *   <Clipe src="/videos/<slug>/clipe.mp4" poster="/videos/<slug>/clipe.jpg" legenda="..." descricao="..." />
+ *   <Clipe src="../<slug>/videos/pouso-ruim.mp4" poster="../<slug>/videos/pouso-ruim-capa.jpg"
+ *          legenda="..." descricao="O que acontece no vídeo, para leitor de tela" />
  *
- * Os arquivos ficam em public/videos/<slug>/ (é onde o painel salva e o único lugar que ele reconhece). Limite: 25 MiB por arquivo,
- * que é o máximo da Cloudflare Workers para arquivo estático; o build falha acima disso.
+ * Os arquivos ficam na pasta da review, em videos/ (é onde o painel salva e o único formato que ele
+ * reconhece). O build publica o vídeo e o quadro de capa com nome versionado em /_astro/.
+ * Limite: 25 MB por arquivo (Cloudflare Workers); o build falha acima disso.
  * Vídeo longo vai para o YouTube: <YouTube id="..." />.
  */
+import { getImage } from 'astro:assets';
+
 interface Props {
   src: string;
   poster?: string;
   legenda?: string;
-  /** Descrição para leitor de tela. */
-  descricao?: string;
+  /** Descrição para leitor de tela. Obrigatória (o build também confere). */
+  descricao: string;
 }
 const { src, poster, legenda, descricao } = Astro.props;
 
-if (!src) {
-  throw new Error('<Clipe> sem vídeo (src). Escolha o arquivo no bloco "Clipe curto / GIF" do painel, ou escreva src="/videos/<slug>/clipe.mp4".');
+// Todos os vídeos e quadros de capa das reviews, com a URL final de cada um.
+const videos = import.meta.glob<string>('/src/content/reviews/*/videos/*.{mp4,webm}', { query: '?url', import: 'default', eager: true });
+const quadros = import.meta.glob<ImageMetadata>('/src/content/reviews/*/videos/*.{jpg,jpeg,png,webp,avif}', { import: 'default', eager: true });
+
+/** "../outer-wilds/videos/x.mp4" -> "/src/content/reviews/outer-wilds/videos/x.mp4" */
+const chave = (caminho: string) => `/src/content/reviews/${caminho.replace(/^\.\.\//, '')}`;
+
+const urlDoVideo = src ? videos[chave(src)] : undefined;
+if (!urlDoVideo) {
+  throw new Error(
+    `<Clipe src="${src ?? ''}">: vídeo não encontrado. Use um .mp4 ou .webm na pasta videos/ da review, ` +
+      `escrito como src="../<slug>/videos/nome.mp4" (é o formato que o painel gera).`,
+  );
 }
-const tipo = src.toLowerCase().endsWith('.webm') ? 'video/webm' : src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : undefined;
-if (!tipo) {
-  throw new Error(`<Clipe src="${src}">: use um arquivo .mp4 ou .webm. GIF animado precisa ser convertido para mp4 antes.`);
+if (!descricao?.trim()) {
+  throw new Error(`<Clipe src="${src}">: falta a descrição (descricao="..."), que é o que o leitor de tela lê.`);
 }
-if (!src.startsWith('/')) {
-  throw new Error(`<Clipe src="${src}">: coloque o vídeo em public/videos/<slug>/ e use src="/videos/<slug>/${src.split('/').pop()}".`);
+let urlDoQuadro: string | undefined;
+if (poster) {
+  const quadro = quadros[chave(poster)];
+  if (!quadro) {
+    throw new Error(`<Clipe poster="${poster}">: imagem não encontrada. Ela deve estar na pasta videos/ da review.`);
+  }
+  urlDoQuadro = (await getImage({ src: quadro, width: 1280, format: 'webp' })).src;
 }
+const tipo = src.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
 ---
 
 <figure class="figura clipe">
-  <video autoplay muted loop playsinline controls preload="metadata" poster={poster} aria-label={descricao} data-clipe>
-    <source src={src} type={tipo} />
+  <video autoplay muted loop playsinline controls preload="metadata" poster={urlDoQuadro} aria-label={descricao} data-clipe>
+    <source src={urlDoVideo} type={tipo} />
   </video>
   {legenda && <figcaption>{legenda}</figcaption>}
 </figure>

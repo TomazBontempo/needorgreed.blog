@@ -20,7 +20,8 @@ const camposReview = ({ image }: SchemaContext) =>
     data: z.coerce.date(),
     plataforma: z.string().optional(),
     duracao: z.string().optional(),
-    capa: image().optional(),
+    /** Obrigatória: é a imagem da ficha em todas as listagens. Fica na pasta da review. */
+    capa: image(),
     /** Frase de efeito em itálico no pé do tooltip. */
     frase: z.string().optional(),
     /** Atributos do item, ex.: { nome: "Nostalgia", valor: "+12" }. */

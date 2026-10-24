@@ -29,12 +29,15 @@ npx astro dev stop           # desliga
 
 **Pelo painel:** `/keystatic` → Reviews → Create. Preenche os campos, escreve o texto, salva.
 
-**Pela IDE:** cria uma pasta em `src/content/reviews/` com um `index.mdx`:
+**Pela IDE:** cria uma pasta em `src/content/reviews/` com o slug da review (minúsculas, sem acento, hífens;
+não mude depois de publicar: o endereço e os comentários dependem dele):
 
 ```
 src/content/reviews/hollow-knight/
   index.mdx
-  capa.jpg
+  capa.jpg          ← obrigatória
+  imagens/          ← imagens do texto
+  videos/           ← clipes e o quadro de capa de cada um
 ```
 
 ```mdx
@@ -48,7 +51,7 @@ idioma: pt            # pt | en | es: a língua em que você escreveu (as outras
 data: 2026-10-23
 plataforma: Switch
 duracao: 45h
-capa: ./capa.jpg
+capa: ../hollow-knight/capa.jpg   # obrigatória, sempre neste formato
 frase: Frase de efeito que aparece no pé do tooltip.
 atributos:
   - nome: Dificuldade
@@ -123,27 +126,30 @@ cobrança), a review fica sem tradução e o próximo run tenta de novo.
 
 ## Imagens e vídeos nas reviews
 
-Tudo funciona igual pelo painel e pela IDE. Exemplo completo: `src/content/reviews/outer-wilds/index.mdx`.
+Tudo de uma review fica na pasta dela, e o caminho sempre começa com `../<slug>/`. É estranho ("sai da pasta
+e entra de novo"), mas é o único formato que o painel gera e reconhece. Exemplo completo:
+`src/content/reviews/outer-wilds/`.
 
-**Imagem.** Fica na pasta da própria review e o Astro otimiza no build. Escreva o caminho com o slug,
-que é o formato que o painel gera e reconhece:
+| O quê | Onde fica | Como escreve |
+|---|---|---|
+| Capa (obrigatória) | `capa.jpg` na raiz da pasta | `capa: ../outer-wilds/capa.jpg` |
+| Imagem do texto | `imagens/` | `![o que a imagem mostra](../outer-wilds/imagens/chefe-final.jpg)` |
+| Clipe | `videos/` | `<Clipe src="../outer-wilds/videos/pouso-ruim.mp4" descricao="..." />` |
 
-```mdx
-![Descrição da imagem](../outer-wilds/foto.jpg)
-```
+**Pelo painel:** a capa vai no campo "Capa"; imagens pelo botão de imagem do editor (em uma linha vazia: a
+imagem entra onde está o cursor); clipes pelo bloco "Clipe curto / GIF". O painel salva cada arquivo na pasta
+certa e escreve o caminho sozinho.
 
-Pelo painel, o botão de imagem do editor salva o arquivo na pasta da review e escreve exatamente isso.
-
-> `./foto.jpg` também funciona no site, mas o painel não reconhece esse formato: ele mostra a linha como
-> texto e, se a review for salva por lá, estraga a imagem. Nesse caso o `npm run build` para e diz qual
-> linha consertar. Use sempre `../<slug>/foto.jpg`.
+**Nome dos arquivos:** renomeie antes de enviar para um nome que diga o que o arquivo mostra
+(`chefe-final.jpg`, não `IMG_2034.jpg`). O painel limpa o nome sozinho: `Chefe Final (versão 2).PNG` vira
+`chefe-final-versao-2.png`. A capa sempre vira `capa.<extensão>`.
 
 **Imagem com legenda.** Bloco "Imagem com legenda" no painel (insira a imagem dentro dele). Na IDE:
 
 ```mdx
 <Figure legenda="O registro da nave liga cada pista.">
 
-![O registro da nave](../outer-wilds/registro.jpg)
+![O registro da nave](../outer-wilds/imagens/registro.jpg)
 
 </Figure>
 ```
@@ -154,20 +160,24 @@ Pelo painel, o botão de imagem do editor salva o arquivo na pasta da review e e
 <YouTube id="dQw4w9WgXcQ" titulo="Trailer de Outer Wilds" />
 ```
 
-**Clipe curto ou GIF.** Bloco "Clipe curto / GIF" no painel, ou coloque os arquivos em `public/videos/<slug>/` e:
+**Clipe curto ou GIF:**
 
 ```mdx
-<Clipe src="/videos/outer-wilds/clipe.mp4" poster="/videos/outer-wilds/clipe.jpg" legenda="Legenda opcional" descricao="O que acontece no vídeo, para leitor de tela" />
+<Clipe src="../outer-wilds/videos/pouso-ruim.mp4" poster="../outer-wilds/videos/pouso-ruim-capa.jpg" legenda="Legenda opcional" descricao="O que acontece no vídeo" />
 ```
 
 - Só `.mp4` ou `.webm`. GIF precisa virar mp4 antes: `ffmpeg -i anim.gif -movflags +faststart -pix_fmt yuv420p -an anim.mp4`.
 - Toca sozinho, sem som, em loop, com controles. Quem pede movimento reduzido no sistema não vê autoplay.
-- Use a pasta `public/videos/<slug>/`: é o único lugar que o painel reconhece. Fora dela, salvar pelo painel apaga o vídeo do bloco.
-- **Limite: 25 MB por arquivo**, o máximo da Cloudflare Workers para arquivo estático. Acima disso o
-  `npm run build` (e o deploy depois do Salvar no painel) para com uma mensagem dizendo qual arquivo e como comprimir.
-  Vídeo longo vai para o YouTube.
+- O quadro de capa (`poster`) é opcional; sugestão de nome: o nome do vídeo com `-capa`.
+- **Limite: 25 MB por arquivo**, o máximo da Cloudflare Workers. Vídeo longo vai para o YouTube.
 
-As legendas, descrições e títulos dos componentes também são traduzidos pelo `npm run translate`.
+**O build confere tudo** (`src/integrations/midia.ts`) e para com uma mensagem dizendo o arquivo e como
+corrigir quando: falta a capa; a capa, uma imagem ou um clipe está fora do formato ou da pasta certa; o arquivo
+não existe; uma imagem está sem texto alternativo ou um clipe sem descrição; um arquivo passa de 25 MB; o painel
+estragou uma imagem. Ele só **avisa**, sem impedir a publicação, quando um nome é genérico (`img-2034.jpg`),
+quando há arquivo solto fora de `imagens/` e `videos/`, ou quando um arquivo não é usado por nenhuma versão.
+
+As legendas, descrições, textos alternativos e títulos também são traduzidos pelo `npm run translate`.
 
 ---
 

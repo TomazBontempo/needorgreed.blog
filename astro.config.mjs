@@ -5,7 +5,7 @@ import react from '@astrojs/react';
 import keystatic from '@keystatic/astro';
 import cloudflare from '@astrojs/cloudflare';
 import node from '@astrojs/node';
-import limiteDeArquivos from './src/integrations/limite-arquivos.ts';
+import checagemDeMidia from './src/integrations/midia.ts';
 
 // No dev, o painel salva arquivos no seu disco (Keystatic "local"), e isso precisa de Node.
 // O runtime da Cloudflare não tem acesso a disco, então no dev usamos o adapter Node
@@ -70,6 +70,6 @@ export default defineConfig({
     },
   ],
 
-  // limiteDeArquivos: barra arquivos acima de 25 MB, o máximo da Cloudflare Workers.
-  integrations: [react(), mdx(), keystatic(), limiteDeArquivos()],
+  // checagemDeMidia: capa obrigatória, mídia na pasta da review, texto alternativo, 25 MB (src/integrations/midia.ts).
+  integrations: [react(), mdx(), keystatic(), checagemDeMidia()],
 });
