@@ -1,12 +1,12 @@
 ---
-/** Sobre: glossário, como funcionam raridade e roll, e quem escreve. Os textos ficam nos dicionários. */
+/** Sobre: como funcionam raridade e roll, quem escreve e, por último, o glossário. Os textos ficam nos dicionários. */
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import TopoPagina from '../components/TopoPagina.astro';
 import MarcaRoll from '../components/MarcaRoll.astro';
 import { dicionario, idiomaDe, url } from '../i18n';
-import { RARIDADES, ROLL_IDS, valorDoRoll, type RollId } from '../lib/raridade';
+import { RARIDADES, ROLL_IDS, valorDoRoll } from '../lib/raridade';
 import { getReviews } from '../lib/reviews';
 
 const idioma = idiomaDe(Astro);
@@ -20,33 +20,11 @@ const faixaRoll = (min: number, i: number) => {
   const prox = RARIDADES[i + 1];
   return prox ? s.faixa(valorDoRoll(min), valorDoRoll(prox.min) - 1) : String(valorDoRoll(min));
 };
-/** Glossário na ordem do dicionário; Need, Greed e Pass entram logo depois de "Roll", na cor de cada um. */
-const glossario = Object.entries(s.glossario).flatMap(([chave, { termo, definicao }]) => [
-  { termo, definicao, roll: undefined as RollId | undefined },
-  ...(chave === 'roll' ? ROLL_IDS.map((r) => ({ termo: t.rolls[r].nome, definicao: t.rolls[r].descricao, roll: r })) : []),
-]);
 ---
 
 <Base titulo={t.paginas.sobre} descricao={s.intro}>
   <div class="container"><div class="sobre">
     <TopoPagina titulo={s.titulo} descricao={s.intro} />
-
-    <section aria-labelledby="s-glossario">
-      <h2 id="s-glossario">{s.glossarioTitulo}</h2>
-      <dl class="termos">
-        {
-          glossario.map((g) => (
-            <div class={g.roll && `roll-${g.roll}`}>
-              <dt class="mono">
-                {g.roll && <MarcaRoll roll={g.roll} tamanho={10} />}
-                {g.termo}
-              </dt>
-              <dd>{g.definicao}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </section>
 
     <section aria-labelledby="s-raridade">
       <h2 id="s-raridade">{s.raridadeTitulo}</h2>
@@ -141,6 +119,20 @@ const glossario = Object.entries(s.glossario).flatMap(([chave, { termo, definica
         }
       </ul>
     </section>
+
+    <section aria-labelledby="s-glossario">
+      <h2 id="s-glossario">{s.glossarioTitulo}</h2>
+      <dl class="termos">
+        {
+          Object.values(s.glossario).map(({ termo, definicao }) => (
+            <div>
+              <dt class="mono">{termo}</dt>
+              <dd>{definicao}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
   </div></div>
 </Base>
 
@@ -220,9 +212,6 @@ const glossario = Object.entries(s.glossario).flatMap(([chave, { termo, definica
   }
   .termos dt {
     color: var(--ouro);
-  }
-  .termos [class*='roll-'] dt {
-    color: var(--roll);
   }
   .rolls dd,
   .termos dd {

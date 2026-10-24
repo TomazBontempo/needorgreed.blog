@@ -12,7 +12,7 @@ const es: Dicionario = {
   hreflang: 'es',
 
   site: {
-    descricao: 'Reseñas de juegos, películas, series y anime. Cada obra es un botín: Need, Greed o Pass.',
+    descricao: 'Reseñas de juegos, películas, series y anime. Cada obra es un loot: Need, Greed o Pass.',
   },
 
   hero: {
@@ -138,7 +138,7 @@ const es: Dicionario = {
     sobre: 'Acerca',
     raridade: 'Rareza',
     autor: 'Autor',
-    maisLoot: 'Más botín',
+    maisLoot: 'Más loot',
     verTodos: 'Todas las reseñas',
     rerolar: 'Tirar de nuevo: mezclar las fichas',
     carrossel: 'Reseñas recientes',
@@ -147,7 +147,7 @@ const es: Dicionario = {
   },
 
   rodape: {
-    assinatura: 'Tirado a mano. Ningún botín patrocinado.',
+    assinatura: 'Tirado a mano. Ningún loot patrocinado.',
     rss: 'Feed RSS',
   },
 
@@ -155,7 +155,7 @@ const es: Dicionario = {
     titulo: 'Aquí no cayó nada',
     texto: 'Esta página hizo despawn, o nunca existió.',
     linhaSistema: 'El sistema tiró Pass (0) por [esta página]',
-    voltar: 'Volver al botín',
+    voltar: 'Volver al loot',
     arquivo: 'Buscar en el archivo',
   },
 
@@ -167,12 +167,12 @@ const es: Dicionario = {
   },
 
   arquivo: {
-    descricao: 'Todo lo que pasó en el sitio, del más nuevo al más viejo: reseñas tiradas, reseñas actualizadas, autores nuevos.',
+    descricao: 'Todo lo que pasó en el sitio, del más nuevo al más viejo: reseñas tiradas, reseñas re-tiradas, autores nuevos.',
     filtros: 'Filtrar el log',
     evento: 'Evento',
     todos: 'Todos',
     reviews: 'Reseñas',
-    atualizacoes: 'Actualizaciones',
+    atualizacoes: 'Re-rolls',
     autores: 'Autores nuevos',
     roll: 'Roll',
     nenhum: 'Ningún evento coincide con estos filtros.',
@@ -180,23 +180,15 @@ const es: Dicionario = {
   },
 
   sobre: {
-    titulo: 'Cómo funciona el botín',
+    titulo: 'Cómo funciona el loot',
     intro:
       'Cada obra reseñada aquí se trata como un objeto que cayó en una raid de MMO. Recibe dos veredictos, y no son lo mismo: qué tan buena es, y si vale tu tiempo ahora.',
     glossarioTitulo: 'Glosario',
-    /** Na ordem em que aparecem. Need, Greed e Pass entram depois de "roll", com o texto de `rolls`. */
+    /** Só os termos que o resto da página não explica, na ordem em que aparecem. */
     glossario: {
-      loot: { termo: 'Loot', definicao: 'Cada obra reseñada aquí. Ya cayó; la pregunta es si vale la pena recogerla.' },
-      raridade: { termo: 'Rareza', definicao: 'Qué tan buena es la obra, de Basura de vendedor a Legendario. Es el color del nombre.' },
-      nota: { termo: 'Nota', definicao: 'De 0 a 10, con un decimal. Es la que define la rareza.' },
-      roll: { termo: 'Roll', definicao: 'El veredicto práctico: ¿vale tu tiempo y tu dinero ahora? Need, Greed o Pass.' },
-      numero: { termo: 'Número del roll', definicao: 'El número entre paréntesis, como (94): la nota por diez.' },
-      motivo: { termo: 'Motivo', definicao: 'La línea pegada al roll que explica el veredicto. Esencial cuando el roll es Greed.' },
       linha: { termo: 'Línea de roll', definicao: 'La firma de cada reseña: Snufupugos tiró Need (94) por [Outer Wilds].' },
-      reroll: { termo: 'Re-roll', definicao: 'La reseña se editó. El log muestra el roll otra vez, con el veredicto actual.' },
       ficha: { termo: 'Ficha', definicao: 'La tarjeta de cada obra: portada, número de colección, rareza, roll y una frase.' },
-      log: { termo: 'Loot log', definicao: 'Los mensajes del sistema al costado: reseñas tiradas y re-tiradas, autores nuevos que se unen al grupo.' },
-      d100: { termo: 'd100', definicao: 'El dado junto a Más botín. Haz clic para sortear otras fichas.' },
+      d100: { termo: 'd100', definicao: 'El dado junto a Más loot. Haz clic para sortear otras fichas.' },
     },
     raridadeTitulo: 'Rareza: qué tan bueno es',
     raridadeTexto:

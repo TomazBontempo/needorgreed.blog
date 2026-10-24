@@ -3,7 +3,7 @@
 Documento de passagem para o próximo agente. Leia o `CLAUDE.md` primeiro (regras, decisões e padrões);
 este arquivo diz **onde paramos**, **o que falta** e **o que já deu errado**. Atualize-o ao fim de cada sessão.
 
-Última atualização: 2026-10-24.
+Última atualização: 2026-10-24 (fim do dia).
 
 ---
 
@@ -20,7 +20,7 @@ O redesign seguiu um plano de 8 passos pedido pelo Tomaz:
 | 5 | Direção visual aprovada ("Fichário de Loot", sem nada de card game) | feito |
 | 6 | Home e página da review, com várias rodadas de ajustes do Tomaz | feito |
 | 7 | Jogos, Telas, Raridade, Autor, Arquivo, Sobre, 404, RSS | feito |
-| 8 | Auditoria e crítica da Impeccable, build, teste completo no `wrangler dev` | **falta** |
+| 8 | Auditoria e crítica da Impeccable, build, teste completo no `wrangler dev` | **em andamento**: crítica feita e corrigida em parte; falta `audit`, `DESIGN.md` e o `wrangler dev` |
 
 Depois do passo 7, a sessão de 2026-10-24 fez:
 - **Espanhol** (América Latina) como terceira língua, em `/es/`, com seletor de idioma no header,
@@ -41,6 +41,23 @@ Ainda em 2026-10-24:
 - **Tudo commitado e enviado ao GitHub** (ver "Git"). A Action de tradução teve um bug no passo de commit,
   corrigido e testado no próprio GitHub.
 
+No fim de 2026-10-24 (commits `d81f94b` em diante):
+- **Crítica da Impeccable** (só leitura, rodada num contexto só, sem sub-agentes): 29 de 32 nas heurísticas
+  aplicáveis. Corrigidos os dois P2: um h1 só por página (um `#` no texto da review vira h2, ver
+  `components/TituloDoTexto.astro`; fichas logo abaixo do h1 viram h2) e o motivo do roll sem repetir na
+  lateral da review. O resto ficou em "Problemas abertos". Screenshots e medidas em `.impeccable/review/`
+  (fora do git).
+- **Hero novo:** uma frase ("Cada obra é um loot."), explicação em duas linhas e o link "Saiba mais sobre
+  nossas notas" na quarta linha. Respiro de até 65px que empurra a página em vez de espremer o destaque,
+  com limite no título de "Mais loot" e 32px de ficha (`--espiar-minimo` em `views/Home.astro`). Testamos
+  alinhar o hero com o destaque; o Tomaz preferiu o alinhamento com o logo do header.
+- **Re-roll no loot log:** edição aparece igual ao roll original (`re-rolled`, `re-rolou`, `re-tiró`), sem
+  contador. O filtro do Arquivo virou "Re-rolls".
+- **Raridade Herança removida** de tudo (lógica, painel, rotas, cores, textos). As reviews de exemplo ainda
+  têm a linha `heranca:` no frontmatter; ela é ignorada e some quando os exemplos forem apagados.
+- **Sobre:** glossário no fim, só com os termos que a página não explica (Linha de roll, Ficha, d100).
+- **Espanhol:** "botín" trocado por "loot" em todo lugar.
+
 **Decisão do Tomaz: o site só sobe com o domínio.** Ele vai comprar o `needorgreed.blog` antes. A Cloudflare
 cobra domínio só em dólar (há IOF em cartão comum); o Tomaz vai usar um cartão sem IOF. Alternativas que
 ficaram registradas: subir antes no endereço gratuito `*.workers.dev` e ligar o domínio depois, sem refazer
@@ -54,8 +71,8 @@ Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed
 
 1. **Testar o site vazio** (o mais importante): apagar as reviews de exemplo numa cópia e garantir que
    home, destaque, loot log, "Mais loot", carrossel, listagens, sitemap e RSS funcionam e que o build passa.
-2. **Passo 8 da Impeccable:** `critique` e `audit` no site todo (três línguas, desktop e celular), corrigir,
-   rodar o finish reviewer e gerar o `DESIGN.md` com o documenter. Ver "Impeccable".
+2. **Passo 8 da Impeccable:** a `critique` já rodou; falta o `audit` no site todo (três línguas, desktop e
+   celular), corrigir, rodar o finish reviewer e gerar o `DESIGN.md` com o documenter.
 3. **Teste no `npx wrangler dev`:** redirecionamento da home com `Accept-Language` em português, espanhol e
    outra língua; links diretos sem redirecionamento; seletor persistindo entre visitas (cookie `lang`).
 4. **Comprar o domínio** e criar o projeto na Cloudflare Workers ligado ao repositório (README, "Deploy").
@@ -73,7 +90,7 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 - **Páginas (inglês na raiz, português em `/pt/`, espanhol em `/es/`):** home, review, Jogos (`/games/`),
   Telas (`/screens/`, com filtro por tipo), Raridade (`/rarity/<slug>/`), Autor (`/authors/<slug>/`),
   Arquivo (`/archive/`, loot log completo por mês com filtros de evento e roll), Sobre (`/about/`), 404 e
-  RSS por idioma. Fragmentos `/fichas/<idioma>/<slug>/` para o tooltip do log (noindex). 96 páginas no build.
+  RSS por idioma. Fragmentos `/fichas/<idioma>-<slug>/` para o tooltip do log (noindex). 96 páginas no build.
 - **Idioma:** o Worker (`src/worker.ts`) decide antes de servir: `?lang=` (seletor ou faixa) grava o cookie;
   com cookie, vale em qualquer página; sem cookie, só a home redireciona, pelo `Accept-Language`; bots nunca.
   Nas outras páginas, a faixa de sugestão (fixa no pé da tela) oferece a troca. Testado no `wrangler dev` e
@@ -102,7 +119,12 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 
 - **Vocabulário em espanhol a revisar** por alguém que fale espanhol: "Pantallas", "Acerca", nomes das
   raridades e a linha de roll ("Snufupugos tiró Need (94) por [Outer Wilds]").
-- **Progresso de leitura** mostra "100% lido" logo de cara numa review curta que cabe na tela.
+- **Progresso de leitura** mostra "100% lido" logo de cara numa review curta que cabe na tela, e "1% lido"
+  no topo de uma review longa (P3 da crítica).
+- **Review no celular sem raridade nem nota** (P1 da crítica, medido): a lateral do veredito some abaixo de
+  900px e só sobra a cor do nome na linha de roll. O Tomaz disse "veremos depois".
+- **Ficha com rodapé desigual** quando aparece a marca "read" de review já lida (P3 da crítica).
+- **Filtros do Arquivo** com 21px de altura de toque (mínimo do WCAG 2.2 é 24px; P3 da crítica).
 - **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
   Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", carrossel, sitemap, RSS):
   fazer antes de apagar os exemplos (item 1 do checklist).
@@ -173,6 +195,9 @@ Repositório: `TomazBontempo/needorgreed.blog` (público). Tudo enviado; `main` 
 - `c9f9c05` mídia na pasta da review, capa obrigatória e checagem no build
 - `500b536` tooltip no dev, links externos, painel reorganizado e mídia sem travas
 - `35155b5` correção do passo de commit da Action de tradução
+- `9bc7efe` ESTADO atualizado (domínio e checklist de estreia)
+- `d81f94b` hero novo, títulos, re-roll no log, glossário e fim da Herança
+- o commit seguinte: re-roll no Arquivo, glossário enxuto no fim do Sobre, "loot" no espanhol e estes documentos
 
 O Tomaz autoriza commits e pushes pedindo; proponha um commit ao fim de cada rodada aprovada (ele pede
 reversões com frequência). Desfazer teste: guarde uma cópia antes; nunca `git checkout` em arquivo com

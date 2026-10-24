@@ -107,7 +107,8 @@ O nick vem do autor, o item é colorido pela raridade, o roll pela cor do roll.
 Desktop (tudo isso cabe na primeira tela; ver "Padrões estabelecidos"):
 
 1. **Header:** logo à esquerda; Jogos, Telas, Arquivo, Sobre e o seletor de idioma à direita. Fixo no topo.
-2. **Hero:** três linhas (as duas frases da tagline e a descrição), sem fundo próprio nem bordas.
+2. **Hero:** a frase de impacto, a explicação em duas linhas, uma linha em branco e o link para o Sobre,
+   sem fundo próprio nem bordas. Alinhado com o logo do header (largura do header), não com o destaque.
 3. **Destaque: a review mais recente, estilo post do Reddit**, sob o título "Última crítica". O texto
    **completo**, numa janela de altura fixa com rolagem interna, sem a ficha do item. No fim, o link
    "Abrir review e comentários" leva à página dedicada, onde ficam os comentários.
@@ -120,7 +121,8 @@ Mobile: header compacto, só a descrição do hero e um carrossel de fichas em o
 
 - **Log = atividade.** Compacto, cronológico, texto de sistema. Registra eventos, não só reviews:
   - review criada: `Snufupugos rolou Greed (72) para [Jogo]`
-  - review atualizada: `Snufupugos atualizou [Jogo]` (agrupar edições do mesmo dia)
+  - review editada (re-roll): `Snufupugos re-rolou Greed (72) para [Jogo]`, igual ao roll original, com o
+    roll atual e sem contador (edições do mesmo dia viram uma linha só). Espanhol: `re-tiró`.
   - autor novo: `OutroNick entrou no grupo`
   Fonte: histórico de commits do GitHub no build (o mesmo mecanismo de autoria, ver abaixo).
   A página **Arquivo** é o log completo, com filtros simples. Isso resolve o arquivo de forma criativa.
@@ -134,7 +136,9 @@ Mobile: header compacto, só a descrição do hero e um carrossel de fichas em o
 - **Jogos** e **Telas**: listagem em cards. Telas = filmes, séries e animes. "Lugares" virá depois como terceira seção.
 - **Raridade** (`/raridade/<id>/`) e **Autor** (`/autores/<slug>/`).
 - **Arquivo:** o loot log completo.
-- **Sobre:** como funcionam raridade e roll, e quem escreve.
+- **Sobre:** toda a lógica (raridade, roll, divergência, número do roll, loot log com re-roll, línguas,
+  quem escreve) e, por último, um glossário só com os termos que o resto da página não explica
+  (Linha de roll, Ficha, d100).
 - **RSS** e **404** temática.
 
 ---
@@ -350,8 +354,13 @@ Tomadas (não reabrir sem o Tomaz pedir):
 - **Direção visual: "Fichário de Loot"**, sem nada de card game (nada de foil, holográfico ou carta de TCG:
   o Tomaz vetou). Cada review é uma ficha de item com número de coleção (Nº 009), borda na cor da raridade
   e uma segunda borda solta por fora.
-- **Copy do hero:** linha 1 "Every drop rated." / "Todo drop tem nota."; linha 2 "Not every drop worth
-  picking up." / "Nem todo drop vale pegar."; linha 3 a descrição. Exatamente três linhas.
+- **Copy do hero:** "Every work is a loot drop." / "Cada obra é um loot." / "Cada obra es un loot.";
+  depois "Reviews of games, films, series and anime." e "Rarity says how good the work is, and the roll
+  says if it is worth your time." em duas linhas; uma linha em branco; o link "More about our ratings" /
+  "Saiba mais sobre nossas notas" / "Más sobre nuestras notas".
+- **Sem raridade Herança** (removida pelo Tomaz em 2026-10-24: não fazia sentido fora da escala).
+  Obra de valor afetivo se avisa no texto da review.
+- **"Loot" também em espanhol** (nada de "botín"): "Más loot", "Cómo funciona el loot".
 - **Número do roll:** nota vezes 10 (0 a 100), sempre dentro da faixa da raridade. `valorDoRoll()`.
 - **Tipografia:** Big Shoulders (display), Literata (texto), Fragment Mono (sistema), via API de fontes
   do Astro (`fonts` no astro.config, baixadas no build).
@@ -368,7 +377,8 @@ Em aberto:
 - **Destaque da home:** na página da review o título vem antes da linha de roll; no destaque da home ainda
   vem depois. Perguntar se deve seguir a página da review.
 - **Bio de autor em inglês:** só existe `bio` (em português). Um campo `bio_en` resolveria.
-- **Fechamento da Impeccable:** falta o passo 8 (crítica e auditoria) e o `DESIGN.md` gerado do site pronto.
+- **Fechamento da Impeccable:** a crítica rodou em 2026-10-24 (ver ESTADO.md); falta a auditoria (`audit`)
+  e o `DESIGN.md` gerado do site pronto.
 
 ## Comandos
 

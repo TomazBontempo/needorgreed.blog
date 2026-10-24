@@ -165,12 +165,12 @@ const pt: Dicionario = {
   },
 
   arquivo: {
-    descricao: 'Tudo que aconteceu no site, do mais novo para o mais antigo: reviews roladas, reviews atualizadas, autores novos.',
+    descricao: 'Tudo que aconteceu no site, do mais novo para o mais antigo: reviews roladas, reviews re-roladas, autores novos.',
     filtros: 'Filtrar o log',
     evento: 'Evento',
     todos: 'Todos',
     reviews: 'Reviews',
-    atualizacoes: 'Atualizações',
+    atualizacoes: 'Re-rolls',
     autores: 'Autores novos',
     roll: 'Roll',
     nenhum: 'Nenhum evento com esses filtros.',
@@ -182,18 +182,10 @@ const pt: Dicionario = {
     intro:
       'Toda obra criticada aqui é tratada como um item que caiu numa raid de MMO. Ela recebe dois vereditos, e eles não são a mesma coisa: o quão boa ela é, e se vale o seu tempo agora.',
     glossarioTitulo: 'Glossário',
-    /** Na ordem em que aparecem. Need, Greed e Pass entram depois de "roll", com o texto de `rolls`. */
+    /** Só os termos que o resto da página não explica, na ordem em que aparecem. */
     glossario: {
-      loot: { termo: 'Loot', definicao: 'Toda obra criticada aqui. Ela caiu; a pergunta é se vale pegar.' },
-      raridade: { termo: 'Raridade', definicao: 'O quão boa é a obra, de Lixo de vendedor a Lendário. É a cor do nome.' },
-      nota: { termo: 'Nota', definicao: 'De 0 a 10, com uma casa decimal. É ela que define a raridade.' },
-      roll: { termo: 'Roll', definicao: 'O veredito prático: vale seu tempo e seu dinheiro agora? Need, Greed ou Pass.' },
-      numero: { termo: 'Número do roll', definicao: 'O número entre parênteses, como (94): a nota vezes dez.' },
-      motivo: { termo: 'Motivo', definicao: 'A linha colada no roll que explica o veredito. Essencial quando o roll é Greed.' },
       linha: { termo: 'Linha de roll', definicao: 'A assinatura de toda review: Snufupugos rolou Need (94) para [Outer Wilds].' },
-      reroll: { termo: 'Re-roll', definicao: 'A review foi editada. O log mostra o roll de novo, com o veredito atual.' },
       ficha: { termo: 'Ficha', definicao: 'O card de cada obra: capa, número de coleção, raridade, roll e uma frase de efeito.' },
-      log: { termo: 'Loot log', definicao: 'As mensagens de sistema na lateral: reviews roladas e re-roladas, autores novos entrando no grupo.' },
       d100: { termo: 'd100', definicao: 'O dado ao lado de Mais loot. Clique para sortear outras fichas.' },
     },
     raridadeTitulo: 'Raridade: o quão bom é',

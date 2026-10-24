@@ -28,7 +28,7 @@ Two independent axes, rarity (how good it is) and roll (Need, Greed or Pass: is 
 - Translation must cost zero and need no credit card (Workers AI free tier).
 - Never use the em dash in any language or surface.
 - Never copy art, fonts, icons or exact visuals from Blizzard or any game; the item tooltip is a genre convention and must be drawn from scratch.
-- Open decisions: hero copy, meaning of the roll number, logo.
+- Open decisions: logo. (Hero copy and the roll number are decided; see CLAUDE.md.)
 
 ## Brand Commitments
 - Name: Need or Greed. Main author nick: Snufupugos (WoW origin).

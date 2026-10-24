@@ -168,12 +168,12 @@ const en = {
   },
 
   arquivo: {
-    descricao: 'Everything that happened on the site, newest first: reviews rolled, reviews updated, new authors.',
+    descricao: 'Everything that happened on the site, newest first: reviews rolled, reviews re-rolled, new authors.',
     filtros: 'Filter the log',
     evento: 'Event',
     todos: 'All',
     reviews: 'Reviews',
-    atualizacoes: 'Updates',
+    atualizacoes: 'Re-rolls',
     autores: 'New authors',
     roll: 'Roll',
     nenhum: 'No event matches these filters.',
@@ -185,18 +185,10 @@ const en = {
     intro:
       'Every work reviewed here is treated like an item that dropped in an MMO raid. It gets two verdicts, and they are not the same thing: how good it is, and whether it is worth your time right now.',
     glossarioTitulo: 'Glossary',
-    /** Na ordem em que aparecem. Need, Greed e Pass entram depois de "roll", com o texto de `rolls`. */
+    /** Só os termos que o resto da página não explica, na ordem em que aparecem. */
     glossario: {
-      loot: { termo: 'Loot', definicao: 'Every work reviewed here. It dropped; the question is whether you pick it up.' },
-      raridade: { termo: 'Rarity', definicao: 'How good the work is, from Vendor Trash to Legendary. It is the colour of the name.' },
-      nota: { termo: 'Score', definicao: 'From 0 to 10, with one decimal. It sets the rarity.' },
-      roll: { termo: 'Roll', definicao: 'The practical verdict: is it worth your time and money right now? Need, Greed or Pass.' },
-      numero: { termo: 'Roll number', definicao: 'The number in brackets, like (94): the score times ten.' },
-      motivo: { termo: 'Reason', definicao: 'The line right next to the roll that explains it. Essential when the roll is Greed.' },
       linha: { termo: 'Roll line', definicao: 'The signature of every review: Snufupugos rolled Need (94) for [Outer Wilds].' },
-      reroll: { termo: 'Re-roll', definicao: 'The review was edited. The log shows the roll again, with the current verdict.' },
       ficha: { termo: 'Item card', definicao: 'The card for each work: cover, collection number, rarity, roll and a one-liner.' },
-      log: { termo: 'Loot log', definicao: 'The system messages on the side: reviews rolled and re-rolled, new authors joining the party.' },
       d100: { termo: 'd100', definicao: 'The die next to More loot. Click it to roll a new set of cards.' },
     },
     raridadeTitulo: 'Rarity: how good it is',
