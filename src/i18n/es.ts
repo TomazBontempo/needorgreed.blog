@@ -141,8 +141,6 @@ const es: Dicionario = {
     maisLoot: 'Más loot',
     verTodos: 'Todas las reseñas',
     rerolar: 'Tirar de nuevo: mezclar las fichas',
-    carrossel: 'Reseñas recientes',
-    posicao: (i: number, n: number) => `${i} de ${n}`,
     rerolado: 'Nuevas fichas sorteadas.',
   },
 

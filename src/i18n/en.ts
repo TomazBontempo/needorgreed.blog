@@ -142,8 +142,6 @@ const en = {
     maisLoot: 'More loot',
     verTodos: 'All reviews',
     rerolar: 'Reroll: shuffle the cards',
-    carrossel: 'Latest reviews',
-    posicao: (i: number, n: number) => `${i} of ${n}`,
     rerolado: 'New cards drawn.',
   },
 

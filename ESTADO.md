@@ -120,7 +120,11 @@ os filtros do Arquivo em fileiras. O desktop foi conferido pixel a pixel e não 
 
 - **Vocabulário em espanhol a revisar** por alguém que fale espanhol: "Pantallas", "Acerca", nomes das
   raridades e a linha de roll ("Snufupugos tiró Need (94) por [Outer Wilds]").
-- **Adiados pelo Tomaz (resolver mais à frente):** a auditoria da Impeccable (`audit`) e o `DESIGN.md`;
+- **Auditoria da Impeccable (`audit`) feita em 2026-10-24: 16/20.** Só o item de polimento foi aplicado (cores
+  fixas viraram tokens, código morto removido). O Tomaz descartou o resto (links do log só por cor, contraste
+  dos eventos "lidos", texto em 200%, 11px no desktop, pré-carregamento das fontes): não reabrir sem ele pedir.
+- **Próximo passo (2026-10-25): limpar o site e subir na Cloudflare**, pelo checklist acima.
+- **Adiados pelo Tomaz (resolver mais à frente):** o `DESIGN.md`;
   o logo (o d100 de traço ainda é placeholder). O mobile já foi revisto (ver "Onde paramos").
 - **Decidido não mexer:** o progresso de leitura mostra "1% lido" no topo de review longa e "100% lido"
   de cara em review curta. Fica como está (decisão do Tomaz).

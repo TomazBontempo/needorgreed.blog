@@ -6,15 +6,21 @@
 :root {
   /* Superfícies */
   --fundo: #0f0d0b;
+  /* Fundo do header fixo: um pouco mais escuro que a página. */
+  --fundo-cabecalho: #0b0a08;
   --painel: #17140f;
   --painel-fundo: #120f0c;
   --borda: #2c261d;
   --borda-forte: #3d3428;
+  /* Linha tracejada entre itens de uma lista (log, veredito, tabela do Sobre). */
+  --borda-tracejada: #2a241c;
 
   /* Texto (o terciário foi clareado da paleta original para passar AA em texto pequeno) */
   --texto: #e9e2d3;
   --texto-2: #a89e8a;
   --texto-3: #8b816f;
+  /* Um pouco mais claro que o texto: o primeiro parágrafo e o negrito da review. */
+  --texto-forte: #f4eee2;
 
   /* Acentos */
   --ouro: #e3b45c;

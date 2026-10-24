@@ -266,7 +266,7 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
 
 ### Padrões estabelecidos (seguir)
 
-- **Uma ficha só.** `Item.astro` com variantes `grande`, `bolso` (listagens) e `mini` (tooltip
+- **Uma ficha só.** `Item.astro` com variantes `bolso` (listagens) e `mini` (tooltip
   do log). Bolso e mini mostram exatamente os mesmos dados (atributos, frase, roll com número, pé); só o
   tamanho muda. Toda review tem **exatamente 2 atributos** (schema e painel exigem). Nunca crie outro desenho de card. Estilos em `src/styles/item.css`, globais, prefixo `it-`.
   Hover do bolso: sobe 4px, escala 1.02, borda na cor da raridade, sombra suave, 180ms, só em `(hover: hover)`;

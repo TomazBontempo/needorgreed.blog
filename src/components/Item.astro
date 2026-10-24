@@ -3,7 +3,6 @@
  * A ficha do item: cada review é um colecionável numerado.
  * Painel escuro, borda na cor da raridade e uma segunda borda solta por fora.
  *
- * variante "grande": a ficha completa.
  * variante "bolso":  a ficha nas listagens ("Mais loot", Jogos, Telas...), com link e hover.
  * variante "mini":   a mesma ficha do bolso em tamanho pequeno, no tooltip do loot log.
  * Bolso e mini mostram exatamente os mesmos dados; só o tamanho muda.
@@ -21,14 +20,12 @@ interface Props {
   review: ReviewCompleta;
   data: VersaoReview['data'];
   idioma: Idioma;
-  variante?: 'grande' | 'bolso' | 'mini';
-  /** Carrega a capa sem lazy (primeira dobra). */
-  prioridade?: boolean;
+  variante: 'bolso' | 'mini';
   /** Nível do título da ficha "bolso": 2 logo abaixo do h1 da página, 3 abaixo de um h2. */
   nivel?: 2 | 3;
 }
 
-const { review, data, idioma, variante = 'grande', prioridade = false, nivel = 3 } = Astro.props;
+const { review, data, idioma, variante, nivel = 3 } = Astro.props;
 const t = dicionario(idioma);
 const { raridade } = review;
 const nomeRaridade = t.raridades[raridade.id].nome;
@@ -47,10 +44,9 @@ const Titulo = variante === 'bolso' ? (`h${nivel}` as const) : 'p';
     <Image
       src={data.capa}
       alt=""
-      widths={variante === 'grande' ? [400, 640] : [320, 560]}
-      sizes={variante === 'mini' ? '240px' : variante === 'bolso' ? '(max-width: 640px) 112px, 300px' : '(max-width: 900px) 92vw, 272px'}
-      loading={prioridade ? 'eager' : 'lazy'}
-      fetchpriority={prioridade ? 'high' : undefined}
+      widths={[320, 560]}
+      sizes={variante === 'mini' ? '240px' : '(max-width: 640px) 112px, 300px'}
+      loading="lazy"
     />
   </div>
 
@@ -77,15 +73,11 @@ const Titulo = variante === 'bolso' ? (`h${nivel}` as const) : 'p';
 
     {data.frase && <p class="it-frase">“{data.frase}”</p>}
 
-    {
-      variante !== 'grande' && (
-        <p class="it-roll mono">
-          <MarcaRoll roll={data.roll} />
-          {t.rolls[data.roll].nome}
-          <span class="it-valor"> ({review.valorRoll})</span>
-        </p>
-      )
-    }
+    <p class="it-roll mono">
+      <MarcaRoll roll={data.roll} />
+      {t.rolls[data.roll].nome}
+      <span class="it-valor"> ({review.valorRoll})</span>
+    </p>
 
     <p class="it-pe mono">
       <span class="it-numero">{t.item.numero} {numero} · {set}</span>
