@@ -77,6 +77,11 @@ const pt: Dicionario = {
     lido: 'lido',
   },
 
+  /** Lido pelo leitor de tela em todo link que sai do blog (abre em nova guia). */
+  links: {
+    novaGuia: '(abre em nova guia)',
+  },
+
   item: {
     numero: 'Nº',
     rotulo: 'Ficha do item',

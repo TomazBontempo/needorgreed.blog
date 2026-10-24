@@ -5,5 +5,7 @@
 import YouTube from './YouTube.astro';
 import Figure from './Figure.astro';
 import Clipe from './Clipe.astro';
+import Link from './Link.astro';
 
-export const componentesMdx = { YouTube, Figure, Clipe };
+/** `a` troca todo link do texto: os de fora do blog abrem em nova guia. */
+export const componentesMdx = { YouTube, Figure, Clipe, a: Link };

@@ -71,6 +71,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <body style={largura ? `--largura: ${largura}` : undefined}>
     <Fragment set:html={`<!--${contrato}-->`} />
     <a class="pular" href="#conteudo">{t.nav.pularParaConteudo}</a>
+    <!-- Descrição dos links externos (aria-describedby): o leitor de tela ouve que abrem em nova guia. -->
+    <span id="aviso-nova-guia" hidden>{t.links.novaGuia}</span>
     <Cabecalho idioma={idioma} />
     <main id="conteudo">
       <slot />

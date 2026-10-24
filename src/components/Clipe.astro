@@ -16,8 +16,8 @@ interface Props {
   src: string;
   poster?: string;
   legenda?: string;
-  /** Descrição para leitor de tela. Obrigatória (o build também confere). */
-  descricao: string;
+  /** Descrição para leitor de tela. Recomendada; sem ela o build só avisa. */
+  descricao?: string;
 }
 const { src, poster, legenda, descricao } = Astro.props;
 
@@ -35,9 +35,6 @@ if (!urlDoVideo) {
       `escrito como src="../<slug>/videos/nome.mp4" (é o formato que o painel gera).`,
   );
 }
-if (!descricao?.trim()) {
-  throw new Error(`<Clipe src="${src}">: falta a descrição (descricao="..."), que é o que o leitor de tela lê.`);
-}
 let urlDoQuadro: string | undefined;
 if (poster) {
   const quadro = quadros[chave(poster)];
@@ -50,7 +47,7 @@ const tipo = src.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
 ---
 
 <figure class="figura clipe">
-  <video autoplay muted loop playsinline controls preload="metadata" poster={urlDoQuadro} aria-label={descricao} data-clipe>
+  <video autoplay muted loop playsinline controls preload="metadata" poster={urlDoQuadro} aria-label={descricao?.trim() || undefined} data-clipe>
     <source src={urlDoVideo} type={tipo} />
   </video>
   {legenda && <figcaption>{legenda}</figcaption>}

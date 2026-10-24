@@ -35,11 +35,20 @@ const imagensTexto = {
   schema: {
     alt: fields.text({
       label: 'Texto alternativo',
-      description: 'Obrigatório. Descreva o que a imagem mostra: é o que o leitor de tela lê e o que o Google usa.',
-      validation: { length: { min: 1 } },
+      description: 'Recomendado. Descreva o que a imagem mostra: é o que o leitor de tela lê e o que o Google usa.',
     }),
   },
 };
+
+/** Logo do painel: o d100 do site, dourado no escuro e num ouro mais fechado no claro. */
+function MarcaD100({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
+  return (
+    <svg viewBox="0 0 26 26" width="24" height="24" fill="none" stroke={colorScheme === 'dark' ? '#e3b45c' : '#9a7124'} strokeWidth="1.5" aria-hidden="true">
+      <path d="M13 1.5 23.5 7.5v11L13 24.5 2.5 18.5v-11z" />
+      <path d="M13 1.5v8M2.5 7.5 13 9.5l10.5-2M13 9.5 7 18.5h12zM2.5 18.5 7 18.5M23.5 18.5H19M13 24.5 7 18.5M13 24.5l6-6" />
+    </svg>
+  );
+}
 
 export default config({
   // PUBLIC_KEYSTATIC_STORAGE=github força o modo GitHub no dev (usado uma vez, no setup do GitHub App).
@@ -49,7 +58,8 @@ export default config({
       : { kind: 'local' },
 
   ui: {
-    brand: { name: 'Need or Greed' },
+    // O mesmo d100 de traço do header do site (placeholder até o logo definitivo).
+    brand: { name: 'Need or Greed', mark: MarcaD100 },
     navigation: {
       Conteúdo: ['reviews'],
       Equipe: ['autores'],
@@ -65,7 +75,17 @@ export default config({
       entryLayout: 'content',
       columns: ['titulo', 'data'],
       schema: {
-        titulo: fields.slug({ name: { label: 'Título da obra' } }),
+        // A ordem aqui é a ordem da lateral do painel, em quatro grupos:
+        // a obra, o veredito, a ficha do item e a publicação. (O Keystatic não tem título de seção.)
+
+        // 1. A obra
+        titulo: fields.slug({
+          name: { label: 'Título da obra' },
+          slug: {
+            label: 'Slug',
+            description: 'Endereço da review (/reviews/slug/). Não mude depois de publicar.',
+          },
+        }),
         tipo: fields.select({
           label: 'Tipo',
           options: [
@@ -76,61 +96,55 @@ export default config({
           ],
           defaultValue: 'jogo',
         }),
+        plataforma: fields.text({ label: 'Plataforma', description: 'Onde jogou ou assistiu. Ex.: PC, Switch, Netflix.' }),
+        duracao: fields.text({ label: 'Duração', description: 'Ex.: 40h, 2 temporadas, 1h52.' }),
+        capa: fields.image({
+          label: 'Capa',
+          description: 'Obrigatória. É a imagem da ficha em todas as listagens.',
+          validation: { isRequired: true },
+          ...pastaDaReview,
+        }),
+
+        // 2. O veredito
         nota: fields.number({
           label: 'Nota (0 a 10)',
-          description: 'Define a raridade: 0-2.9 Lixo, 3 Comum, 5 Incomum, 7 Raro, 9 Épico, 10 Lendário.',
+          description: 'Define a raridade: até 2.9 Lixo, 3 Comum, 5 Incomum, 7 Raro, 9 Épico, 10 Lendário.',
           step: 0.1,
           validation: { isRequired: true, min: 0, max: 10 },
         }),
         heranca: fields.checkbox({
           label: 'Herança',
-          description: 'Obra da sua vida. Fica fora da escala de raridade.',
+          description: 'Obra da sua vida: fica fora da escala, sem raridade.',
           defaultValue: false,
         }),
         roll: fields.select({
           label: 'Roll',
+          description: 'Need: vale agora, preço cheio. Greed: vale, com condição. Pass: não vale.',
           options: [
-            { label: 'Need: jogue/assista agora', value: 'need' },
-            { label: 'Greed: vale, mas sem pressa', value: 'greed' },
-            { label: 'Pass: deixa passar', value: 'pass' },
+            { label: 'Need', value: 'need' },
+            { label: 'Greed', value: 'greed' },
+            { label: 'Pass', value: 'pass' },
           ],
           defaultValue: 'greed',
         }),
         motivoRoll: fields.text({
           label: 'Motivo do roll',
-          description:
-            'Uma linha explicando o veredito. Essencial no Greed. Ex.: Espere uma promoção, 60 reais é muito pelo conteúdo.',
+          description: 'Uma linha. Essencial no Greed. Ex.: Espere uma promoção.',
         }),
-        idioma: fields.select({
-          label: 'Idioma do texto',
-          description: 'As versões nas outras línguas são traduzidas automaticamente depois do Salvar.',
-          options: [
-            { label: 'Português', value: 'pt' },
-            { label: 'Inglês', value: 'en' },
-            { label: 'Espanhol', value: 'es' },
-          ],
-          defaultValue: 'pt',
-        }),
-        data: fields.date({ label: 'Data', defaultValue: { kind: 'today' }, validation: { isRequired: true } }),
-        plataforma: fields.text({ label: 'Plataforma / onde assistiu', description: 'Ex.: PC, Switch, Netflix, Crunchyroll' }),
-        duracao: fields.text({ label: 'Duração', description: 'Ex.: 40h, 2 temporadas, 1h52' }),
-        capa: fields.image({
-          label: 'Capa',
-          description: 'Obrigatória: é a imagem da ficha em todas as listagens.',
-          validation: { isRequired: true },
-          ...pastaDaReview,
-        }),
+
+        // 3. A ficha do item
         frase: fields.text({
           label: 'Frase de efeito',
-          description: 'Aparece em itálico no pé do tooltip, como texto de item.',
+          description: 'Em itálico no pé da ficha, como texto de item.',
         }),
         atributos: fields.array(
           fields.object({
             nome: fields.text({ label: 'Atributo', description: 'Ex.: Nostalgia' }),
-            valor: fields.text({ label: 'Valor', description: 'Ex.: +12' }),
+            valor: fields.text({ label: 'Valor', description: 'Ex.: +12 ou -4' }),
           }),
           {
-            label: 'Atributos do item',
+            label: 'Atributos',
+            description: 'Positivos em verde, negativos em vermelho.',
             itemLabel: (p) => `${p.fields.valor.value} ${p.fields.nome.value}`.trim() || 'Atributo',
           },
         ),
@@ -138,11 +152,25 @@ export default config({
           label: 'Tags',
           itemLabel: (p) => p.value || 'Tag',
         }),
+
+        // 4. A publicação
+        data: fields.date({ label: 'Data', defaultValue: { kind: 'today' }, validation: { isRequired: true } }),
+        idioma: fields.select({
+          label: 'Idioma do texto',
+          description: 'A língua em que você escreveu. As outras são traduzidas sozinhas.',
+          options: [
+            { label: 'Português', value: 'pt' },
+            { label: 'Inglês', value: 'en' },
+            { label: 'Espanhol', value: 'es' },
+          ],
+          defaultValue: 'pt',
+        }),
         rascunho: fields.checkbox({
           label: 'Rascunho',
-          description: 'Rascunhos não aparecem no site publicado.',
+          description: 'Não aparece no site publicado.',
           defaultValue: false,
         }),
+
         conteudo: fields.mdx({
           label: 'Texto da crítica',
           options: { image: imagensTexto },
@@ -157,7 +185,7 @@ export default config({
             Clipe: block({
               label: 'Clipe curto / GIF',
               description:
-                'Vídeo curto em mp4 ou webm, toca sozinho e sem som, em loop. Máximo 25 MB. Vídeo longo: use o bloco do YouTube. Renomeie o arquivo antes de enviar para um nome que diga o que ele mostra.',
+                'Vídeo curto em mp4 ou webm, toca sozinho e sem som, em loop. Máximo 25 MB. Vídeo longo: use o bloco do YouTube.',
               schema: {
                 src: fields.file({
                   label: 'Vídeo (.mp4 ou .webm, até 25 MB)',
@@ -167,14 +195,13 @@ export default config({
                 }),
                 poster: fields.image({
                   label: 'Imagem de capa do clipe',
-                  description: 'Aparece antes do vídeo carregar. Sugestão de nome: o nome do vídeo com -capa (pouso-ruim-capa.jpg).',
+                  description: 'Aparece antes do vídeo carregar.',
                   ...videos,
                 }),
                 legenda: fields.text({ label: 'Legenda' }),
                 descricao: fields.text({
                   label: 'Descrição para leitor de tela',
-                  description: 'Obrigatória. O que acontece no vídeo.',
-                  validation: { length: { min: 1 } },
+                  description: 'Recomendada. O que acontece no vídeo.',
                 }),
               },
             }),

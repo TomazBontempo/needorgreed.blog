@@ -55,7 +55,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
         }
         const r = e.review;
         const item = (
-          <a class={`item r-${r.raridade.id}`} href={url(idioma, 'reviews', r.slug)} data-ficha={`/fichas/${idioma}/${r.slug}/`}>
+          <a class={`item r-${r.raridade.id}`} href={url(idioma, 'reviews', r.slug)} data-ficha={`/fichas/${idioma}-${r.slug}/`}>
             [{r.entry.data.titulo}]
           </a>
         );
@@ -93,7 +93,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 <script>
   /**
    * Tooltip do item: parar o mouse (ou focar pelo teclado) no [Nome] do log mostra a ficha mini.
-   * Um elemento só por página, preenchido com o fragmento /fichas/<idioma>/<slug>/ (buscado uma vez
+   * Um elemento só por página, preenchido com o fragmento /fichas/<idioma>-<slug>/ (buscado uma vez
    * e guardado). Abre à esquerda do link (o log fica à direita da tela) e vira para a direita, ou
    * para cima/baixo, se não couber. Nunca cobre o nome. Em tela de toque não existe: o toque abre a review.
    */

@@ -67,10 +67,9 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
   que estão em algum commit enviado aparecem com a data do commit; as outras, com a data da própria review.
 - **Mídia nas reviews:** tudo na pasta da review (`capa.<ext>` obrigatória, `imagens/`, `videos/`), caminhos
   `../<slug>/...`. Imagens otimizadas, `<Figure>` com legenda, `<YouTube>`, `<Clipe>` (mp4/webm publicado em
-  `/_astro/`). O painel limpa o nome no upload e exige texto alternativo. `src/integrations/midia.ts` para o
-  build em capa ausente ou fora do formato, mídia fora da pasta, arquivo inexistente, imagem sem texto
-  alternativo, clipe sem descrição, imagem escapada pelo painel e arquivo acima de 25 MB; avisa sobre nomes
-  genéricos e arquivos soltos ou sem uso. Testado em 2026-10-24.
+  `/_astro/`). O painel limpa o nome no upload. `src/integrations/midia.ts` para o build em capa ausente ou
+  fora do formato, mídia fora da pasta, arquivo inexistente, imagem escapada pelo painel e arquivo acima de
+  25 MB; só avisa sobre texto alternativo ou descrição de clipe faltando e arquivos soltos ou sem uso.
 - **Checagens que passavam no fim da sessão de 2026-10-24:** `npx astro check` com 0 erros, `npm run build`
   sem erros, 2.678 links internos do build sem nenhum quebrado, detector da Impeccable sem achados,
   nenhum travessão.
@@ -85,6 +84,26 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 - **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
   Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", carrossel, sitemap, RSS):
   fazer antes de apagar os exemplos.
+
+---
+
+## Para rever no futuro
+
+- **Nome dos arquivos de imagem (decisão de 2026-10-24).** O Tomaz abandonou qualquer regra de nome: o build
+  não avisa mais sobre nomes genéricos (`IMG_2034.jpg`, `image.png`), e o painel só limpa o nome no upload
+  (minúsculas, sem acento, hífens). Motivo: hoje só ele escreve e organiza os próprios arquivos. **Rever
+  quando entrar um autor novo.** O que já se sabe:
+  - O Google trata o nome do arquivo como pista leve; o texto alternativo e o texto ao redor pesam mais.
+  - O painel (Keystatic) não consegue obrigar nome nem texto alternativo na inserção da imagem: um bloco com
+    campos obrigatórios é salvo vazio sem aviso (testado em 2026-10-24). Desligar o botão de imagem nativo
+    impede colar (Ctrl+V) e arrastar imagens, mas não força o preenchimento.
+  - Opções levantadas e não escolhidas: (1) voltar com o aviso no build; (2) GitHub Action que renomeia
+    imagens de nome genérico a partir do texto alternativo e atualiza os caminhos; (3) a mesma Action gerar
+    um rascunho de texto alternativo com um modelo de visão do Workers AI (grátis), marcado para revisão;
+    (4) no `astro dev`, uma faixa na própria página da review listando os problemas de mídia.
+- **Texto alternativo e descrição de clipe viraram só aviso (decisão de 2026-10-24).** O Tomaz não quer
+  descrição esquecida segurando publicação. Sem eles a página funciona, mas fica pior para leitor de tela e
+  para o Google. Rever junto com o nome dos arquivos; as opções (3) e (4) acima ajudariam a não esquecer.
 
 ---
 
@@ -166,7 +185,8 @@ com `locale: 'es-MX'` (ou `pt-BR`): isso muda o `navigator.languages`.
   - arquivos de bloco (`fields.file`) só são reconhecidos em `<directory>/<slug>/`;
   - a capa (`fields.image` no frontmatter) também: `./capa.jpg` aparece vazia e é apagada ao salvar
     (resolvido: tudo usa `../<slug>/...` e o build barra o formato errado);
-  - o painel não pede texto alternativo no upload por padrão (agora o campo é obrigatório no painel e no build);
+  - o painel não exige o texto alternativo da imagem do texto, mesmo marcado como obrigatório (o Tomaz
+    salvou imagens sem ele em 2026-10-24); depois disso o texto alternativo virou só aviso no build;
   - a imagem entra onde está o cursor: com uma imagem selecionada, o upload a substitui (e o painel apaga
     o arquivo antigo, que ficou sem uso).
 - **`git checkout -- <arquivo>` para desfazer um teste** volta ao último commit e apaga mudanças não
@@ -179,6 +199,11 @@ com `locale: 'es-MX'` (ou `pt-BR`): isso muda o `navigator.languages`.
 - **Classes genéricas colidem:** o loot log usa `.item` nos links; por isso a ficha usa o prefixo `it-`.
 - **`hreflang` não aceita `es-419`** (o Google só aceita país de duas letras como região): o espanhol usa
   `es`. O espanhol latino-americano fica garantido no texto e no prompt de tradução.
+- **Fragmentos do tooltip com `/en/` no caminho davam 404 no `astro dev`** (o roteador do i18n do Astro
+  recusa qualquer trecho igual à língua padrão). Em produção funcionava porque os arquivos são estáticos.
+  Agora o endereço é `/fichas/<idioma>-<slug>/`. Teste sempre também no `astro dev`, não só no build.
+- **Plugins rehype/remark são ignorados** pelo processador padrão de Markdown do Astro 7 (Sätteri). Para
+  mudar como um elemento do texto sai, use o mapa de componentes do MDX (`src/components/mdx.ts`).
 - **O scratchpad do Playwright é apagado entre sessões:** reinstale com `npm i playwright` numa pasta fora
   do repositório antes de tirar screenshots.
 

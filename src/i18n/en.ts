@@ -80,6 +80,11 @@ const en = {
     lido: 'read',
   },
 
+  /** Lido pelo leitor de tela em todo link que sai do blog (abre em nova guia). */
+  links: {
+    novaGuia: '(opens in a new tab)',
+  },
+
   item: {
     numero: 'No.',
     rotulo: 'Item card',

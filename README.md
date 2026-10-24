@@ -140,9 +140,9 @@ e entra de novo"), mas é o único formato que o painel gera e reconhece. Exempl
 imagem entra onde está o cursor); clipes pelo bloco "Clipe curto / GIF". O painel salva cada arquivo na pasta
 certa e escreve o caminho sozinho.
 
-**Nome dos arquivos:** renomeie antes de enviar para um nome que diga o que o arquivo mostra
-(`chefe-final.jpg`, não `IMG_2034.jpg`). O painel limpa o nome sozinho: `Chefe Final (versão 2).PNG` vira
-`chefe-final-versao-2.png`. A capa sempre vira `capa.<extensão>`.
+**Nome dos arquivos:** livre. O painel só limpa o nome no upload: `Chefe Final (versão 2).PNG` vira
+`chefe-final-versao-2.png`. A capa sempre vira `capa.<extensão>`. Um nome que diga o que a imagem mostra
+ajuda quem procura o arquivo depois, mas não é regra.
 
 **Imagem com legenda.** Bloco "Imagem com legenda" no painel (insira a imagem dentro dele). Na IDE:
 
@@ -173,9 +173,11 @@ certa e escreve o caminho sozinho.
 
 **O build confere tudo** (`src/integrations/midia.ts`) e para com uma mensagem dizendo o arquivo e como
 corrigir quando: falta a capa; a capa, uma imagem ou um clipe está fora do formato ou da pasta certa; o arquivo
-não existe; uma imagem está sem texto alternativo ou um clipe sem descrição; um arquivo passa de 25 MB; o painel
-estragou uma imagem. Ele só **avisa**, sem impedir a publicação, quando um nome é genérico (`img-2034.jpg`),
-quando há arquivo solto fora de `imagens/` e `videos/`, ou quando um arquivo não é usado por nenhuma versão.
+não existe; um arquivo passa de 25 MB; o painel estragou uma imagem. Ele só **avisa**, sem impedir a
+publicação, quando uma imagem está sem texto alternativo ou um clipe sem descrição, quando há arquivo solto
+fora de `imagens/` e `videos/`, ou quando um arquivo não é usado por nenhuma versão.
+
+Build parado não tira o site do ar: a Cloudflare mantém a última versão publicada e só não publica a nova.
 
 As legendas, descrições, textos alternativos e títulos também são traduzidos pelo `npm run translate`.
 

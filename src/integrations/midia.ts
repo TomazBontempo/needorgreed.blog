@@ -10,12 +10,12 @@
  *
  * Param o build (no dev, aparecem como erro no terminal):
  *   - review sem capa, capa fora do formato, ou arquivo da capa que não existe;
- *   - imagem do texto fora de imagens/, arquivo que não existe, ou sem texto alternativo;
- *   - clipe fora de videos/, arquivo que não existe, ou sem descrição;
+ *   - imagem do texto fora de imagens/ ou arquivo que não existe;
+ *   - clipe fora de videos/ ou arquivo que não existe;
  *   - imagem escapada pelo painel (!\[...]\(...), que some do site sem erro;
  *   - arquivo acima de 25 MB (limite da Cloudflare Workers para arquivo estático).
- * Só avisam:
- *   - nome de arquivo genérico (img-2034.jpg, captura-de-tela-...): funciona, mas não descreve a imagem;
+ * Só avisam (decisão do Tomaz: descrição esquecida não segura publicação):
+ *   - imagem sem texto alternativo e clipe sem descrição;
  *   - arquivo solto na pasta da review, fora de imagens/ e videos/;
  *   - arquivo que nenhuma versão da review usa.
  */
@@ -23,7 +23,6 @@ import type { AstroIntegration } from 'astro';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { nomeGenerico } from '../lib/nomes-de-arquivo';
 
 export const LIMITE_BYTES = 25 * 1024 * 1024;
 
@@ -94,7 +93,7 @@ function conferirReview(pastaReviews: string, slug: string): Resultado {
       if (!existe(caminho)) erros.push(`${onde}: a imagem não existe: ${caminho}`);
       else usados.add(caminho);
       if (!alt.trim()) {
-        erros.push(`${onde}: a imagem ${caminho} está sem texto alternativo. Descreva o que ela mostra: ![o que aparece na imagem](${caminho})`);
+        avisos.push(`${onde}: a imagem ${caminho} está sem texto alternativo (é o que o leitor de tela lê). Para descrever: ![o que aparece na imagem](${caminho})`);
       }
     }
 
@@ -113,12 +112,12 @@ function conferirReview(pastaReviews: string, slug: string): Resultado {
         else usados.add(attrs.poster);
       }
       if (!attrs.descricao?.trim()) {
-        erros.push(`${onde}: o clipe ${src} está sem descrição (descricao="..."), que é o que o leitor de tela lê.`);
+        avisos.push(`${onde}: o clipe ${src} está sem descrição (descricao="..."), que é o que o leitor de tela lê.`);
       }
     }
   }
 
-  // Avisos: arquivos soltos, genéricos ou sem uso
+  // Avisos: arquivos soltos ou sem uso
   for (const caminho of arquivos(pasta)) {
     const rel = relative(pasta, caminho).split('\\').join('/');
     const nome = basename(caminho);
@@ -131,7 +130,6 @@ function conferirReview(pastaReviews: string, slug: string): Resultado {
     if (pastaDoArquivo === 'imagens' && !EXT_IMAGEM.test(nome)) avisos.push(`${slug}/${rel}: arquivo que não é imagem dentro de imagens/.`);
     if (pastaDoArquivo === 'videos' && !EXT_VIDEO.test(nome) && !EXT_IMAGEM.test(nome)) avisos.push(`${slug}/${rel}: arquivo que não é vídeo nem quadro de capa dentro de videos/.`);
     if (!usados.has(`../${slug}/${rel}`)) avisos.push(`${slug}/${rel}: nenhuma versão da review usa este arquivo.`);
-    if (nomeGenerico(nome)) avisos.push(`${slug}/${rel}: nome genérico. Funciona, mas um nome que diga o que o arquivo mostra ajuda quem procura (e o Google), ex.: chefe-final.jpg.`);
   }
 
   return { erros, avisos };

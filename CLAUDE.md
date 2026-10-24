@@ -278,8 +278,9 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   nunca inclui o destaque, prefere reviews fora do log, botão d100 para rolar de novo. Sem JS: ordem do build.
 - **Home mobile (<900px):** sem título visível no hero, sem destaque e sem log; carrossel de fichas com
   scroll-snap nativo, 85vw por ficha, indicador "1 / N", ordem cronológica, última ficha "Todas as reviews".
-- **Tooltip do loot log:** um elemento só por página, preenchido pelo fragmento `/fichas/<idioma>/<slug>/`
-  (gerado no build, fora do Worker e dos buscadores). Abre à esquerda do link, nunca cobre o nome, 150ms de
+- **Tooltip do loot log:** um elemento só por página, preenchido pelo fragmento `/fichas/<idioma>-<slug>/`
+  (gerado no build, fora do Worker e dos buscadores; a língua vai colada no slug porque o roteador do Astro
+  devolve 404 para qualquer caminho com `en` como trecho isolado, já que o inglês não tem prefixo). Abre à esquerda do link, nunca cobre o nome, 150ms de
   atraso, Esc fecha, foco do teclado abre, não existe em toque.
 - **Página da review:** título, linha de roll, motivo. Lateral esquerda fixa (veredito, progresso de leitura,
   sumário com a seção atual), texto no centro, loot log à direita. No celular, só a coluna do centro.
@@ -287,9 +288,16 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   `imagens/`, clipes e seus quadros em `videos/`; 2) **capa obrigatória** (schema, painel e build; não existe
   ficha sem imagem); 3) **nenhum erro silencioso**. Caminhos sempre `../<slug>/...` (o único formato que o
   painel reconhece: `./foto.jpg` é apagado ou escapado ao salvar pelo painel). O painel limpa o nome do arquivo
-  no upload (`src/lib/nomes-de-arquivo.ts`) e exige texto alternativo; o `<Clipe>` exige `descricao`.
-  `src/integrations/midia.ts` faz o build parar em qualquer violação e avisa sobre nomes genéricos e arquivos
-  soltos ou sem uso. Limite de 25 MB por arquivo (Cloudflare Workers). Detalhes no README.
+  no upload (`src/lib/nomes-de-arquivo.ts`); o nome é livre (sem regra nem aviso, decisão do Tomaz). Texto
+  alternativo e `descricao` do `<Clipe>` são recomendados: sem eles o build só avisa (decisão do Tomaz;
+  o painel também não consegue obrigar, testado). `src/integrations/midia.ts` faz o build parar quando a
+  página sairia quebrada (capa, caminho ou arquivo errado, 25 MB) e avisa sobre o resto. Limite de 25 MB por arquivo (Cloudflare Workers). Detalhes no README.
+- **Links para fora do blog abrem em nova guia** (regra do Tomaz: o leitor não sai do Need or Greed), com
+  `rel="noopener noreferrer"` e o aviso "(abre em nova guia)" para leitor de tela (`aria-describedby`).
+  No texto das reviews isso é automático: o MDX troca todo `a` pelo componente `Link`
+  (`src/components/Link.astro`, critério em `src/lib/links-externos.ts`). Em componente, use
+  `ATRIBUTOS_LINK_EXTERNO` e `relCom()`. Plugins rehype não servem: o processador padrão de Markdown do
+  Astro 7 (Sätteri) os ignora.
 - **Texto de interface só nos dicionários**, inclusive o Sobre. O TypeScript obriga en.ts e pt.ts a terem
   as mesmas chaves. Plural sempre por função do dicionário, nunca por troca de número no texto.
 - **Testes visuais:** Playwright com o Chromium já instalado em `~/.cache/ms-playwright`, rodando fora do

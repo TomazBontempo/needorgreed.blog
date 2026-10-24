@@ -1,0 +1,23 @@
+---
+/**
+ * Todo link do texto das reviews passa por aqui (mapa do MDX em src/components/mdx.ts).
+ * Link para fora do blog abre em nova guia, com rel de segurança e o aviso para leitor de tela.
+ * Link interno (/reviews/..., #ancora) sai como um link normal.
+ */
+import { ATRIBUTOS_LINK_EXTERNO, ehExterno, relCom } from '../lib/links-externos';
+
+const { href, rel, ...resto } = Astro.props;
+const externo = ehExterno(href);
+---
+
+{
+  externo ? (
+    <a href={href} {...resto} {...ATRIBUTOS_LINK_EXTERNO} rel={relCom(...(rel ? String(rel).split(/\s+/) : []))}>
+      <slot />
+    </a>
+  ) : (
+    <a href={href} rel={rel} {...resto}>
+      <slot />
+    </a>
+  )
+}
