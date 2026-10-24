@@ -30,16 +30,38 @@ Depois do passo 7, a sessão de 2026-10-24 fez:
 - Hero novo ("Cada obra é um loot: / Need, Greed ou Pass." + a descrição), nome do repositório corrigido
   para `TomazBontempo/needorgreed.blog`, README atualizado.
 
-**Próximo passo: o 8.** Rodar `critique` e `audit` da Impeccable no site todo (agora nas três línguas),
-corrigir o que aparecer, `npm run build`, e testar com `npx wrangler dev`: redirecionamento da home com
-`Accept-Language` em português, espanhol e outra língua, links diretos sem redirecionamento, e o seletor
-persistindo entre visitas (cookie `lang`). Depois, gerar o `DESIGN.md` (documenter da Impeccable) a partir
-do site pronto. Mostrar o resultado ao Tomaz.
+Ainda em 2026-10-24:
+- **Regras de mídia novas** (pedido do Tomaz). Tudo da review na pasta dela (`capa.<ext>`, `imagens/`,
+  `videos/`) e capa obrigatória. O build para só quando a página sairia quebrada (capa, caminho ou arquivo
+  errado, 25 MB); texto alternativo e descrição de clipe viraram só aviso, e o nome do arquivo é livre
+  (ver "Para rever no futuro"). Resolveu o bug da capa `./capa.jpg` apagada pelo painel.
+- **Links para fora do blog** abrem em nova guia, com seta e aviso para leitor de tela.
+- **Tooltip do loot log** corrigido no `astro dev` (fragmentos em `/fichas/<idioma>-<slug>/`).
+- **Painel:** logo d100, campos reordenados (obra, veredito, ficha, publicação), explicações curtas.
+- **Tudo commitado e enviado ao GitHub** (ver "Git"). A Action de tradução teve um bug no passo de commit,
+  corrigido e testado no próprio GitHub.
 
-Ainda em 2026-10-24: **regras de mídia novas** (pedido do Tomaz). Tudo da review na pasta dela
-(`capa.<ext>`, `imagens/`, `videos/`), capa obrigatória e nenhum erro silencioso: o build para em qualquer
-violação. Testado no painel (abrir, enviar imagem, salvar, reabrir) e com reviews quebradas de propósito.
-Isso resolveu o bug da capa `./capa.jpg` apagada pelo painel.
+**Decisão do Tomaz: o site só sobe com o domínio.** Ele vai comprar o `needorgreed.blog` antes. A Cloudflare
+cobra domínio só em dólar (há IOF em cartão comum); o Tomaz vai usar um cartão sem IOF. Alternativas que
+ficaram registradas: subir antes no endereço gratuito `*.workers.dev` e ligar o domínio depois, sem refazer
+nada; ou registrar o domínio num registrador que cobre em reais e só apontar o DNS para a Cloudflare.
+Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed.blog` é o `site` do
+`astro.config.mjs` (canonical, hreflang, sitemap, RSS, imagem de compartilhamento) e o login do painel online.
+
+**Próximo passo: o 8, com o checklist de estreia abaixo.**
+
+### Checklist para subir o site
+
+1. **Testar o site vazio** (o mais importante): apagar as reviews de exemplo numa cópia e garantir que
+   home, destaque, loot log, "Mais loot", carrossel, listagens, sitemap e RSS funcionam e que o build passa.
+2. **Passo 8 da Impeccable:** `critique` e `audit` no site todo (três línguas, desktop e celular), corrigir,
+   rodar o finish reviewer e gerar o `DESIGN.md` com o documenter. Ver "Impeccable".
+3. **Teste no `npx wrangler dev`:** redirecionamento da home com `Accept-Language` em português, espanhol e
+   outra língua; links diretos sem redirecionamento; seletor persistindo entre visitas (cookie `lang`).
+4. **Comprar o domínio** e criar o projeto na Cloudflare Workers ligado ao repositório (README, "Deploy").
+5. **Configurar segredos e serviços** (ver "Configuração externa"): `GITHUB_TOKEN` no build, token do
+   Workers AI na Action, Giscus, GitHub App do Keystatic.
+6. **Apagar as reviews de exemplo** (inclusive `teste-do-snufu`) e publicar.
 
 O **mobile** foi deixado de lado de propósito: o Tomaz disse que vai rever depois. Hoje a home mobile é um
 carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à esquerda) abaixo de 640px.
@@ -83,7 +105,9 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 - **Progresso de leitura** mostra "100% lido" logo de cara numa review curta que cabe na tela.
 - **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
   Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", carrossel, sitemap, RSS):
-  fazer antes de apagar os exemplos.
+  fazer antes de apagar os exemplos (item 1 do checklist).
+- **Action de tradução usa versões antigas** de `actions/checkout@v4` e `actions/setup-node@v4` (Node 20,
+  descontinuado no GitHub; hoje roda forçado no Node 24). Atualizar para a v5.
 
 ---
 
@@ -111,8 +135,8 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 
 Nada disso dá para fazer sem o Tomaz. Instruções completas no `README.md`.
 
-- **Repositório no GitHub:** existe, é `TomazBontempo/needorgreed.blog` (público), e o código já aponta para
-  ele. Falta só o push dos commits locais (ver "Git").
+- **Domínio `needorgreed.blog`:** ainda não comprado (ver "Onde paramos").
+- **Projeto na Cloudflare Workers:** ainda não criado. O repositório já existe e está em dia.
 - **Token da Cloudflare para tradução:** Workers AI Read + Workers AI Edit. Secrets da Action:
   `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_TOKEN`. Plano Free, sem cartão (regra inegociável do CLAUDE.md).
 - **Giscus:** `repoId` e `categoryId` vazios em `src/site.config.ts`. Enquanto isso, a página da review
@@ -140,12 +164,19 @@ Lighthouse Keeper '98, Cidade de Concreto); Outer Wilds, Frieren e Survival Gen�
 
 ## Git
 
-- `e7687cb`: protótipo (o único commit que está no GitHub).
-- `6bac050`: redesign completo (2026-10-23 e começo de 2026-10-24).
-- Commit seguinte: espanhol, regra de idioma nova, seletor, faixa de sugestão, sitemap e este arquivo.
+Repositório: `TomazBontempo/needorgreed.blog` (público). Tudo enviado; `main` local igual ao GitHub em
+2026-10-24:
 
-Os commits do redesign ainda **não foram enviados** ao GitHub: o Tomaz faz o push. O Tomaz autoriza
-commits pedindo; proponha um commit ao fim de cada rodada aprovada (ele pede reversões com frequência).
+- `e7687cb` protótipo
+- `6bac050` redesign completo
+- `eb07ea4` espanhol, idioma pelo navegador e seletor de idioma
+- `c9f9c05` mídia na pasta da review, capa obrigatória e checagem no build
+- `500b536` tooltip no dev, links externos, painel reorganizado e mídia sem travas
+- `35155b5` correção do passo de commit da Action de tradução
+
+O Tomaz autoriza commits e pushes pedindo; proponha um commit ao fim de cada rodada aprovada (ele pede
+reversões com frequência). Desfazer teste: guarde uma cópia antes; nunca `git checkout` em arquivo com
+mudança não commitada.
 
 ---
 
