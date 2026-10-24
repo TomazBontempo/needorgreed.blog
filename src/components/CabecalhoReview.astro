@@ -36,17 +36,32 @@ const Titulo = href ? 'h3' : 'h1';
     raridade={review.raridade.id}
   />
   {data.motivoRoll && <p class="motivo">{data.motivoRoll}</p>}
+  {
+    /* Celular e tablet em pé: a lateral do veredito some, então ele vem para cá, compacto.
+       O roll já está na linha de cima. */
+    !href && (
+      <dl class:list={['veredito-celular', `r-${review.raridade.id}`]}>
+        <div>
+          <dt>{t.review.raridade}</dt>
+          <dd class="raridade">{t.raridades[review.raridade.id].nome} · {notaFormatada(data.nota)}</dd>
+        </div>
+        {data.plataforma && (
+          <div>
+            <dt>{t.review.plataforma}</dt>
+            <dd>{data.plataforma}</dd>
+          </div>
+        )}
+        {data.duracao && (
+          <div>
+            <dt>{t.review.duracao}</dt>
+            <dd>{data.duracao}</dd>
+          </div>
+        )}
+      </dl>
+    )
+  }
   {!tituloPrimeiro && <Titulo class="titulo">{href ? <a href={href}>{data.titulo}</a> : data.titulo}</Titulo>}
   <p class="meta">
-    {
-      /* No celular a lateral do veredito some: a raridade e a nota vêm para a meta, como no pé da ficha. */
-      !href && (
-        <span class:list={['raridade-celular', `r-${review.raridade.id}`]}>
-          <span class="sr-only">{t.review.raridade}: </span>
-          {t.raridades[review.raridade.id].nome} · {notaFormatada(data.nota)}
-        </span>
-      )
-    }
     <time datetime={data.data.toISOString().slice(0, 10)}>{formatarData(idioma, data.data)}</time>
     <span>{t.review.leitura(minutosDeLeitura(versao.entry.body))}</span>
     <span>
@@ -115,13 +130,41 @@ const Titulo = href ? 'h3' : 'h1';
     font-size: 0.75rem;
     color: var(--texto-3);
   }
-  .raridade-celular {
+  .veredito-celular {
     display: none;
-    color: var(--cor);
   }
   @media (max-width: 900px) {
-    .raridade-celular {
-      display: inline;
+    .veredito-celular {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 28px;
+      margin: 16px 0 0;
+      padding: 12px 0;
+      border-block: 1px solid var(--borda);
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+    }
+    .veredito-celular dt {
+      font-size: 0.8125rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--texto-3);
+    }
+    .veredito-celular dd {
+      margin: 2px 0 0;
+      color: var(--texto);
+    }
+    .veredito-celular .raridade {
+      color: var(--cor);
+    }
+    .titulo-primeiro .meta {
+      margin-top: 14px;
+    }
+  }
+  /* Celular: a linha de roll quebra em duas linhas parecidas, sem deixar o nome da obra sozinho. */
+  @media (max-width: 720px) {
+    .cab-review :global(.linha-roll) {
+      text-wrap: balance;
     }
   }
   .meta a {
@@ -131,5 +174,12 @@ const Titulo = href ? 'h3' : 'h1';
   .meta a:hover {
     color: var(--ouro);
     text-decoration: underline;
+  }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .meta {
+      font-size: 0.8125rem;
+    }
   }
 </style>

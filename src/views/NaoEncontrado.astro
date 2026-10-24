@@ -76,4 +76,13 @@ const [antes, depois] = t.erro404.linhaSistema.split(/\[|\]/);
       padding-top: 40px;
     }
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .acoes a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
 </style>

@@ -8,7 +8,7 @@
  * - Degradê no pé avisa que tem mais texto; some quando a rolagem chega ao fim.
  * - Só o título e o link do fim levam à página da review (o bloco não é um link).
  *
- * Abaixo de 900px a janela solta a altura (rolagem dentro de rolagem é ruim no celular).
+ * Abaixo de 900px vira um resumo: título, linha de roll, motivo e o link para a review (sem o texto).
  */
 import { render } from 'astro:content';
 import CabecalhoReview from './CabecalhoReview.astro';
@@ -149,6 +149,21 @@ const comentarios = await contarComentarios(review.slug);
     }
     .degrade {
       display: none;
+    }
+    /* Celular: só o resumo; o texto fica na página da review. */
+    .janela :global(.prosa),
+    .janela :global(.aviso-traducao) {
+      display: none;
+    }
+    .abrir {
+      margin-top: 4px;
+    }
+  }
+  @media (max-width: 720px) {
+    .abrir a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
     }
   }
 </style>

@@ -38,6 +38,14 @@ const { idioma, itens, rotulo, nivel = 3 } = Astro.props;
     background: var(--painel-fundo);
     border: 1px solid var(--borda);
   }
+  /* Celular: uma moldura só, sem o painel em volta das fichas. */
+  @media (max-width: 720px) {
+    .fichario-lista {
+      padding: 0;
+      background: none;
+      border: 0;
+    }
+  }
   @media (max-width: 640px) {
     .fichario-lista {
       grid-template-columns: minmax(0, 1fr);

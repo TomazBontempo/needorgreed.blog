@@ -70,7 +70,7 @@ Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed
 ### Checklist para subir o site
 
 1. **Testar o site vazio** (o mais importante): apagar as reviews de exemplo numa cópia e garantir que
-   home, destaque, loot log, "Mais loot", carrossel, listagens, sitemap e RSS funcionam e que o build passa.
+   home, destaque, loot log, "Mais loot", listagens, sitemap e RSS funcionam e que o build passa.
 2. **Passo 8 da Impeccable:** a `critique` já rodou; falta o `audit` no site todo (três línguas, desktop e
    celular), corrigir, rodar o finish reviewer e gerar o `DESIGN.md` com o documenter.
 3. **Teste no `npx wrangler dev`:** redirecionamento da home com `Accept-Language` em português, espanhol e
@@ -80,8 +80,9 @@ Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed
    Workers AI na Action, Giscus, GitHub App do Keystatic.
 6. **Apagar as reviews de exemplo** (inclusive `teste-do-snufu`) e publicar.
 
-O **mobile** foi deixado de lado de propósito: o Tomaz disse que vai rever depois. Hoje a home mobile é um
-carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à esquerda) abaixo de 640px.
+O **mobile** foi revisto em 2026-10-24 (header compacto, piso de 13px, toque de 44px, home empilhada sem
+carrossel, fichas com uma moldura só, veredito e progresso na review). Também a faixa de idioma em uma linha e
+os filtros do Arquivo em fileiras. O desktop foi conferido pixel a pixel e não mudou.
 
 ---
 
@@ -133,7 +134,7 @@ carrossel de fichas; as outras páginas usam as fichas em linha (capa pequena à
 - **Bio traduzida** (2026-10-24): implementada e testada com `--mock`; a primeira tradução de verdade sai
   na Action quando houver token.
 - **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
-  Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", carrossel, sitemap, RSS):
+  Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", sitemap, RSS):
   fazer antes de apagar os exemplos (item 1 do checklist).
 - **Action de tradução** atualizada para `checkout@v7` e `setup-node@v7` em 2026-10-24 (testada no GitHub,
   sem aviso de Node 20).

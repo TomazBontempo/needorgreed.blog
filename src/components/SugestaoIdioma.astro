@@ -29,7 +29,7 @@ const outras = IDIOMAS.filter((l) => l !== idioma);
             {t.sugestao.ir}
           </a>
           <button type="button" data-ficar={idioma}>
-            {t.sugestao.ficar(t.nomesIdiomas[idioma])}
+            <span class="ficar-texto">{t.sugestao.ficar(t.nomesIdiomas[idioma])}</span>
           </button>
         </div>
       </aside>
@@ -124,6 +124,54 @@ const outras = IDIOMAS.filter((l) => l !== idioma);
       left: 16px;
       bottom: 16px;
       max-width: none;
+    }
+  }
+
+  /* Celular: uma linha só, de 52px. O link para a outra língua e um X de 44px que faz o mesmo que
+     "Continuar em ..." (o texto continua lá para o leitor de tela). A frase de cima sai: o link já diz tudo. */
+  @media (max-width: 720px) {
+    .sugestao-idioma {
+      display: flex;
+      align-items: center;
+      height: 52px;
+      padding: 0 4px 0 16px;
+    }
+    p {
+      display: none;
+    }
+    .acoes {
+      flex: 1;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .acoes a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+    button {
+      position: relative;
+      flex: none;
+      width: 44px;
+      height: 44px;
+      text-decoration: none;
+    }
+    .ficar-texto {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+    button::before {
+      content: '';
+      position: absolute;
+      inset: 14px;
+      background:
+        linear-gradient(45deg, transparent calc(50% - 0.75px), currentColor calc(50% - 0.75px), currentColor calc(50% + 0.75px), transparent calc(50% + 0.75px)),
+        linear-gradient(-45deg, transparent calc(50% - 0.75px), currentColor calc(50% - 0.75px), currentColor calc(50% + 0.75px), transparent calc(50% + 0.75px));
     }
   }
 </style>

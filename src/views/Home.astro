@@ -27,8 +27,6 @@ const EVENTOS_NO_LOG = 14;
 const TAMANHO_DO_SORTEIO = 24;
 /** Fichas visíveis sem JavaScript. */
 const VISIVEIS_SEM_JS = 6;
-/** Celular: quantas reviews recentes entram no carrossel (depois vem a ficha "Todas as reviews"). */
-const NO_CARROSSEL = 12;
 
 const idioma = idiomaDe(Astro);
 const t = dicionario(idioma);
@@ -41,10 +39,6 @@ const { eventos } = await getLootLog();
 const noLog = new Set(eventos.slice(0, EVENTOS_NO_LOG).flatMap((e) => (e.tipo === 'autor' ? [] : [e.review.slug])));
 const fila = [...resto.filter((r) => !noLog.has(r.slug)), ...resto.filter((r) => noLog.has(r.slug))].slice(0, TAMANHO_DO_SORTEIO);
 const mais = await Promise.all(fila.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma), noLog: noLog.has(r.slug) })));
-
-// Celular: carrossel em ordem cronológica, a mais nova primeiro (a mesma ordem do log).
-const recentes = await Promise.all(reviews.slice(0, NO_CARROSSEL).map(async (r) => ({ review: r, versao: await versaoEm(r, idioma) })));
-const totalCarrossel = recentes.length + 1;
 
 /**
  * Sorteio das fichas. Inline e logo depois da lista: roda antes da primeira pintura,
@@ -147,28 +141,6 @@ const SORTEIO = `(() => {
     </div>
   </div>
 
-  {/* Celular: no lugar do destaque, do log e de "Mais loot", um carrossel de fichas. */}
-  <section class="carrossel" aria-label={t.paginas.carrossel} data-carrossel>
-    <ol class="trilho">
-      {recentes.map(({ review, versao }) => (
-        <li>
-          <Item review={review} data={versao.data} idioma={idioma} variante="bolso" />
-        </li>
-      ))}
-      <li class="fim">
-        <a class="todas" href={url(idioma, 'arquivo')}>
-          <svg viewBox="0 0 26 26" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
-            <path d="M13 1.5 23.5 7.5v11L13 24.5 2.5 18.5v-11z" />
-            <path d="M13 1.5v8M2.5 7.5 13 9.5l10.5-2M13 9.5 7 18.5h12zM2.5 18.5 7 18.5M23.5 18.5H19M13 24.5 7 18.5M13 24.5l6-6" />
-          </svg>
-          <span>{t.paginas.verTodos}</span>
-        </a>
-      </li>
-    </ol>
-    <p class="posicao mono" aria-hidden="true" hidden>
-      <span data-atual>1</span> / {totalCarrossel}
-    </p>
-  </section>
 
   {
     mais.length > 0 && (
@@ -197,43 +169,6 @@ const SORTEIO = `(() => {
   }
 </Base>
 
-<script>
-  // Carrossel do celular. Sem JS ele funciona igual (scroll-snap nativo); aqui só:
-  //  - o indicador "3 / 13";
-  //  - o foco pelo teclado traz a ficha para a tela.
-  const carrossel = document.querySelector<HTMLElement>('[data-carrossel]');
-  if (carrossel) {
-    const trilho = carrossel.querySelector<HTMLElement>('.trilho')!;
-    const posicao = carrossel.querySelector<HTMLElement>('.posicao')!;
-    const atual = posicao.querySelector<HTMLElement>('[data-atual]')!;
-    const itens = [...trilho.children] as HTMLElement[];
-    posicao.hidden = false;
-    const visiveis = new Map<Element, number>();
-    const observador = new IntersectionObserver(
-      (entradas) => {
-        entradas.forEach((e) => visiveis.set(e.target, e.intersectionRatio));
-        let melhor = -1;
-        let indice = 0;
-        itens.forEach((li, i) => {
-          const r = visiveis.get(li) ?? 0;
-          if (r > melhor) {
-            melhor = r;
-            indice = i;
-          }
-        });
-        atual.textContent = String(indice + 1);
-      },
-      { root: trilho, threshold: [0, 0.25, 0.5, 0.75, 1] },
-    );
-    itens.forEach((li) => observador.observe(li));
-
-    const calmo = matchMedia('(prefers-reduced-motion: reduce)');
-    trilho.addEventListener('focusin', (e) => {
-      const li = (e.target as Element).closest('li');
-      li?.scrollIntoView({ behavior: calmo.matches ? 'auto' : 'smooth', block: 'nearest', inline: 'start' });
-    });
-  }
-</script>
 
 <style>
   .primeira-tela {
@@ -408,120 +343,61 @@ const SORTEIO = `(() => {
       gap: 12px;
     }
   }
-  /* ---------- Celular: carrossel (abaixo de 900px). No desktop não existe. ---------- */
-  .carrossel {
-    display: none;
-  }
+  /* ---------- Celular e tablet em pé (abaixo de 900px): tudo empilhado ----------
+     Hero curto, a última crítica compacta (sem o texto), os 5 últimos eventos do log e "Mais loot"
+     em lista. O desktop não muda. */
   @media (max-width: 900px) {
-    /* Sem título visível (continua para leitor de tela) e só a descrição, em letra pequena. */
-    .hero h1 {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-    }
     .hero .container {
-      padding-block: 14px 12px;
+      padding-block: 24px 8px;
+    }
+    .hero h1 {
+      font-size: 1.75rem;
     }
     .hero p {
-      margin: 0;
-      font-size: 0.8125rem;
-      line-height: 1.45;
+      margin: 8px 0 0;
+      font-size: 0.875rem;
+      line-height: 1.5;
     }
-    /* Sem destaque, sem log e sem "Mais loot": o carrossel ocupa o lugar. */
-    .mesa,
-    .mais {
+    .hero .saiba {
+      margin-top: 4px;
+    }
+    .mesa {
+      margin-top: 24px;
+    }
+    .mesa :global(.lateral li:nth-child(n + 6)) {
       display: none;
     }
-    .carrossel {
-      display: block;
-      /* Altura da ficha: a tela menos header, descrição e indicador, para não precisar rolar. */
-      --altura-ficha: clamp(400px, calc(100dvh - var(--cabecalho-h) - 128px), 660px);
+    .mesa :global(.lateral) {
+      margin-top: 40px;
+    }
+    .mais {
+      margin-top: 48px;
+    }
+    .topo-mais h2 {
+      font-size: 1.6rem;
     }
   }
-  .trilho {
-    display: flex;
-    gap: 12px;
-    margin: 0;
-    padding: 6px var(--gutter) 8px;
-    list-style: none;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--gutter);
-    scrollbar-width: none;
-  }
-  .trilho::-webkit-scrollbar {
-    display: none;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .trilho {
-      scroll-behavior: smooth;
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .rerolar {
+      width: 44px;
+      height: 44px;
     }
-  }
-  /* Cada ficha ocupa ~85% da largura: a borda da próxima aparece e mostra que tem mais. */
-  .trilho > li {
-    flex: 0 0 85vw;
-    height: var(--altura-ficha);
-    scroll-snap-align: start;
-  }
-  /* A mesma ficha das listagens, em pé e com a capa esticando para preencher a altura. */
-  .trilho :global(.it--bolso) {
-    flex-direction: column;
-    gap: 0;
-    height: 100%;
-  }
-  .trilho :global(.it--bolso .it-capa) {
-    flex: 1 1 auto;
-    width: auto;
-    min-height: 0;
-    aspect-ratio: auto;
-  }
-  .trilho :global(.it--bolso .it-dados) {
-    flex: none;
-  }
-  .trilho :global(.it--bolso .it-nome) {
-    margin-top: 12px;
-    font-size: 1.6rem;
-  }
-  .trilho :global(.it--bolso .it-frase) {
-    display: block;
-  }
-  .trilho > .fim {
-    flex-basis: 60vw;
-  }
-  .todas {
-    height: 100%;
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 14px;
-    border: 1px solid var(--borda-forte);
-    outline: 1px solid var(--borda);
-    outline-offset: 3px;
-    background: var(--painel-fundo);
-    color: var(--ouro);
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 1.5rem;
-    line-height: 1;
-    text-transform: uppercase;
-    text-align: center;
-    text-decoration: none;
-  }
-  .todas span::after {
-    content: ' \2192';
-  }
-  .posicao {
-    margin: 4px 0 0;
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--texto-3);
-  }
-  .posicao [data-atual] {
-    color: var(--ouro);
+    .topo-mais a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+    /* Uma moldura só: sem o painel em volta das fichas. */
+    .fichario {
+      padding: 0;
+      background: none;
+      border: 0;
+    }
+    .hero p a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
   }
 </style>

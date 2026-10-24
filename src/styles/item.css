@@ -248,3 +248,45 @@
   background: rgb(15 13 11 / 0.85);
   border: 1px solid var(--borda-forte);
 }
+
+/* Celular: nenhum texto abaixo de 13px na ficha das listagens. */
+@media (max-width: 720px) {
+  .it--bolso .it-tipo,
+  .it--bolso .it-atributos,
+  .it--bolso .it-roll,
+  .it--bolso .it-pe,
+  .it--bolso.lido .it-capa::after {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Celular: atributos lado a lado (quebram para a linha de baixo se não couberem) e o pé sempre
+   numa linha: o número e a seção encurtam com reticências, a raridade e a nota ficam inteiras. */
+@media (max-width: 720px) {
+  .it--bolso .it-dados {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .it--bolso .it-atributos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 14px;
+  }
+  .it--bolso .it-pe {
+    flex-wrap: nowrap;
+  }
+  .it--bolso .it-numero {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .it--bolso .it-raridade {
+    flex: none;
+  }
+}
+/* Celular estreito (360px): capa um pouco menor para "Lixo de vendedor · 2.1" caber inteiro no pé. */
+@media (max-width: 380px) {
+  .it--bolso .it-capa {
+    width: 88px;
+  }
+}

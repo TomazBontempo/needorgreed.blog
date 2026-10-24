@@ -192,4 +192,42 @@ const tiposEvento = [
     font-size: 0.875rem;
     color: var(--texto-3);
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .contagem {
+      font-size: 0.8125rem;
+    }
+    .mes h2 {
+      font-size: 0.8125rem;
+    }
+    label {
+      min-height: 44px;
+    }
+    /* Cada grupo (Evento, Roll) numa fileira só, que rola para o lado se não couber. */
+    .filtros {
+      display: block;
+      padding: 4px 0 4px 16px;
+    }
+    fieldset {
+      /* Fieldset não encolhe abaixo do conteúdo por padrão; sem isso a fileira vaza do painel. */
+      min-width: 0;
+      flex-wrap: nowrap;
+      gap: 0 20px;
+      padding-right: 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    fieldset::-webkit-scrollbar {
+      display: none;
+    }
+    fieldset + fieldset {
+      border-top: 1px solid var(--borda);
+    }
+    legend,
+    label {
+      flex: none;
+      white-space: nowrap;
+    }
+  }
 </style>

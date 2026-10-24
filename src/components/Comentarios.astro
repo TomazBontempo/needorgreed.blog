@@ -67,4 +67,11 @@ const ativo = Boolean(GISCUS.repoId && GISCUS.categoryId);
     font-size: 0.8125rem;
     color: var(--texto-3);
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    h2 {
+      font-size: 0.8125rem;
+    }
+  }
 </style>

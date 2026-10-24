@@ -66,10 +66,10 @@
     --gutter: 16px;
   }
 }
-/* No celular o header tem duas linhas compactas: marca e idioma (44px), menu (36px). */
+/* No celular só a linha da marca e do idioma fica presa (56px + 1px de borda); o menu rola com a página. */
 @media (max-width: 720px) {
   :root {
-    --cabecalho-h: 81px;
+    --cabecalho-h: 57px;
   }
 }
 

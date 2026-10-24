@@ -14,6 +14,7 @@ const links: Array<[Secao, string]> = [
   ['sobre', t.nav.sobre],
 ];
 const atual = Astro.url.pathname;
+const itens = links.map(([secao, nome]) => ({ nome, href: url(idioma, secao) }));
 ---
 
 <header class="cabecalho">
@@ -31,16 +32,13 @@ const atual = Astro.url.pathname;
       <nav aria-label={t.nav.principal}>
         <ul>
           {
-            links.map(([secao, nome]) => {
-              const href = url(idioma, secao);
-              return (
-                <li>
-                  <a href={href} aria-current={atual.startsWith(href) ? 'page' : undefined}>
-                    {nome}
-                  </a>
-                </li>
-              );
-            })
+            itens.map(({ nome, href }) => (
+              <li>
+                <a href={href} aria-current={atual.startsWith(href) ? 'page' : undefined}>
+                  {nome}
+                </a>
+              </li>
+            ))
           }
         </ul>
       </nav>
@@ -49,6 +47,22 @@ const atual = Astro.url.pathname;
     </div>
   </div>
 </header>
+
+<!-- Celular: o menu fica fora do header fixo e rola com a página (só a linha do logo fica presa).
+     No desktop não aparece. -->
+<nav class="nav-celular" aria-label={t.nav.principal}>
+  <ul class="container">
+    {
+      itens.map(({ nome, href }) => (
+        <li>
+          <a href={href} aria-current={atual.startsWith(href) ? 'page' : undefined}>
+            {nome}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
 
 <style>
   /* Fixo no topo de todas as páginas. Fundo sólido para o texto não aparecer por baixo.
@@ -118,41 +132,44 @@ const atual = Astro.url.pathname;
     text-decoration: underline;
   }
 
-  /* Celular: duas linhas compactas (44px + 36px), somando o --cabecalho-h do global.css. */
+  .nav-celular {
+    display: none;
+  }
+
+  /* Celular: só a linha do logo (56px, o --cabecalho-h do global.css) fica presa no topo.
+     O menu vem logo abaixo, fora do header, e rola com a página. */
   @media (max-width: 720px) {
     .linha {
-      height: auto;
-      flex-wrap: wrap;
-      gap: 0 16px;
+      height: 56px;
+      gap: 16px;
     }
-    .direita {
-      display: contents;
+    .direita nav {
+      display: none;
     }
     .marca {
-      height: 44px;
+      min-height: 44px;
       font-size: 1.2rem;
     }
     .marca svg {
       width: 22px;
       height: 22px;
     }
-    .cabecalho :global(.seletor-idioma summary) {
-      padding: 4px 8px;
+    .nav-celular {
+      display: block;
+      border-bottom: 1px solid var(--borda);
     }
-    nav {
-      order: 3;
-      width: 100%;
-      border-top: 1px solid var(--borda);
-    }
-    nav ul {
+    .nav-celular ul {
+      display: flex;
       justify-content: space-between;
       gap: 12px;
+      /* O "nav ul" do desktop zera o padding; aqui volta a margem lateral do .container. */
+      padding-inline: var(--gutter);
     }
-    nav a {
+    .nav-celular a {
       display: block;
-      height: 35px;
-      line-height: 35px;
-      font-size: 0.75rem;
+      height: 44px;
+      line-height: 44px;
+      font-size: 0.8125rem;
     }
   }
 </style>

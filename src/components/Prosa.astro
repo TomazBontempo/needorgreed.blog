@@ -119,4 +119,11 @@ interface Props {
       hyphens: auto;
     }
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .prosa :global(figcaption) {
+      font-size: 0.8125rem;
+    }
+  }
 </style>

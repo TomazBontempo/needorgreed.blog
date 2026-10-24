@@ -115,7 +115,8 @@ Desktop (tudo isso cabe na primeira tela; ver "Padrões estabelecidos"):
 4. **Loot log:** barra lateral ao lado do destaque, como a janela de chat no canto da tela de um jogo.
 5. **Mais loot:** fichas sorteadas (descoberta, não cronológico), com botão d100 para sortear de novo.
 
-Mobile: header compacto, só a descrição do hero e um carrossel de fichas em ordem cronológica.
+Mobile (até 900px): tudo empilhado. Hero com a frase, a última crítica em resumo (sem o texto), os 5 últimos
+eventos do log e "Mais loot" em lista. Ver "Padrões estabelecidos".
 
 ### Loot log x cards: funções diferentes, não redundantes
 
@@ -265,7 +266,7 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
 
 ### Padrões estabelecidos (seguir)
 
-- **Uma ficha só.** `Item.astro` com variantes `grande`, `bolso` (listagens e carrossel) e `mini` (tooltip
+- **Uma ficha só.** `Item.astro` com variantes `grande`, `bolso` (listagens) e `mini` (tooltip
   do log). Bolso e mini mostram exatamente os mesmos dados (atributos, frase, roll com número, pé); só o
   tamanho muda. Toda review tem **exatamente 2 atributos** (schema e painel exigem). Nunca crie outro desenho de card. Estilos em `src/styles/item.css`, globais, prefixo `it-`.
   Hover do bolso: sobe 4px, escala 1.02, borda na cor da raridade, sombra suave, 180ms, só em `(hover: hover)`;
@@ -283,14 +284,24 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   degradê no pé e sem prender a rolagem da página. Título "Última crítica" / "Latest review" fora da janela.
 - **"Mais loot":** sorteado no navegador por um script inline antes da primeira pintura (sem layout shift),
   nunca inclui o destaque, prefere reviews fora do log, botão d100 para rolar de novo. Sem JS: ordem do build.
-- **Home mobile (<900px):** sem título visível no hero, sem destaque e sem log; carrossel de fichas com
-  scroll-snap nativo, 85vw por ficha, indicador "1 / N", ordem cronológica, última ficha "Todas as reviews".
+- **Home mobile (<900px):** empilhada, sem carrossel (removido em 2026-10-24): hero com a frase (28px), "Última
+  crítica" em resumo (título, linha de roll, motivo, meta e o link, sem o texto), loot log com os 5 últimos
+  eventos e "Mais loot" em lista com o d100.
+- **Celular (até 720px), regras gerais:** só a linha do logo e do idioma fica presa (`--cabecalho-h` 57px); o
+  menu fica logo abaixo, fora do header (`.nav-celular`), e rola com a página. Nenhum texto abaixo de 13px.
+  Todo link ou botão fora de uma frase tem 44px de altura de toque. Listagens sem o painel em volta das fichas
+  (uma moldura só); na ficha, atributos lado a lado e o pé sempre numa linha (número e seção encurtam com
+  reticências; raridade e nota inteiras). Faixa de idioma em uma linha (52px: link e um X que equivale a
+  "Continuar em ..."). Filtros do Arquivo em fileiras de 44px que rolam para o lado.
+  **Nada disso pode mudar o desktop**: conferir pixel a pixel.
 - **Tooltip do loot log:** um elemento só por página, preenchido pelo fragmento `/fichas/<idioma>-<slug>/`
   (gerado no build, fora do Worker e dos buscadores; a língua vai colada no slug porque o roteador do Astro
   devolve 404 para qualquer caminho com `en` como trecho isolado, já que o inglês não tem prefixo). Abre à esquerda do link, nunca cobre o nome, 150ms de
   atraso, Esc fecha, foco do teclado abre, não existe em toque.
 - **Página da review:** título, linha de roll, motivo. Lateral esquerda fixa (veredito, progresso de leitura,
-  sumário com a seção atual), texto no centro, loot log à direita. No celular, só a coluna do centro.
+  sumário com a seção atual), texto no centro, loot log à direita. Abaixo de 900px, só a coluna do centro,
+  com um veredito compacto embaixo do motivo (raridade e nota, plataforma, duração) e uma barra de 2px de
+  progresso de leitura presa embaixo do header.
 - **Mídia nas reviews (regras do Tomaz):** 1) tudo na pasta da review: `capa.<ext>` na raiz, imagens em
   `imagens/`, clipes e seus quadros em `videos/`; 2) **capa obrigatória** (schema, painel e build; não existe
   ficha sem imagem); 3) **nenhum erro silencioso**. Caminhos sempre `../<slug>/...` (o único formato que o
@@ -377,7 +388,6 @@ Tomadas (não reabrir sem o Tomaz pedir):
 
 Em aberto:
 - **Logo.** O d100 de traço é placeholder.
-- **Home mobile:** hoje é um carrossel de fichas (ver "Padrões"). O Tomaz disse que vai rever o mobile depois.
 - **Fechamento da Impeccable:** a crítica rodou em 2026-10-24 (ver ESTADO.md); falta a auditoria (`audit`)
   e o `DESIGN.md` gerado do site pronto.
 

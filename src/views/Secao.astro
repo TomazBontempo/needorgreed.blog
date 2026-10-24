@@ -120,4 +120,14 @@ const tipos = secao === 'telas' ? (['filme', 'serie', 'anime'] as TipoId[]).filt
     font-size: 0.875rem;
     color: var(--texto-3);
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .contagem {
+      font-size: 0.8125rem;
+    }
+    label {
+      min-height: 44px;
+    }
+  }
 </style>

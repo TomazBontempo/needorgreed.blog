@@ -36,6 +36,8 @@ const { eventos } = await getLootLog();
   data-lendo={review.slug}
   lang={dicionario(versao.idiomaTexto).hreflang}
 >
+  <!-- Celular: progresso de leitura numa barra de 2px embaixo do header (no desktop fica na lateral). -->
+  <div class="progresso-celular" aria-hidden="true"><span data-progresso-celular></span></div>
   <aside class="lado">
     <LateralReview idioma={idioma} review={review} versao={versao} titulos={headings} />
   </aside>
@@ -110,12 +112,39 @@ const { eventos } = await getLootLog();
       display: none;
     }
   }
+  .progresso-celular {
+    display: none;
+  }
   @media (max-width: 900px) {
     .review {
       display: block;
     }
     .lado {
       display: none;
+    }
+    .progresso-celular {
+      display: block;
+      position: fixed;
+      top: calc(var(--cabecalho-h) - 1px);
+      left: 0;
+      right: 0;
+      z-index: 21;
+      height: 2px;
+      pointer-events: none;
+    }
+    .progresso-celular span {
+      display: block;
+      height: 100%;
+      background: var(--cor);
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+  }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .tags {
+      font-size: 0.8125rem;
     }
   }
 </style>

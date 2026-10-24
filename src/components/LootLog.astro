@@ -323,4 +323,23 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
   .vazio {
     margin: 8px 0;
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .log {
+      font-size: 0.8125rem;
+    }
+    h2 {
+      font-size: 0.8125rem;
+    }
+    .topo-log a {
+      font-size: 0.8125rem;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+    time {
+      font-size: 0.8125rem;
+    }
+  }
 </style>

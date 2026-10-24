@@ -114,4 +114,14 @@ const bio = await bioEm(autor, idioma);
       grid-template-columns: minmax(0, 1fr);
     }
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .meta {
+      font-size: 0.8125rem;
+    }
+    .rotulo {
+      font-size: 0.8125rem;
+    }
+  }
 </style>

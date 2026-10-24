@@ -56,4 +56,16 @@ const contagem = (id: RaridadeId) => reviews.filter((r) => r.raridade.id === id)
     margin-left: 6px;
     color: var(--texto-3);
   }
+
+  /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */
+  @media (max-width: 720px) {
+    .legenda ul {
+      font-size: 0.8125rem;
+    }
+    .legenda a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
 </style>
