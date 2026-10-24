@@ -14,7 +14,7 @@ const en = {
   },
 
   hero: {
-    titulo: 'Every work is a loot drop.',
+    titulo: 'Every work is a loot.',
     descricao1: 'Reviews of games, films, series and anime.',
     descricao2: 'Rarity says how good the work is, and the roll says if it is worth your time.',
     saibaMais: 'More about our ratings',
@@ -184,13 +184,6 @@ const en = {
     titulo: 'How the loot works',
     intro:
       'Every work reviewed here is treated like an item that dropped in an MMO raid. It gets two verdicts, and they are not the same thing: how good it is, and whether it is worth your time right now.',
-    glossarioTitulo: 'Glossary',
-    /** Só os termos que o resto da página não explica, na ordem em que aparecem. */
-    glossario: {
-      linha: { termo: 'Roll line', definicao: 'The signature of every review: Snufupugos rolled Need (94) for [Outer Wilds].' },
-      ficha: { termo: 'Item card', definicao: 'The card for each work: cover, collection number, rarity, roll and a one-liner.' },
-      d100: { termo: 'd100', definicao: 'The die next to More loot. Click it to roll a new set of cards.' },
-    },
     raridadeTitulo: 'Rarity: how good it is',
     raridadeTexto:
       'Comes straight from the score, 0 to 10 with one decimal. The colour of the item name tells you the rarity at a glance, anywhere on the site.',

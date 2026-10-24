@@ -47,7 +47,7 @@ No fim de 2026-10-24 (commits `d81f94b` em diante):
   `components/TituloDoTexto.astro`; fichas logo abaixo do h1 viram h2) e o motivo do roll sem repetir na
   lateral da review. O resto ficou em "Problemas abertos". Screenshots e medidas em `.impeccable/review/`
   (fora do git).
-- **Hero novo:** uma frase ("Cada obra é um loot."), explicação em duas linhas e o link "Saiba mais sobre
+- **Hero novo:** uma frase ("Cada obra é um loot.", em inglês "Every work is a loot."), explicação em duas linhas e o link "Saiba mais sobre
   nossas notas" na quarta linha. Respiro de até 65px que empurra a página em vez de espremer o destaque,
   com limite no título de "Mais loot" e 32px de ficha (`--espiar-minimo` em `views/Home.astro`). Testamos
   alinhar o hero com o destaque; o Tomaz preferiu o alinhamento com o logo do header.
@@ -55,7 +55,7 @@ No fim de 2026-10-24 (commits `d81f94b` em diante):
   contador. O filtro do Arquivo virou "Re-rolls".
 - **Raridade Herança removida** de tudo (lógica, painel, rotas, cores, textos). As reviews de exemplo ainda
   têm a linha `heranca:` no frontmatter; ela é ignorada e some quando os exemplos forem apagados.
-- **Sobre:** glossário no fim, só com os termos que a página não explica (Linha de roll, Ficha, d100).
+- **Sobre:** chegou a ter um glossário no fim; o Tomaz achou redundante e ele foi removido.
 - **Espanhol:** "botín" trocado por "loot" em todo lugar.
 
 **Decisão do Tomaz: o site só sobe com o domínio.** Ele vai comprar o `needorgreed.blog` antes. A Cloudflare
@@ -197,7 +197,7 @@ Repositório: `TomazBontempo/needorgreed.blog` (público). Tudo enviado; `main` 
 - `35155b5` correção do passo de commit da Action de tradução
 - `9bc7efe` ESTADO atualizado (domínio e checklist de estreia)
 - `d81f94b` hero novo, títulos, re-roll no log, glossário e fim da Herança
-- o commit seguinte: re-roll no Arquivo, glossário enxuto no fim do Sobre, "loot" no espanhol e estes documentos
+- `0726790` re-roll no Arquivo, "loot" no espanhol e documentos atualizados
 
 O Tomaz autoriza commits e pushes pedindo; proponha um commit ao fim de cada rodada aprovada (ele pede
 reversões com frequência). Desfazer teste: guarde uma cópia antes; nunca `git checkout` em arquivo com

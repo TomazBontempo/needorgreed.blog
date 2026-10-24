@@ -137,8 +137,7 @@ Mobile: header compacto, só a descrição do hero e um carrossel de fichas em o
 - **Raridade** (`/raridade/<id>/`) e **Autor** (`/autores/<slug>/`).
 - **Arquivo:** o loot log completo.
 - **Sobre:** toda a lógica (raridade, roll, divergência, número do roll, loot log com re-roll, línguas,
-  quem escreve) e, por último, um glossário só com os termos que o resto da página não explica
-  (Linha de roll, Ficha, d100).
+  quem escreve). Sem glossário: testado e removido pelo Tomaz (a página já explica tudo).
 - **RSS** e **404** temática.
 
 ---
@@ -354,7 +353,7 @@ Tomadas (não reabrir sem o Tomaz pedir):
 - **Direção visual: "Fichário de Loot"**, sem nada de card game (nada de foil, holográfico ou carta de TCG:
   o Tomaz vetou). Cada review é uma ficha de item com número de coleção (Nº 009), borda na cor da raridade
   e uma segunda borda solta por fora.
-- **Copy do hero:** "Every work is a loot drop." / "Cada obra é um loot." / "Cada obra es un loot.";
+- **Copy do hero:** "Every work is a loot." / "Cada obra é um loot." / "Cada obra es un loot.";
   depois "Reviews of games, films, series and anime." e "Rarity says how good the work is, and the roll
   says if it is worth your time." em duas linhas; uma linha em branco; o link "More about our ratings" /
   "Saiba mais sobre nossas notas" / "Más sobre nuestras notas".

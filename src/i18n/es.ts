@@ -183,13 +183,6 @@ const es: Dicionario = {
     titulo: 'Cómo funciona el loot',
     intro:
       'Cada obra reseñada aquí se trata como un objeto que cayó en una raid de MMO. Recibe dos veredictos, y no son lo mismo: qué tan buena es, y si vale tu tiempo ahora.',
-    glossarioTitulo: 'Glosario',
-    /** Só os termos que o resto da página não explica, na ordem em que aparecem. */
-    glossario: {
-      linha: { termo: 'Línea de roll', definicao: 'La firma de cada reseña: Snufupugos tiró Need (94) por [Outer Wilds].' },
-      ficha: { termo: 'Ficha', definicao: 'La tarjeta de cada obra: portada, número de colección, rareza, roll y una frase.' },
-      d100: { termo: 'd100', definicao: 'El dado junto a Más loot. Haz clic para sortear otras fichas.' },
-    },
     raridadeTitulo: 'Rareza: qué tan bueno es',
     raridadeTexto:
       'Sale directo de la nota, de 0 a 10 con un decimal. El color del nombre del objeto te dice la rareza de un vistazo, en cualquier parte del sitio.',
