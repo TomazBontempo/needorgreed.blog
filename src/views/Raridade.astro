@@ -1,0 +1,52 @@
+---
+/** Página de uma raridade: todas as reviews dela, com a legenda das outras para navegar. */
+import Base from '../layouts/Base.astro';
+import TopoPagina from '../components/TopoPagina.astro';
+import Fichario from '../components/Fichario.astro';
+import LegendaRaridade from '../components/LegendaRaridade.astro';
+import { dicionario, idiomaDe } from '../i18n';
+import { getReviews, versaoEm } from '../lib/reviews';
+import type { RaridadeId } from '../lib/raridade';
+
+interface Props {
+  raridade: RaridadeId;
+}
+const { raridade } = Astro.props;
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const reviews = (await getReviews()).filter((r) => r.raridade.id === raridade);
+const itens = await Promise.all(reviews.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma) })));
+const nome = t.raridades[raridade].nome;
+const descricao = raridade === 'heranca' ? t.paginas.herancaDescricao : t.paginas.faixaNota(t.raridades[raridade].faixa);
+---
+
+<Base titulo={nome} descricao={descricao}>
+  <div class="container">
+    <TopoPagina titulo={nome} descricao={descricao} classe={`r-${raridade}`}>
+      <p class="contagem mono">{t.paginas.contagem(reviews.length)}</p>
+    </TopoPagina>
+    <div class="barra">
+      <LegendaRaridade idioma={idioma} atual={raridade} />
+    </div>
+    {itens.length > 0 ? <Fichario idioma={idioma} itens={itens} rotulo={nome} /> : <p class="vazio mono">{t.paginas.vazio}</p>}
+  </div>
+</Base>
+
+<style>
+  .contagem {
+    margin: 14px 0 0;
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .barra {
+    margin-bottom: 20px;
+  }
+  .vazio {
+    margin: 0;
+    padding: 40px 24px;
+    font-size: 0.875rem;
+    color: var(--texto-3);
+    background: var(--painel-fundo);
+    border: 1px solid var(--borda);
+  }
+</style>

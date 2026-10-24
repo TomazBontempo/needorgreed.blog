@@ -1,14 +1,23 @@
 ---
 /**
- * Comentários via Giscus. Configure em src/site.config.ts (GISCUS).
- * Sem repoId preenchido, mostra só um aviso em desenvolvimento.
+ * Comentários via Giscus (GitHub Discussions). Configure em src/site.config.ts (GISCUS).
+ * Uma discussão por review, com o slug como título: as versões em inglês e português
+ * dividem os mesmos comentários.
  */
 import { GISCUS } from '../site.config';
+import { dicionario, type Idioma } from '../i18n';
+
+interface Props {
+  idioma: Idioma;
+  slug: string;
+}
+const { idioma, slug } = Astro.props;
+const t = dicionario(idioma);
 const ativo = Boolean(GISCUS.repoId && GISCUS.categoryId);
 ---
 
-<section class="comentarios" aria-labelledby="titulo-comentarios">
-  <h2 id="titulo-comentarios">Chat do grupo</h2>
+<section class="comentarios" id="discussao" aria-labelledby="titulo-discussao">
+  <h2 id="titulo-discussao">{t.review.discussao}</h2>
   {
     ativo ? (
       <script
@@ -18,21 +27,20 @@ const ativo = Boolean(GISCUS.repoId && GISCUS.categoryId);
         data-repo-id={GISCUS.repoId}
         data-category={GISCUS.category}
         data-category-id={GISCUS.categoryId}
-        data-mapping={GISCUS.mapping}
+        data-mapping="specific"
+        data-term={slug}
         data-strict="1"
         data-reactions-enabled="1"
         data-emit-metadata="0"
         data-input-position="top"
         data-theme={GISCUS.theme}
-        data-lang={GISCUS.lang}
+        data-lang={idioma === 'pt' ? 'pt' : 'en'}
         data-loading="lazy"
         crossorigin="anonymous"
         async
       />
     ) : (
-      import.meta.env.DEV && (
-        <p class="aviso mono">Comentários desativados: preencha GISCUS em src/site.config.ts.</p>
-      )
+      <p class="vazio">{t.review.discussaoEmBreve}</p>
     )
   }
 </section>
@@ -40,15 +48,23 @@ const ativo = Boolean(GISCUS.repoId && GISCUS.categoryId);
 <style>
   .comentarios {
     margin-top: 64px;
-    padding-top: 32px;
-    border-top: 1px solid var(--borda);
+    padding-top: 14px;
+    border-top: 1px solid var(--ouro);
+    scroll-margin-top: calc(var(--cabecalho-h) + 24px);
   }
   h2 {
-    font-size: 1.4rem;
     margin: 0 0 20px;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ouro);
   }
-  .aviso {
-    font-size: 13px;
+  .vazio {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
     color: var(--texto-3);
   }
 </style>

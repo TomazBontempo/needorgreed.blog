@@ -4,12 +4,10 @@
  */
 export const SITE = {
   nome: 'Need or Greed',
-  descricao: 'Críticas de jogos, séries, filmes e animes. Cada obra é um loot: Need, Greed ou Pass.',
   url: 'https://needorgreed.blog',
-  idioma: 'pt-BR',
 
   /** Repositório usado para descobrir o autor de cada review (owner/repo). */
-  repo: 'TomazBontempo/needorgreed',
+  repo: 'TomazBontempo/needorgreed.blog',
 
   /** Autor usado quando não dá para descobrir quem criou o arquivo (ex.: dev local sem git). */
   autorPadrao: 'TomazBontempo',
@@ -21,11 +19,11 @@ export const SITE = {
  * Enquanto repoId estiver vazio, a área de comentários não aparece.
  */
 export const GISCUS = {
-  repo: 'TomazBontempo/needorgreed',
+  repo: 'TomazBontempo/needorgreed.blog',
   repoId: '',
   category: 'Comentários',
   categoryId: '',
-  mapping: 'pathname',
-  lang: 'pt',
+  // Mapeia pelo slug da review, não pela URL: /reviews/x/ e /pt/reviews/x/ dividem a mesma discussão.
+  mapping: 'specific',
   theme: 'dark_dimmed',
 };

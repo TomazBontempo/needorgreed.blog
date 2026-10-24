@@ -1,0 +1,28 @@
+---
+/**
+ * A marca de cada roll, para ele não depender só da cor:
+ *   Need = losango cheio, Greed = círculo vazado, Pass = traço.
+ */
+import type { RollId } from '../lib/raridade';
+
+interface Props {
+  roll: RollId;
+  tamanho?: number;
+}
+const { roll, tamanho = 9 } = Astro.props;
+---
+
+<svg class="marca-roll" width={tamanho} height={tamanho} viewBox="0 0 10 10" aria-hidden="true">
+  {roll === 'need' && <path d="M5 0.5 9.5 5 5 9.5 0.5 5z" fill="currentColor" />}
+  {roll === 'greed' && <circle cx="5" cy="5" r="3.6" fill="none" stroke="currentColor" stroke-width="1.6" />}
+  {roll === 'pass' && <path d="M1 5h8" stroke="currentColor" stroke-width="1.8" />}
+</svg>
+
+<style>
+  .marca-roll {
+    display: inline-block;
+    flex: none;
+    vertical-align: 0.02em;
+    margin-right: 0.4em;
+  }
+</style>

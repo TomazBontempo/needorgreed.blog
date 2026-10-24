@@ -1,9 +1,47 @@
+# Dependências
 node_modules/
+
+# Build e caches do Astro, Vite e Wrangler
 dist/
 .astro/
 .wrangler/
+.cache/
+*.tsbuildinfo
+
+# Segredos e variáveis locais (tokens do GitHub, Cloudflare e Keystatic)
 .env
 .env.*
 !.env.example
 .dev.vars
+.dev.vars.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testes com navegador (Playwright)
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Impeccable: screenshots de revisão, mockups de decisão, respostas da página de decisão
+# e a configuração local da máquina. O config.json (padrão do projeto) vai para o repositório.
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/config.local.json
+
+# Configurações pessoais do Claude Code (as do projeto, se existirem, vão para o repositório)
+.claude/settings.local.json
+
+# Editores e sistema operacional
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*~
 .DS_Store
+Thumbs.db

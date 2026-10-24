@@ -1,0 +1,197 @@
+/**
+ * Textos de interface em português do Brasil (servido também para Portugal).
+ * Mesmas chaves de src/i18n/en.ts; o TypeScript reclama se faltar alguma.
+ */
+import type { Dicionario } from './en';
+
+const pt: Dicionario = {
+  idioma: 'pt',
+  locale: 'pt-BR',
+  hreflang: 'pt-BR',
+
+  site: {
+    descricao: 'Críticas de jogos, séries, filmes e animes. Cada obra é um loot: Need, Greed ou Pass.',
+  },
+
+  hero: {
+    linha1: 'Cada obra é um loot:',
+    linha2: 'Need, Greed ou Pass.',
+    descricao: 'Críticas de jogos, filmes, séries e animes. A raridade diz o quão boa é a obra, e o roll diz se vale seu tempo.',
+  },
+
+  nav: {
+    jogos: 'Jogos',
+    telas: 'Telas',
+    arquivo: 'Arquivo',
+    sobre: 'Sobre',
+    principal: 'Navegação principal',
+    pularParaConteudo: 'Pular para o conteúdo',
+  },
+
+  idiomaToggle: {
+    rotulo: 'Read in English',
+    curto: 'EN',
+    atual: 'Português',
+  },
+
+  raridades: {
+    lixo: { nome: 'Lixo de vendedor', faixa: '0 a 2.9' },
+    comum: { nome: 'Comum', faixa: '3 a 4.9' },
+    incomum: { nome: 'Incomum', faixa: '5 a 6.9' },
+    raro: { nome: 'Raro', faixa: '7 a 8.9' },
+    epico: { nome: 'Épico', faixa: '9 a 9.9' },
+    lendario: { nome: 'Lendário', faixa: '10' },
+    heranca: { nome: 'Herança', faixa: 'fora da escala' },
+  },
+
+  rolls: {
+    need: { nome: 'Need', descricao: 'Vale agora, pelo preço cheio. Não espere.' },
+    greed: { nome: 'Greed', descricao: 'É bom, com condição: espere promoção, só para fãs do gênero, ou custa muito tempo.' },
+    pass: { nome: 'Pass', descricao: 'Não vale, nem com desconto ou de graça.' },
+  },
+
+  tipos: {
+    jogo: 'Jogo',
+    filme: 'Filme',
+    serie: 'Série',
+    anime: 'Anime',
+  },
+
+  log: {
+    titulo: 'Loot log',
+    rolou: 'rolou',
+    para: 'para',
+    atualizou: 'atualizou',
+    edicoes: (n: number) => (n > 1 ? `${n} edições` : ''),
+    entrou: 'entrou no grupo',
+    vazio: 'Nada caiu ainda.',
+    verTudo: 'Log completo',
+    lido: 'lido',
+  },
+
+  item: {
+    numero: 'Nº',
+    rotulo: 'Ficha do item',
+  },
+
+  review: {
+    escritoPor: 'Escrito por',
+    editadoPor: 'editado por',
+    verDiscussao: (n: number) => (n === 1 ? 'Ver discussão (1 comentário)' : `Ver discussão (${n} comentários)`),
+    verDiscussaoSemNumero: 'Ver discussão',
+    discussaoEmBreve: 'Os comentários abrem em breve.',
+    leitura: (min: number) => `${min} min de leitura`,
+    destaque: 'Última crítica',
+    abrir: 'Abrir review e comentários',
+    abrirComContagem: (n: number) => `Abrir review e comentários (${n})`,
+    janela: (titulo: string) => `Review mais recente: ${titulo}. Texto com rolagem.`,
+    lerCompleta: 'Ler review completa',
+    sumario: 'Nesta review',
+    progresso: 'Progresso de leitura',
+    lido: (pct: number) => `${pct}% lido`,
+    veredito: 'Veredito',
+    raridade: 'Raridade',
+    roll: 'Roll',
+    discussao: 'Discussão',
+    tags: 'Tags',
+    plataforma: 'Plataforma',
+    duracao: 'Duração',
+    traduzidoDe: { pt: 'Traduzido automaticamente do português.', en: 'Traduzido automaticamente do inglês.' },
+    verOriginal: 'Ler o original',
+    semTraducao: { pt: 'Ainda sem tradução, mostrando o original em português.', en: 'Ainda sem tradução, mostrando o original em inglês.' },
+  },
+
+  paginas: {
+    jogos: 'Jogos',
+    telas: 'Telas',
+    jogosDescricao: 'Todos os jogos que caíram, do mais novo para o mais antigo.',
+    telasDescricao: 'Filmes, séries e animes. Do mais novo para o mais antigo.',
+    filtroTipo: 'Mostrar',
+    filtroTodos: 'Todos',
+    vazio: 'Nada caiu aqui ainda.',
+    contagem: (n: number) => (n === 1 ? '1 review' : `${n} reviews`),
+    raridades: 'Raridades',
+    herancaDescricao: 'As obras da vida. Fora da escala, sem imparcialidade nenhuma.',
+    faixaNota: (faixa: string) => `Nota ${faixa}.`,
+    arquivo: 'Arquivo',
+    sobre: 'Sobre',
+    raridade: 'Raridade',
+    autor: 'Autor',
+    maisLoot: 'Mais loot',
+    verTodos: 'Todas as reviews',
+    rerolar: 'Rolar de novo: embaralhar as fichas',
+    carrossel: 'Críticas recentes',
+    posicao: (i: number, n: number) => `${i} de ${n}`,
+    rerolado: 'Novas fichas sorteadas.',
+  },
+
+  rodape: {
+    assinatura: 'Rolado à mão. Nenhum drop patrocinado.',
+    rss: 'Feed RSS',
+  },
+
+  erro404: {
+    titulo: 'Nada caiu aqui',
+    texto: 'Esta página deu despawn, ou nunca existiu.',
+    linhaSistema: 'O sistema rolou Pass (0) para [esta página]',
+    voltar: 'Voltar para o loot',
+    arquivo: 'Procurar no arquivo',
+  },
+
+  autor: {
+    reviews: 'Reviews',
+    atividade: 'Atividade',
+    github: 'GitHub',
+    desde: (data: string) => `No grupo desde ${data}`,
+  },
+
+  arquivo: {
+    descricao: 'Tudo que aconteceu no site, do mais novo para o mais antigo: reviews roladas, reviews atualizadas, autores novos.',
+    filtros: 'Filtrar o log',
+    evento: 'Evento',
+    todos: 'Todos',
+    reviews: 'Reviews',
+    atualizacoes: 'Atualizações',
+    autores: 'Autores novos',
+    roll: 'Roll',
+    nenhum: 'Nenhum evento com esses filtros.',
+    total: (n: number) => (n === 1 ? '1 evento' : `${n} eventos`),
+  },
+
+  sobre: {
+    titulo: 'Como funciona o loot',
+    intro:
+      'Toda obra criticada aqui é tratada como um item que caiu numa raid de MMO. Ela recebe dois vereditos, e eles não são a mesma coisa: o quão boa ela é, e se vale o seu tempo agora.',
+    raridadeTitulo: 'Raridade: o quão bom é',
+    raridadeTexto:
+      'Sai direto da nota, de 0 a 10 com uma casa decimal. A cor do nome do item mostra a raridade de longe, em qualquer lugar do site.',
+    herancaTexto:
+      'Herança fica fora da escala: as obras da vida do autor, criticadas sem imparcialidade nenhuma e avisando isso de cara.',
+    rollTitulo: 'Roll: vale agora?',
+    rollTexto:
+      'O roll é o veredito prático. Ele pesa preço, duração e para quem a obra é. Todo roll vem com o motivo numa linha, colado nele.',
+    divergenciaTitulo: 'Os dois podem discordar, e a graça é essa',
+    divergencias: {
+      epicoGreed: 'Épico, mas Greed: excelente, mas é um grind de 100 horas para um nicho.',
+      incomumNeed: 'Incomum, mas Need: curtinho, barato ou já está no serviço que você paga.',
+      raroPass: 'Raro, mas Pass: bem feito, mas é remaster de algo que você joga mais barato.',
+    },
+    numeroTitulo: 'O número do roll',
+    numeroTexto:
+      'Em "Snufupugos rolou Need (94)", o número é a nota vezes dez. Ele sempre cai na faixa da raridade: 70 a 89 é Raro, 90 a 99 é Épico, 100 é Lendário.',
+    logTitulo: 'O loot log',
+    logTexto:
+      'A coluna de mensagens de sistema registra o que acontece no site: uma review rolada, uma review atualizada, alguém novo entrando no grupo. O arquivo guarda o log inteiro.',
+    traducaoTitulo: 'Duas línguas',
+    traducaoTexto:
+      'As reviews são escritas em português ou inglês e a outra versão é traduzida automaticamente, com um aviso no topo e o link para o original. Os comentários são os mesmos nas duas versões.',
+    quemTitulo: 'Quem rola o dado',
+    quemTexto: 'Cada review é assinada pela conta do GitHub que criou o arquivo. Ninguém escolhe a própria assinatura.',
+    verRaridade: (nome: string) => `Todas as reviews de raridade ${nome}`,
+    nota: 'Nota',
+    numero: 'Número do roll',
+    faixa: (de: number, ate: number) => `${de} a ${ate}`,
+  },
+};
+
+export default pt;

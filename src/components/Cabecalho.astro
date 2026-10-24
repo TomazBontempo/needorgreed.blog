@@ -1,0 +1,158 @@
+---
+import IdiomaToggle from './IdiomaToggle.astro';
+import { dicionario, url, type Idioma, type Secao } from '../i18n';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const t = dicionario(idioma);
+const links: Array<[Secao, string]> = [
+  ['jogos', t.nav.jogos],
+  ['telas', t.nav.telas],
+  ['arquivo', t.nav.arquivo],
+  ['sobre', t.nav.sobre],
+];
+const atual = Astro.url.pathname;
+---
+
+<header class="cabecalho">
+  <div class="container linha">
+    <a class="marca" href={url(idioma)}>
+      <!-- Placeholder do logo: um d100 de traço. O logo definitivo ainda está em aberto. -->
+      <svg viewBox="0 0 26 26" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M13 1.5 23.5 7.5v11L13 24.5 2.5 18.5v-11z" />
+        <path d="M13 1.5v8M2.5 7.5 13 9.5l10.5-2M13 9.5 7 18.5h12zM2.5 18.5 7 18.5M23.5 18.5H19M13 24.5 7 18.5M13 24.5l6-6" />
+      </svg>
+      <span>Need or Greed</span>
+    </a>
+
+    <div class="direita">
+      <nav aria-label={t.nav.principal}>
+        <ul>
+          {
+            links.map(([secao, nome]) => {
+              const href = url(idioma, secao);
+              return (
+                <li>
+                  <a href={href} aria-current={atual.startsWith(href) ? 'page' : undefined}>
+                    {nome}
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </nav>
+
+      <IdiomaToggle idioma={idioma} />
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Fixo no topo de todas as páginas. Fundo sólido para o texto não aparecer por baixo.
+     z-index 20: acima do conteúdo, abaixo do tooltip do log (50). */
+  .cabecalho {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #0b0a08;
+    border-bottom: 1px solid var(--borda);
+  }
+  /* Container próprio do header: mesma largura em todas as páginas, independente do layout de cada uma. */
+  .linha {
+    max-width: var(--largura-cabecalho);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: var(--cabecalho-alto);
+  }
+  .direita {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--texto);
+    text-decoration: none;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+  .marca svg {
+    color: var(--ouro);
+    transition: transform 0.6s var(--ease);
+  }
+  .marca:hover {
+    color: var(--texto);
+  }
+  .marca:hover svg {
+    transform: rotate(60deg);
+  }
+  nav ul {
+    display: flex;
+    gap: 26px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  nav a {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--texto-2);
+    text-decoration: none;
+  }
+  nav a:hover,
+  nav a[aria-current='page'] {
+    color: var(--ouro);
+  }
+  nav a[aria-current='page'] {
+    text-decoration: underline;
+  }
+
+  /* Celular: duas linhas compactas (44px + 36px), somando o --cabecalho-h do global.css. */
+  @media (max-width: 720px) {
+    .linha {
+      height: auto;
+      flex-wrap: wrap;
+      gap: 0 16px;
+    }
+    .direita {
+      display: contents;
+    }
+    .marca {
+      height: 44px;
+      font-size: 1.2rem;
+    }
+    .marca svg {
+      width: 22px;
+      height: 22px;
+    }
+    .cabecalho :global(.idioma-toggle) {
+      padding: 4px 8px;
+    }
+    nav {
+      order: 3;
+      width: 100%;
+      border-top: 1px solid var(--borda);
+    }
+    nav ul {
+      justify-content: space-between;
+      gap: 12px;
+    }
+    nav a {
+      display: block;
+      height: 35px;
+      line-height: 35px;
+      font-size: 0.75rem;
+    }
+  }
+</style>

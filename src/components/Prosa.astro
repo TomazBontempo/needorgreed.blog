@@ -1,0 +1,122 @@
+---
+/** O texto da review. Ritmo de revista: medida curta, entrelinha generosa, títulos condensados. */
+interface Props {
+  class?: string;
+}
+---
+
+<div class:list={['prosa', Astro.props.class]}>
+  <slot />
+</div>
+
+<style>
+  .prosa {
+    font-size: 1.15625rem;
+    line-height: 1.68;
+    max-width: 66ch;
+  }
+  .prosa :global(p) {
+    margin: 0 0 1.05em;
+  }
+  /* Lede: o primeiro parágrafo é só um pouco maior e mais claro. */
+  .prosa > :global(p:first-of-type) {
+    font-size: 1.08em;
+    line-height: 1.6;
+    color: #f4eee2;
+  }
+  .prosa :global(h2),
+  .prosa :global(h3) {
+    margin: 1.9em 0 0.45em;
+    font-family: var(--display);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+  .prosa :global(h2) {
+    font-size: 1.75rem;
+  }
+  .prosa :global(h3) {
+    font-size: 1.35rem;
+  }
+  .prosa :global(blockquote) {
+    margin: 1.6em 0;
+    padding: 0 0 0 1.1em;
+    border-left: 1px solid var(--ouro);
+    font-style: italic;
+    font-size: 1.2em;
+    line-height: 1.5;
+    color: var(--frase);
+  }
+  .prosa :global(blockquote p) {
+    margin: 0;
+  }
+  .prosa :global(ul),
+  .prosa :global(ol) {
+    margin: 0 0 1.05em;
+    padding-left: 1.3em;
+  }
+  .prosa :global(li) {
+    margin: 0.3em 0;
+  }
+  .prosa :global(li::marker) {
+    color: var(--ouro);
+  }
+  .prosa :global(strong) {
+    font-weight: 650;
+    color: #f4eee2;
+  }
+  .prosa :global(em) {
+    font-style: italic;
+  }
+  .prosa :global(code) {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    padding: 0.1em 0.35em;
+    background: var(--painel);
+    border: 1px solid var(--borda);
+  }
+  .prosa :global(h2),
+  .prosa :global(h3) {
+    scroll-margin-top: calc(var(--cabecalho-h) + 24px);
+  }
+  .prosa :global(img),
+  .prosa :global(video) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 1.6em 0;
+    border: 1px solid var(--borda);
+    background: var(--painel-fundo);
+  }
+  .prosa :global(.figura) {
+    margin: 1.8em 0;
+  }
+  .prosa :global(.figura p) {
+    margin: 0;
+  }
+  .prosa :global(.figura img),
+  .prosa :global(.figura video) {
+    margin: 0;
+  }
+  .prosa :global(figcaption) {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--texto-3);
+  }
+  .prosa :global(hr) {
+    margin: 2.4em auto;
+    width: 40%;
+    border: 0;
+    border-top: 1px solid var(--borda-forte);
+  }
+  @media (max-width: 640px) {
+    .prosa {
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      hyphens: auto;
+    }
+  }
+</style>

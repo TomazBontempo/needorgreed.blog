@@ -1,0 +1,121 @@
+---
+/**
+ * A página de uma review.
+ *
+ * Desktop, três colunas: lateral fixa (veredito, progresso, sumário) | texto | loot log.
+ * Entre 900 e 1180px: lateral e texto. Celular: só o texto (título, texto, tags, autor, comentários).
+ * (O destaque da home é outro componente: DestaqueHome.astro.)
+ */
+import { render } from 'astro:content';
+import CabecalhoReview from './CabecalhoReview.astro';
+import LateralReview from './LateralReview.astro';
+import LootLog from './LootLog.astro';
+import Prosa from './Prosa.astro';
+import AvisoTraducao from './AvisoTraducao.astro';
+import Comentarios from './Comentarios.astro';
+import { componentesMdx } from './mdx';
+import { dicionario, type Idioma } from '../i18n';
+import type { ReviewCompleta as Review, VersaoReview } from '../lib/reviews';
+import { getLootLog } from '../lib/lootlog';
+
+interface Props {
+  idioma: Idioma;
+  review: Review;
+  versao: VersaoReview;
+}
+
+const { idioma, review, versao } = Astro.props;
+const t = dicionario(idioma);
+const { data } = versao;
+const { Content, headings } = await render(versao.entry);
+const { eventos } = await getLootLog();
+---
+
+<article
+  class:list={['review', `r-${review.raridade.id}`, `roll-${data.roll}`]}
+  data-lendo={review.slug}
+  lang={dicionario(versao.idiomaTexto).hreflang}
+>
+  <aside class="lado">
+    <LateralReview idioma={idioma} review={review} versao={versao} titulos={headings} />
+  </aside>
+
+  <div class="centro">
+    <CabecalhoReview idioma={idioma} review={review} versao={versao} tituloPrimeiro />
+    <div class="corpo" data-corpo-review>
+      <AvisoTraducao idioma={idioma} versao={versao} slug={review.slug} />
+      <Prosa>
+        <Content components={componentesMdx} />
+      </Prosa>
+    </div>
+    {
+      data.tags.length > 0 && (
+        <p class="tags">
+          <span>{t.review.tags}:</span>
+          {data.tags.map((tag) => (
+            <span class="tag">#{tag}</span>
+          ))}
+        </p>
+      )
+    }
+    <Comentarios idioma={idioma} slug={review.slug} />
+  </div>
+
+  <aside class="log-lateral">
+    <LootLog idioma={idioma} eventos={eventos} limite={14} />
+  </aside>
+</article>
+
+<style>
+  /* A coluna de texto para em ~720px (66 a 72 caracteres); a largura extra vai para as laterais. */
+  .review {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(0, 720px) minmax(260px, 1fr);
+    gap: 48px;
+    align-items: start;
+  }
+  .lado,
+  .log-lateral {
+    position: sticky;
+    /* Começa abaixo do header fixo. */
+    top: calc(var(--cabecalho-h) + 24px);
+    max-height: calc(100dvh - var(--cabecalho-h) - 48px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--borda-forte) transparent;
+  }
+  .centro {
+    min-width: 0;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 36px 0 0;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .tag {
+    color: var(--texto-2);
+  }
+
+  @media (max-width: 1180px) {
+    .review {
+      grid-template-columns: 200px minmax(0, 720px);
+      gap: 40px;
+    }
+    .log-lateral {
+      display: none;
+    }
+  }
+  @media (max-width: 900px) {
+    .review {
+      display: block;
+    }
+    .lado {
+      display: none;
+    }
+  }
+</style>

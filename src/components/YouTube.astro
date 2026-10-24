@@ -9,7 +9,7 @@ interface Props {
   id: string;
   titulo?: string;
 }
-const { id, titulo = 'Vídeo' } = Astro.props;
+const { id, titulo = 'YouTube' } = Astro.props;
 ---
 
 <div class="video">
@@ -24,10 +24,10 @@ const { id, titulo = 'Vídeo' } = Astro.props;
 <style>
   .video {
     aspect-ratio: 16 / 9;
-    margin: 1.5em 0;
-    border-radius: var(--raio);
-    overflow: hidden;
+    margin: 1.8em 0;
     border: 1px solid var(--borda);
+    outline: 1px solid var(--borda);
+    outline-offset: 3px;
     background: #000;
   }
   iframe {

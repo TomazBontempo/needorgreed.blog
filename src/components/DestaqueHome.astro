@@ -1,0 +1,154 @@
+---
+/**
+ * A review mais recente na home, inteira, dentro de uma janela de altura fixa.
+ * O leitor rola dentro da janela e lê tudo ali; a página não é empurrada.
+ *
+ * - Focável e com rótulo: setas, Page Down e Home/End rolam a janela.
+ * - Sem overscroll-behavior: ao chegar no fim do texto, a roda volta a rolar a página.
+ * - Degradê no pé avisa que tem mais texto; some quando a rolagem chega ao fim.
+ * - Só o título e o link do fim levam à página da review (o bloco não é um link).
+ *
+ * Abaixo de 900px a janela solta a altura (rolagem dentro de rolagem é ruim no celular).
+ */
+import { render } from 'astro:content';
+import CabecalhoReview from './CabecalhoReview.astro';
+import AvisoTraducao from './AvisoTraducao.astro';
+import Prosa from './Prosa.astro';
+import { componentesMdx } from './mdx';
+import { dicionario, url, type Idioma } from '../i18n';
+import type { ReviewCompleta, VersaoReview } from '../lib/reviews';
+import { contarComentarios } from '../lib/comentarios';
+
+interface Props {
+  idioma: Idioma;
+  review: ReviewCompleta;
+  versao: VersaoReview;
+  class?: string;
+}
+
+const { idioma, review, versao, class: classe } = Astro.props;
+const t = dicionario(idioma);
+const { data } = versao;
+const { Content } = await render(versao.entry);
+const href = url(idioma, 'reviews', review.slug);
+const comentarios = await contarComentarios(review.slug);
+---
+
+<article
+  class:list={['destaque', `r-${review.raridade.id}`, `roll-${data.roll}`, classe]}
+  lang={dicionario(versao.idiomaTexto).hreflang}
+  data-destaque
+  aria-labelledby="titulo-destaque"
+>
+  <h2 class="topo-destaque" id="titulo-destaque">{t.review.destaque}</h2>
+  <div class="janela" tabindex="0" role="region" aria-label={t.review.janela(data.titulo)}>
+    <CabecalhoReview idioma={idioma} review={review} versao={versao} href={href} />
+    <AvisoTraducao idioma={idioma} versao={versao} slug={review.slug} />
+    <Prosa>
+      <Content components={componentesMdx} />
+    </Prosa>
+    <p class="abrir">
+      <a href={href}>{comentarios ? t.review.abrirComContagem(comentarios) : t.review.abrir}</a>
+    </p>
+  </div>
+  <div class="degrade" aria-hidden="true"></div>
+</article>
+
+<script>
+  // Some com o degradê quando a janela chega ao fim (ou quando o texto cabe inteiro).
+  document.querySelectorAll<HTMLElement>('[data-destaque]').forEach((art) => {
+    const janela = art.querySelector<HTMLElement>('.janela')!;
+    const atualizar = () => {
+      const noFim = janela.scrollTop + janela.clientHeight >= janela.scrollHeight - 8;
+      art.classList.toggle('no-fim', noFim);
+    };
+    janela.addEventListener('scroll', atualizar, { passive: true });
+    new ResizeObserver(atualizar).observe(janela);
+    atualizar();
+  });
+</script>
+
+<style>
+  .destaque {
+    position: relative;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  /* Título fora da janela, no mesmo estilo e altura do "Loot log" ao lado. */
+  .topo-destaque {
+    margin: 0 0 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--ouro);
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ouro);
+  }
+  .janela {
+    height: 100%;
+    overflow-y: auto;
+    padding: 26px 36px 36px;
+    background: var(--painel-fundo);
+    border: 1px solid var(--borda);
+    scrollbar-width: auto;
+    scrollbar-color: color-mix(in srgb, var(--ouro) 55%, var(--borda)) var(--painel);
+    scrollbar-gutter: stable;
+  }
+  .janela:focus-visible {
+    outline: 2px solid var(--ouro);
+    outline-offset: 2px;
+  }
+  .janela::-webkit-scrollbar {
+    width: 10px;
+  }
+  .janela::-webkit-scrollbar-track {
+    background: var(--painel);
+    border-left: 1px solid var(--borda);
+  }
+  .janela::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--ouro) 55%, var(--borda));
+    border: 2px solid var(--painel);
+  }
+
+  .degrade {
+    position: absolute;
+    left: 1px;
+    right: 14px;
+    bottom: 1px;
+    height: 72px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--painel-fundo) 85%);
+    transition: opacity 0.3s var(--ease);
+  }
+  .no-fim .degrade {
+    opacity: 0;
+  }
+
+  .abrir {
+    margin: 30px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--borda);
+    font-family: var(--mono);
+    font-size: 0.875rem;
+  }
+  .abrir a::after {
+    content: ' \2192';
+  }
+
+  @media (max-width: 900px) {
+    .janela {
+      height: auto;
+      overflow: visible;
+      padding: 0;
+      background: none;
+      border: 0;
+    }
+    .degrade {
+      display: none;
+    }
+  }
+</style>

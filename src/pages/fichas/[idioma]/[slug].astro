@@ -1,0 +1,28 @@
+---
+/**
+ * Fragmento HTML com a ficha mini de uma review, para o tooltip do loot log.
+ * Não é uma página: só a ficha, buscada sob demanda quando o leitor para o mouse num item do log.
+ *   /fichas/en/outer-wilds/   /fichas/pt/outer-wilds/
+ * Fica fora do Worker (wrangler.jsonc) e fora dos buscadores (public/_headers e robots.txt).
+ */
+import Item from '../../../components/Item.astro';
+import { IDIOMAS, type Idioma } from '../../../i18n';
+import { getReviews, versaoEm, type ReviewCompleta } from '../../../lib/reviews';
+
+export async function getStaticPaths() {
+  const reviews = await getReviews();
+  return IDIOMAS.flatMap((idioma) =>
+    reviews.map((review) => ({ params: { idioma, slug: review.slug }, props: { review, idioma } })),
+  );
+}
+
+interface Props {
+  review: ReviewCompleta;
+  idioma: Idioma;
+}
+
+const { review, idioma } = Astro.props;
+const { data } = await versaoEm(review, idioma);
+---
+
+<Item review={review} data={data} idioma={idioma} variante="mini" />

@@ -1,0 +1,115 @@
+---
+/** Página de um autor: perfil, as reviews dele e a atividade dele no loot log. */
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import TopoPagina from '../components/TopoPagina.astro';
+import Fichario from '../components/Fichario.astro';
+import LootLog from '../components/LootLog.astro';
+import { dicionario, formatarData, idiomaDe } from '../i18n';
+import { getReviews, versaoEm } from '../lib/reviews';
+import { getLootLog } from '../lib/lootlog';
+import type { Autor } from '../lib/autores';
+
+interface Props {
+  slug: string;
+  login: string;
+  autor?: Autor;
+}
+const { slug, login, autor } = Astro.props;
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const nick = autor?.data.nick ?? login;
+const reviews = (await getReviews()).filter((r) => r.autor.slug === slug);
+const itens = await Promise.all(reviews.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma) })));
+const eventos = (await getLootLog()).eventos.filter((e) => e.autor.slug === slug);
+const entrada = eventos.findLast((e) => e.tipo === 'autor');
+---
+
+<Base titulo={nick} descricao={autor?.data.bio}>
+  <div class="container">
+    <TopoPagina titulo={nick}>
+      <div class="perfil">
+        {autor?.data.avatar && <Image src={autor.data.avatar} alt="" width={72} height={72} class="avatar" />}
+        <div>
+          {autor?.data.bio && <p class="bio" lang="pt-BR">{autor.data.bio}</p>}
+          <p class="meta mono">
+            <span>{t.paginas.contagem(reviews.length)}</span>
+            {entrada && <span>{t.autor.desde(formatarData(idioma, entrada.data))}</span>}
+            <a href={`https://github.com/${login}`} rel="me">
+              {t.autor.github}: {login}
+            </a>
+          </p>
+        </div>
+      </div>
+    </TopoPagina>
+
+    <div class="colunas">
+      <section aria-labelledby="titulo-reviews">
+        <h2 id="titulo-reviews" class="rotulo">{t.autor.reviews}</h2>
+        {itens.length > 0 ? <Fichario idioma={idioma} itens={itens} rotulo={t.autor.reviews} /> : <p class="vazio mono">{t.paginas.vazio}</p>}
+      </section>
+      <section aria-labelledby="titulo-atividade" class="atividade">
+        <h2 id="titulo-atividade" class="rotulo">{t.autor.atividade}</h2>
+        <LootLog idioma={idioma} eventos={eventos} limite={30} cabecalho={false} />
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .perfil {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-top: 18px;
+  }
+  .perfil :global(.avatar) {
+    flex: none;
+    border: 1px solid var(--borda-forte);
+    outline: 1px solid var(--borda);
+    outline-offset: 3px;
+  }
+  .bio {
+    margin: 0;
+    max-width: 62ch;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--texto-2);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 10px 0 0;
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .colunas {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 40px;
+    align-items: start;
+  }
+  .rotulo {
+    margin: 0 0 12px;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ouro);
+  }
+  .atividade :global(.log) {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .vazio {
+    font-size: 0.875rem;
+    color: var(--texto-3);
+  }
+  @media (max-width: 900px) {
+    .colunas {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

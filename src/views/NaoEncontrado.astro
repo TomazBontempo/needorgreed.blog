@@ -1,0 +1,79 @@
+---
+/** 404 temática: uma mensagem de sistema de loot que não deu em nada. */
+import Base from '../layouts/Base.astro';
+import MarcaRoll from '../components/MarcaRoll.astro';
+import LootLog from '../components/LootLog.astro';
+import { dicionario, idiomaDe, url } from '../i18n';
+import { getLootLog } from '../lib/lootlog';
+
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const { eventos } = await getLootLog();
+const [antes, depois] = t.erro404.linhaSistema.split(/\[|\]/);
+---
+
+<Base titulo={t.erro404.titulo} descricao={t.erro404.texto} noindex>
+  <div class="container nada">
+    <div class="texto">
+      <p class="sistema mono roll-pass">
+        <MarcaRoll roll="pass" />
+        {antes}<span class="item">[{depois}]</span>
+      </p>
+      <h1>{t.erro404.titulo}</h1>
+      <p class="sub">{t.erro404.texto}</p>
+      <p class="acoes mono">
+        <a href={url(idioma)}>{t.erro404.voltar}</a>
+        <a href={url(idioma, 'arquivo')}>{t.erro404.arquivo}</a>
+      </p>
+    </div>
+    <LootLog idioma={idioma} eventos={eventos} limite={6} class="log-404" />
+  </div>
+</Base>
+
+<style>
+  .nada {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 48px;
+    align-items: start;
+    padding-top: 72px;
+    min-height: calc(100dvh - var(--cabecalho-h) - 200px);
+  }
+  .sistema {
+    margin: 0 0 18px;
+    font-size: 0.875rem;
+    color: var(--pass);
+  }
+  .item {
+    color: var(--r-lixo);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+  .sub {
+    margin: 14px 0 0;
+    font-size: 1.125rem;
+    color: var(--texto-2);
+  }
+  .acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin: 32px 0 0;
+    font-size: 0.875rem;
+  }
+  .acoes a::after {
+    content: ' \2192';
+  }
+  @media (max-width: 900px) {
+    .nada {
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 40px;
+    }
+  }
+</style>

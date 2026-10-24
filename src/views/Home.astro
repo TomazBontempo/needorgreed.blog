@@ -1,0 +1,511 @@
+---
+/**
+ * Home, ordem fixa: hero curto, a review mais recente inteira (com o loot log ao lado,
+ * ou depois dela no celular) e "Mais loot".
+ *
+ * "Mais loot" é para descobrir, não cronológico (o log já é a ordem do tempo): o build manda um
+ * conjunto de fichas e um script inline sorteia quais aparecem, antes da primeira pintura.
+ * Sem JavaScript, ficam as primeiras na ordem do build.
+ *
+ * No desktop, tudo cabe na primeira tela: a altura de hero + destaque é a altura da tela
+ * menos o header e menos uma faixa (--espiar) onde aparecem o título e o topo de "Mais loot".
+ */
+import Base from '../layouts/Base.astro';
+import DestaqueHome from '../components/DestaqueHome.astro';
+import LootLog from '../components/LootLog.astro';
+import Item from '../components/Item.astro';
+import { dicionario, idiomaDe, url } from '../i18n';
+import { getReviews, versaoEm } from '../lib/reviews';
+import { getLootLog } from '../lib/lootlog';
+
+/** Quantos eventos o log da home mostra (as reviews que aparecem nele vão para o fim da fila do sorteio). */
+const EVENTOS_NO_LOG = 14;
+/** Fichas no HTML para o sorteio. As escondidas não baixam a capa (loading lazy). */
+const TAMANHO_DO_SORTEIO = 24;
+/** Fichas visíveis sem JavaScript. */
+const VISIVEIS_SEM_JS = 6;
+/** Celular: quantas reviews recentes entram no carrossel (depois vem a ficha "Todas as reviews"). */
+const NO_CARROSSEL = 12;
+
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const reviews = await getReviews();
+const [destaque, ...resto] = reviews;
+const versaoDestaque = destaque && (await versaoEm(destaque, idioma));
+const { eventos } = await getLootLog();
+
+// Sorteio: nunca a review em destaque; primeiro as que não aparecem no log, depois as que aparecem.
+const noLog = new Set(eventos.slice(0, EVENTOS_NO_LOG).flatMap((e) => (e.tipo === 'autor' ? [] : [e.review.slug])));
+const fila = [...resto.filter((r) => !noLog.has(r.slug)), ...resto.filter((r) => noLog.has(r.slug))].slice(0, TAMANHO_DO_SORTEIO);
+const mais = await Promise.all(fila.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma), noLog: noLog.has(r.slug) })));
+
+// Celular: carrossel em ordem cronológica, a mais nova primeiro (a mesma ordem do log).
+const recentes = await Promise.all(reviews.slice(0, NO_CARROSSEL).map(async (r) => ({ review: r, versao: await versaoEm(r, idioma) })));
+const totalCarrossel = recentes.length + 1;
+
+/**
+ * Sorteio das fichas. Inline e logo depois da lista: roda antes da primeira pintura,
+ * então nada troca de lugar na frente do leitor.
+ *  - Vagas: duas fileiras cheias, no mínimo 6 (as colunas crescem com a tela).
+ *  - Só sorteia se houver mais fichas que vagas; senão mostra todas, na ordem do build.
+ *  - Prefere as que não estão no log; as do log só completam.
+ *  - O botão d100 sorteia de novo (com animação curta, sem ela em movimento reduzido).
+ */
+const SORTEIO = `(() => {
+  const lista = document.getElementById('fichario');
+  const botao = document.getElementById('rerolar');
+  const aviso = document.getElementById('rerolado');
+  if (!lista || !botao) return;
+  const fichas = [...lista.children];
+  const fora = fichas.filter((li) => !li.hasAttribute('data-no-log'));
+  const doLog = fichas.filter((li) => li.hasAttribute('data-no-log'));
+  const embaralhar = (a) => {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const vagas = () => {
+    const colunas = getComputedStyle(lista).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+    return Math.max(6, colunas * 2);
+  };
+  let ordem = fichas;
+  const sortear = (n) => {
+    if (fichas.length <= n) return fichas;
+    const escolhidas = fora.length >= n ? embaralhar(fora).slice(0, n) : fora.concat(embaralhar(doLog).slice(0, n - fora.length));
+    return embaralhar(escolhidas).concat(fichas.filter((li) => !escolhidas.includes(li)));
+  };
+  const mostrar = () => {
+    const n = vagas();
+    botao.hidden = fichas.length <= n;
+    if (fichas.length <= n) ordem = fichas;
+    ordem.forEach((li, i) => {
+      li.hidden = i >= n;
+      lista.append(li);
+    });
+  };
+  ordem = sortear(vagas());
+  mostrar();
+
+  let colunasAntes = vagas();
+  addEventListener('resize', () => {
+    const n = vagas();
+    if (n !== colunasAntes) {
+      colunasAntes = n;
+      if (ordem === fichas) ordem = sortear(n);
+      mostrar();
+    }
+  });
+
+  const calmo = matchMedia('(prefers-reduced-motion: reduce)');
+  botao.addEventListener('click', () => {
+    const n = vagas();
+    const antes = ordem.slice(0, n);
+    let nova = sortear(n);
+    for (let t = 0; t < 5 && nova.slice(0, n).every((li, i) => li === antes[i]); t++) nova = sortear(n);
+    const trocar = () => {
+      ordem = nova;
+      mostrar();
+      aviso.textContent = '';
+      aviso.textContent = aviso.dataset.texto;
+    };
+    if (calmo.matches) return trocar();
+    botao.classList.add('rolando');
+    lista.classList.add('saindo');
+    setTimeout(() => {
+      trocar();
+      lista.classList.remove('saindo');
+      lista.classList.add('entrando');
+      requestAnimationFrame(() => requestAnimationFrame(() => lista.classList.remove('entrando')));
+    }, 160);
+    setTimeout(() => botao.classList.remove('rolando'), 450);
+  });
+})();`;
+---
+
+<Base largura="1232px">
+  <div class="primeira-tela">
+    <section class="hero">
+      <div class="container">
+        <h1><span>{t.hero.linha1}</span> <span class="ouro">{t.hero.linha2}</span></h1>
+        <p>{t.hero.descricao}</p>
+      </div>
+    </section>
+
+    <div class="container mesa">
+      {destaque && versaoDestaque && <DestaqueHome idioma={idioma} review={destaque} versao={versaoDestaque} />}
+      <LootLog idioma={idioma} eventos={eventos} limite={EVENTOS_NO_LOG} class="lateral" />
+    </div>
+  </div>
+
+  {/* Celular: no lugar do destaque, do log e de "Mais loot", um carrossel de fichas. */}
+  <section class="carrossel" aria-label={t.paginas.carrossel} data-carrossel>
+    <ol class="trilho">
+      {recentes.map(({ review, versao }) => (
+        <li>
+          <Item review={review} data={versao.data} idioma={idioma} variante="bolso" />
+        </li>
+      ))}
+      <li class="fim">
+        <a class="todas" href={url(idioma, 'arquivo')}>
+          <svg viewBox="0 0 26 26" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+            <path d="M13 1.5 23.5 7.5v11L13 24.5 2.5 18.5v-11z" />
+            <path d="M13 1.5v8M2.5 7.5 13 9.5l10.5-2M13 9.5 7 18.5h12zM2.5 18.5 7 18.5M23.5 18.5H19M13 24.5 7 18.5M13 24.5l6-6" />
+          </svg>
+          <span>{t.paginas.verTodos}</span>
+        </a>
+      </li>
+    </ol>
+    <p class="posicao mono" aria-hidden="true" hidden>
+      <span data-atual>1</span> / {totalCarrossel}
+    </p>
+  </section>
+
+  {
+    mais.length > 0 && (
+      <section class="container mais" aria-labelledby="titulo-mais">
+        <header class="topo-mais">
+          <h2 id="titulo-mais">{t.paginas.maisLoot}</h2>
+          <button type="button" class="rerolar" id="rerolar" aria-label={t.paginas.rerolar} title={t.paginas.rerolar} hidden>
+            <svg viewBox="0 0 26 26" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M13 1.5 23.5 7.5v11L13 24.5 2.5 18.5v-11z" />
+              <path d="M13 1.5v8M2.5 7.5 13 9.5l10.5-2M13 9.5 7 18.5h12zM2.5 18.5 7 18.5M23.5 18.5H19M13 24.5 7 18.5M13 24.5l6-6" />
+            </svg>
+          </button>
+          <a href={url(idioma, 'arquivo')}>{t.paginas.verTodos}</a>
+        </header>
+        <p class="sr-only" aria-live="polite" id="rerolado" data-texto={t.paginas.rerolado} />
+        <ul class="fichario" id="fichario">
+          {mais.map(({ review, versao, noLog }, i) => (
+            <li data-no-log={noLog ? '' : undefined} hidden={i >= VISIVEIS_SEM_JS}>
+              <Item review={review} data={versao.data} idioma={idioma} variante="bolso" />
+            </li>
+          ))}
+        </ul>
+        <script is:inline set:html={SORTEIO} />
+      </section>
+    )
+  }
+</Base>
+
+<script>
+  // Carrossel do celular. Sem JS ele funciona igual (scroll-snap nativo); aqui só:
+  //  - o indicador "3 / 13";
+  //  - o foco pelo teclado traz a ficha para a tela.
+  const carrossel = document.querySelector<HTMLElement>('[data-carrossel]');
+  if (carrossel) {
+    const trilho = carrossel.querySelector<HTMLElement>('.trilho')!;
+    const posicao = carrossel.querySelector<HTMLElement>('.posicao')!;
+    const atual = posicao.querySelector<HTMLElement>('[data-atual]')!;
+    const itens = [...trilho.children] as HTMLElement[];
+    posicao.hidden = false;
+    const visiveis = new Map<Element, number>();
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => visiveis.set(e.target, e.intersectionRatio));
+        let melhor = -1;
+        let indice = 0;
+        itens.forEach((li, i) => {
+          const r = visiveis.get(li) ?? 0;
+          if (r > melhor) {
+            melhor = r;
+            indice = i;
+          }
+        });
+        atual.textContent = String(indice + 1);
+      },
+      { root: trilho, threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    itens.forEach((li) => observador.observe(li));
+
+    const calmo = matchMedia('(prefers-reduced-motion: reduce)');
+    trilho.addEventListener('focusin', (e) => {
+      const li = (e.target as Element).closest('li');
+      li?.scrollIntoView({ behavior: calmo.matches ? 'auto' : 'smooth', block: 'nearest', inline: 'start' });
+    });
+  }
+</script>
+
+<style>
+  .primeira-tela {
+    /* Altura da tela, menos o header, menos a faixa onde "Mais loot" aparece. */
+    --espiar: clamp(200px, 26dvh, 300px);
+    height: calc(100dvh - var(--cabecalho-h) - var(--espiar));
+    min-height: 500px;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  /* Largura total, mesmo fundo da página; o conteúdo usa a largura do header. */
+  .hero .container {
+    max-width: var(--largura-cabecalho);
+    padding-block: 36px 38px;
+  }
+  .mesa {
+    margin-top: 20px;
+  }
+  .hero h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.75rem, 1.1rem + 1.3vw, 2.375rem);
+    line-height: 1;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+  }
+  .hero h1 span {
+    display: block;
+  }
+  .hero .ouro {
+    color: var(--ouro);
+  }
+  .hero p {
+    margin: 6px 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--texto-2);
+  }
+
+  .mesa {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 32px;
+  }
+  .mesa :global(.lateral) {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--borda-forte) transparent;
+  }
+
+  .mais {
+    margin-top: 28px;
+  }
+  .topo-mais {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 10px;
+    border-top: 1px solid var(--ouro);
+    margin-bottom: 16px;
+  }
+  .topo-mais a {
+    margin-left: auto;
+  }
+  .topo-mais h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .topo-mais a {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+  }
+  .rerolar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: none;
+    border: 1px solid var(--borda-forte);
+    color: var(--ouro);
+    cursor: pointer;
+    transition: border-color 150ms var(--ease);
+  }
+  .rerolar[hidden] {
+    display: none;
+  }
+  .rerolar:hover {
+    border-color: var(--ouro);
+  }
+  .rerolar svg {
+    transition: transform 420ms var(--ease);
+  }
+  .rerolar:global(.rolando) svg {
+    transform: rotate(360deg);
+  }
+
+  .fichario > li {
+    transition:
+      opacity 150ms var(--ease),
+      transform 150ms var(--ease);
+  }
+  .fichario:global(.saindo) > li,
+  .fichario:global(.entrando) > li {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  .fichario {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    margin: 0;
+    padding: 24px;
+    list-style: none;
+    background: var(--painel-fundo);
+    border: 1px solid var(--borda);
+  }
+
+  @media (max-width: 1100px) {
+    .mesa {
+      grid-template-columns: minmax(0, 1fr) 240px;
+      gap: 24px;
+    }
+  }
+  /* Celular e tablet em pé: sem altura fixa, sem rolagem interna. */
+  @media (max-width: 900px) {
+    .primeira-tela {
+      height: auto;
+      min-height: 0;
+      display: block;
+    }
+    .mesa {
+      display: block;
+    }
+    .mesa :global(.lateral) {
+      overflow: visible;
+      margin-top: 56px;
+    }
+    .mais {
+      margin-top: 64px;
+    }
+    .fichario {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: 20px;
+      gap: 20px;
+    }
+  }
+  @media (max-width: 640px) {
+    .fichario {
+      grid-template-columns: minmax(0, 1fr);
+      padding: 12px;
+      gap: 12px;
+    }
+  }
+  /* ---------- Celular: carrossel (abaixo de 900px). No desktop não existe. ---------- */
+  .carrossel {
+    display: none;
+  }
+  @media (max-width: 900px) {
+    /* Sem título visível (continua para leitor de tela) e só a descrição, em letra pequena. */
+    .hero h1 {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+    .hero .container {
+      padding-block: 14px 12px;
+    }
+    .hero p {
+      margin: 0;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+    /* Sem destaque, sem log e sem "Mais loot": o carrossel ocupa o lugar. */
+    .mesa,
+    .mais {
+      display: none;
+    }
+    .carrossel {
+      display: block;
+      /* Altura da ficha: a tela menos header, descrição e indicador, para não precisar rolar. */
+      --altura-ficha: clamp(400px, calc(100dvh - var(--cabecalho-h) - 128px), 660px);
+    }
+  }
+  .trilho {
+    display: flex;
+    gap: 12px;
+    margin: 0;
+    padding: 6px var(--gutter) 8px;
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .trilho::-webkit-scrollbar {
+    display: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .trilho {
+      scroll-behavior: smooth;
+    }
+  }
+  /* Cada ficha ocupa ~85% da largura: a borda da próxima aparece e mostra que tem mais. */
+  .trilho > li {
+    flex: 0 0 85vw;
+    height: var(--altura-ficha);
+    scroll-snap-align: start;
+  }
+  /* A mesma ficha das listagens, em pé e com a capa esticando para preencher a altura. */
+  .trilho :global(.it--bolso) {
+    flex-direction: column;
+    gap: 0;
+    height: 100%;
+  }
+  .trilho :global(.it--bolso .it-capa) {
+    flex: 1 1 auto;
+    width: auto;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+  .trilho :global(.it--bolso .it-dados) {
+    flex: none;
+  }
+  .trilho :global(.it--bolso .it-nome) {
+    margin-top: 12px;
+    font-size: 1.6rem;
+  }
+  .trilho :global(.it--bolso .it-frase) {
+    display: block;
+  }
+  .trilho :global(.it--bolso .it-sem-capa) {
+    font-size: 4.5rem;
+  }
+  .trilho > .fim {
+    flex-basis: 60vw;
+  }
+  .todas {
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 14px;
+    border: 1px solid var(--borda-forte);
+    outline: 1px solid var(--borda);
+    outline-offset: 3px;
+    background: var(--painel-fundo);
+    color: var(--ouro);
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+  }
+  .todas span::after {
+    content: ' \2192';
+  }
+  .posicao {
+    margin: 4px 0 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .posicao [data-atual] {
+    color: var(--ouro);
+  }
+</style>

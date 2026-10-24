@@ -1,27 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
+import NaoEncontrado from '../views/NaoEncontrado.astro';
 ---
 
-<Base titulo="Página não encontrada">
-  <section class="container erro">
-    <p class="mono linha">Você não pode lootear esse corpo.</p>
-    <h1>404</h1>
-    <p>Essa página despawnou. <a href="/">Voltar para a estalagem</a>.</p>
-  </section>
-</Base>
-
-<style>
-  .erro {
-    padding-block: 120px;
-    text-align: center;
-  }
-  .linha {
-    color: #ff5a4a;
-    font-size: 14px;
-  }
-  h1 {
-    font-size: 5rem;
-    margin: 8px 0;
-    color: var(--r-lixo);
-  }
-</style>
+<NaoEncontrado />

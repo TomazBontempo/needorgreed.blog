@@ -1,0 +1,31 @@
+---
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import ReviewCompleta from '../components/ReviewCompleta.astro';
+import { dicionario, idiomaDe } from '../i18n';
+import { versaoEm, type ReviewCompleta as Review } from '../lib/reviews';
+
+interface Props {
+  review: Review;
+}
+
+const { review } = Astro.props;
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const versao = await versaoEm(review, idioma);
+const { data } = versao;
+const og = data.capa ? (await getImage({ src: data.capa, width: 1200, format: 'jpg' })).src : undefined;
+const descricao = data.motivoRoll ?? data.frase ?? `${t.rolls[data.roll].nome}: ${data.titulo}`;
+---
+
+<Base titulo={data.titulo} descricao={descricao} imagem={og} artigo>
+  <div class="container pagina">
+    <ReviewCompleta idioma={idioma} review={review} versao={versao} />
+  </div>
+</Base>
+
+<style>
+  .pagina {
+    padding-top: 40px;
+  }
+</style>

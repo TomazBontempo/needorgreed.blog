@@ -1,5 +1,5 @@
 import { config, collection, fields } from '@keystatic/core';
-import { block } from '@keystatic/core/content-components';
+import { block, wrapper } from '@keystatic/core/content-components';
 
 /**
  * Painel de escrita em /keystatic.
@@ -8,12 +8,32 @@ import { block } from '@keystatic/core/content-components';
  * Produção: login com GitHub; cada "Salvar" vira um commit no repositório
  * feito pela conta de quem está logado.
  */
-const REPO = 'TomazBontempo/needorgreed';
+const REPO = 'TomazBontempo/needorgreed.blog';
 
+/**
+ * Clipes curtos: servidos como arquivo estático, por isso ficam em public/.
+ * O painel guarda em public/videos/<slug>/ e escreve src="/videos/<slug>/arquivo.mp4".
+ */
+const videos = {
+  directory: 'public/videos',
+  publicPath: '/videos/',
+};
+
+/** Capa: guardada em src/assets/reviews/<slug>/. */
 const imagensReviews = {
   directory: 'src/assets/reviews',
   // Caminho relativo a partir de src/content/reviews/<slug>/index.mdx
   publicPath: '../../../assets/reviews/',
+};
+
+/**
+ * Imagens do texto: guardadas na pasta da própria review (src/content/reviews/<slug>/),
+ * escritas como ../<slug>/foto.jpg. O painel só reconhece imagens nesse formato:
+ * um ./foto.jpg escrito à mão aparece como texto no painel e é estragado se salvar por lá.
+ */
+const imagensTexto = {
+  directory: 'src/content/reviews',
+  publicPath: '../',
 };
 
 export default config({
@@ -71,6 +91,20 @@ export default config({
           ],
           defaultValue: 'greed',
         }),
+        motivoRoll: fields.text({
+          label: 'Motivo do roll',
+          description:
+            'Uma linha explicando o veredito. Essencial no Greed. Ex.: Espere uma promoção, 60 reais é muito pelo conteúdo.',
+        }),
+        idioma: fields.select({
+          label: 'Idioma do texto',
+          description: 'A versão na outra língua é traduzida automaticamente depois do Salvar.',
+          options: [
+            { label: 'Português', value: 'pt' },
+            { label: 'Inglês', value: 'en' },
+          ],
+          defaultValue: 'pt',
+        }),
         data: fields.date({ label: 'Data', defaultValue: { kind: 'today' }, validation: { isRequired: true } }),
         plataforma: fields.text({ label: 'Plataforma / onde assistiu', description: 'Ex.: PC, Switch, Netflix, Crunchyroll' }),
         duracao: fields.text({ label: 'Duração', description: 'Ex.: 40h, 2 temporadas, 1h52' }),
@@ -100,14 +134,44 @@ export default config({
         }),
         conteudo: fields.mdx({
           label: 'Texto da crítica',
-          options: { image: imagensReviews },
+          options: { image: imagensTexto },
           components: {
+            Figure: wrapper({
+              label: 'Imagem com legenda',
+              description: 'Insira a imagem dentro do bloco e escreva a legenda no campo abaixo.',
+              schema: {
+                legenda: fields.text({ label: 'Legenda' }),
+              },
+            }),
+            Clipe: block({
+              label: 'Clipe curto / GIF',
+              description: 'Vídeo curto em mp4 ou webm, toca sozinho e sem som, em loop. Máximo 25 MB. Vídeo longo: use o bloco do YouTube.',
+              schema: {
+                src: fields.file({
+                  label: 'Vídeo (.mp4 ou .webm, até 25 MB)',
+                  description: 'Acima de 25 MB o site não publica (limite da Cloudflare). GIF: converta para mp4 antes.',
+                  validation: { isRequired: true },
+                  ...videos,
+                }),
+                poster: fields.image({
+                  label: 'Imagem de capa do clipe',
+                  description: 'Aparece antes do vídeo carregar.',
+                  ...videos,
+                }),
+                legenda: fields.text({ label: 'Legenda' }),
+                descricao: fields.text({ label: 'Descrição para leitor de tela' }),
+              },
+            }),
             YouTube: block({
               label: 'Vídeo do YouTube',
               schema: {
                 id: fields.text({
                   label: 'ID do vídeo',
                   description: 'O código depois de v= no link. Ex.: dQw4w9WgXcQ',
+                }),
+                titulo: fields.text({
+                  label: 'Título do vídeo',
+                  description: 'Para leitor de tela. Ex.: Trailer de Outer Wilds',
                 }),
               },
             }),

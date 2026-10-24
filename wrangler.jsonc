@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "needorgreed",
+  "compatibility_date": "2026-10-19",
+  // Worker próprio: decide o idioma e depois chama o handler do Astro.
+  "main": "./src/worker.ts",
+  "assets": {
+    "binding": "ASSETS",
+    // Sem isto, as páginas estáticas são servidas direto e o Worker nunca vê a visita,
+    // então o redirecionamento por idioma não acontece. Só as rotas HTML passam pelo Worker.
+    "run_worker_first": ["/*", "!/_astro/*", "!/*.xml", "!/*.svg", "!/*.png", "!/*.jpg", "!/*.webp", "!/*.ico", "!/*.txt", "!/*.mp4", "!/*.webm", "!/videos/*", "!/fichas/*"]
+  },
+  "observability": { "enabled": true }
+}

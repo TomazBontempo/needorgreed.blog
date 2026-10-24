@@ -1,0 +1,42 @@
+---
+/**
+ * Aviso discreto no topo de uma review que não está na língua original:
+ * traduzida automaticamente, ou ainda sem tradução (mostrando o original).
+ */
+import { dicionario, url, type Idioma } from '../i18n';
+import type { VersaoReview } from '../lib/reviews';
+
+interface Props {
+  idioma: Idioma;
+  versao: VersaoReview;
+  slug: string;
+}
+const { idioma, versao, slug } = Astro.props;
+const t = dicionario(idioma);
+const original = versao.idiomaOriginal;
+---
+
+{
+  versao.aviso && (
+    <p class="aviso-traducao">
+      {versao.aviso === 'traduzida' ? t.review.traduzidoDe[original] : t.review.semTraducao[original]}
+      {versao.aviso === 'traduzida' && (
+        <>
+          {' '}
+          <a href={`${url(original, 'reviews', slug)}?lang=${original}`} hreflang={dicionario(original).hreflang} data-idioma={original}>
+            {t.review.verOriginal}
+          </a>
+        </>
+      )}
+    </p>
+  )
+}
+
+<style>
+  .aviso-traducao {
+    margin: 0 0 18px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+</style>

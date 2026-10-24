@@ -1,0 +1,66 @@
+---
+/**
+ * A assinatura de cada review, no formato de mensagem de sistema de loot:
+ *   Snufupugos rolled Need (94) for [Outer Wilds]
+ * O nick vem do autor, o item é colorido pela raridade, o roll pela cor do roll.
+ */
+import MarcaRoll from './MarcaRoll.astro';
+import { dicionario, url, type Idioma } from '../i18n';
+import type { RaridadeId, RollId } from '../lib/raridade';
+
+interface Props {
+  idioma: Idioma;
+  nick: string;
+  autorSlug: string;
+  roll: RollId;
+  valor: number;
+  titulo: string;
+  raridade: RaridadeId;
+  /** Link do item. Sem href, o nome fica como texto (na própria página da review). */
+  href?: string;
+  class?: string;
+}
+
+const { idioma, nick, autorSlug, roll, valor, titulo, raridade, href, class: classe } = Astro.props;
+const t = dicionario(idioma);
+---
+
+<p class:list={['linha-roll', `roll-${roll}`, `r-${raridade}`, classe]}>
+  <a class="quem" href={url(idioma, 'autores', autorSlug)}>{nick}</a>{' '}{t.log.rolou}{' '}
+  <span class="roll"><MarcaRoll roll={roll} />{t.rolls[roll].nome}</span>{' '}
+  <span class="valor">({valor})</span>{' '}{t.log.para}{' '}
+  {href ? <a class="item" href={href}>[{titulo}]</a> : <span class="item">[{titulo}]</span>}
+</p>
+
+<style>
+  .linha-roll {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--texto-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .quem {
+    color: var(--texto);
+    text-decoration: none;
+  }
+  .quem:hover {
+    color: var(--ouro);
+    text-decoration: underline;
+  }
+  .roll {
+    color: var(--roll);
+    white-space: nowrap;
+  }
+  .valor {
+    color: var(--texto-3);
+  }
+  .item {
+    color: var(--cor);
+    text-decoration: none;
+  }
+  a.item:hover {
+    text-decoration: underline;
+  }
+</style>

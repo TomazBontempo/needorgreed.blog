@@ -3,9 +3,10 @@
  *
  * Dois eixos independentes:
  *  - Raridade: o quão bom é (derivada da nota 0 a 10).
- *  - Roll: se vale pegar (Need, Greed ou Pass).
+ *  - Roll: se vale seu tempo e dinheiro agora (Need, Greed ou Pass).
  *
  * "Herança" fica fora da escala: as obras da vida, sem imparcialidade nenhuma.
+ * Nomes e descrições ficam nos dicionários (src/i18n), aqui só a lógica.
  */
 
 export type RaridadeId = 'lixo' | 'comum' | 'incomum' | 'raro' | 'epico' | 'lendario' | 'heranca';
@@ -13,30 +14,20 @@ export type RollId = 'need' | 'greed' | 'pass';
 
 export interface Raridade {
   id: RaridadeId;
-  nome: string;
-  faixa: string;
   /** Nota mínima para cair nesta raridade. */
   min: number;
-  /** Variável CSS com a cor da raridade (definida em global.css). */
-  cor: string;
 }
 
 export const RARIDADES: Raridade[] = [
-  { id: 'lixo', nome: 'Lixo de vendedor', faixa: '0 a 2.9', min: 0, cor: 'var(--r-lixo)' },
-  { id: 'comum', nome: 'Comum', faixa: '3 a 4.9', min: 3, cor: 'var(--r-comum)' },
-  { id: 'incomum', nome: 'Incomum', faixa: '5 a 6.9', min: 5, cor: 'var(--r-incomum)' },
-  { id: 'raro', nome: 'Raro', faixa: '7 a 8.9', min: 7, cor: 'var(--r-raro)' },
-  { id: 'epico', nome: 'Épico', faixa: '9 a 9.9', min: 9, cor: 'var(--r-epico)' },
-  { id: 'lendario', nome: 'Lendário', faixa: '10', min: 10, cor: 'var(--r-lendario)' },
+  { id: 'lixo', min: 0 },
+  { id: 'comum', min: 3 },
+  { id: 'incomum', min: 5 },
+  { id: 'raro', min: 7 },
+  { id: 'epico', min: 9 },
+  { id: 'lendario', min: 10 },
 ];
 
-export const HERANCA: Raridade = {
-  id: 'heranca',
-  nome: 'Herança',
-  faixa: 'fora da escala',
-  min: Infinity,
-  cor: 'var(--r-heranca)',
-};
+export const HERANCA: Raridade = { id: 'heranca', min: Infinity };
 
 export const TODAS_RARIDADES: Raridade[] = [...RARIDADES, HERANCA];
 
@@ -51,22 +42,26 @@ export function raridadePorId(id: string): Raridade | undefined {
   return TODAS_RARIDADES.find((r) => r.id === id);
 }
 
-export const ROLLS: Record<RollId, { nome: string; descricao: string }> = {
-  need: { nome: 'Need', descricao: 'Jogue ou assista agora.' },
-  greed: { nome: 'Greed', descricao: 'Vale, mas espera promoção ou um tempo livre.' },
-  pass: { nome: 'Pass', descricao: 'Deixa passar.' },
-};
+export const ROLL_IDS: RollId[] = ['need', 'greed', 'pass'];
 
-/** O número do dado (1 a 100) que aparece na mensagem de roll. Nota 9.4 vira 94. */
+/**
+ * O número do roll: a nota vezes dez, de 0 a 100. Nota 9.4 vira 94.
+ * Cai sempre na mesma faixa da raridade (Raro 70 a 89, Épico 90 a 99, Lendário 100).
+ */
 export function valorDoRoll(nota: number): number {
-  return Math.max(1, Math.min(100, Math.round(nota * 10)));
+  return Math.max(0, Math.min(100, Math.round(nota * 10)));
+}
+
+/** Nota com uma casa decimal, como aparece no item: 10 vira "10.0". */
+export function notaFormatada(nota: number): string {
+  return nota.toFixed(1);
 }
 
 export const TIPOS = {
-  jogo: { nome: 'Jogo', secao: 'jogos' },
-  filme: { nome: 'Filme', secao: 'telas' },
-  serie: { nome: 'Série', secao: 'telas' },
-  anime: { nome: 'Anime', secao: 'telas' },
+  jogo: { secao: 'jogos' },
+  filme: { secao: 'telas' },
+  serie: { secao: 'telas' },
+  anime: { secao: 'telas' },
 } as const;
 
 export type TipoId = keyof typeof TIPOS;

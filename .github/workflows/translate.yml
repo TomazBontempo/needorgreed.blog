@@ -1,0 +1,68 @@
+# Traduz as reviews para a outra língua e commita o resultado no repositório.
+# A tradução fica versionada, revisável e editável, e não é refeita a cada build.
+name: Tradução das reviews
+
+on:
+  push:
+    branches: [main]
+    # Só os originais. Os commits desta Action mexem em index.en.mdx/index.pt.mdx e não disparam de novo.
+    paths:
+      - 'src/content/reviews/*/index.mdx'
+      - 'src/content/reviews/*/index.md'
+  # Repescagem diária, logo depois que a cota grátis do Workers AI zera (meia-noite UTC).
+  schedule:
+    - cron: '30 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: traducao
+  cancel-in-progress: false
+
+jobs:
+  traduzir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+
+      - name: Traduzir
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN }}
+          TRANSLATE_REPORT: ${{ runner.temp }}/relatorio.md
+        run: npm run translate
+
+      - name: Commitar traduções
+        env:
+          RELATORIO: ${{ runner.temp }}/relatorio.md
+        run: |
+          git add 'src/content/reviews/*/index.en.mdx' 'src/content/reviews/*/index.pt.mdx'
+          if git diff --cached --quiet; then
+            echo "Nenhuma tradução nova."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          {
+            echo "Tradução automática das reviews"
+            echo
+            git diff --cached --name-only | sed 's/^/- /'
+            if [ -s "$RELATORIO" ]; then
+              echo
+              echo "Avisos:"
+              cat "$RELATORIO"
+            fi
+          } > "$RUNNER_TEMP/mensagem.txt"
+          git commit -F "$RUNNER_TEMP/mensagem.txt"
+          git pull --rebase
+          git push

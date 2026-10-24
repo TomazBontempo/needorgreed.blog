@@ -1,0 +1,337 @@
+---
+/**
+ * Loot log: a atividade do site como mensagens de sistema, da mais nova para a mais antiga.
+ * Na home é a coluna ao lado do destaque (depois dele no celular); no Arquivo, o log completo.
+ */
+import MarcaRoll from './MarcaRoll.astro';
+import { dicionario, formatarData, url, type Idioma } from '../i18n';
+import type { EventoLog } from '../lib/lootlog';
+
+interface Props {
+  idioma: Idioma;
+  eventos: EventoLog[];
+  /** Quantos eventos mostrar. Sem limite, mostra todos. */
+  limite?: number;
+  /** Mostra o título e o link para o log completo. */
+  cabecalho?: boolean;
+  class?: string;
+}
+
+const { idioma, eventos, limite, cabecalho = true, class: classe } = Astro.props;
+const t = dicionario(idioma);
+const lista = limite ? eventos.slice(0, limite) : eventos;
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<section class:list={['log', classe]} aria-labelledby={cabecalho ? 'titulo-log' : undefined}>
+  {
+    cabecalho && (
+      <header class="topo-log">
+        <h2 id="titulo-log">{t.log.titulo}</h2>
+        <a href={url(idioma, 'arquivo')}>{t.log.verTudo}</a>
+      </header>
+    )
+  }
+
+  {lista.length === 0 && <p class="vazio">{t.log.vazio}</p>}
+
+  <ol>
+    {
+      lista.map((e) => {
+        const autor = (
+          <a class="quem" href={url(idioma, 'autores', e.autor.slug)}>
+            {e.autor.nick}
+          </a>
+        );
+        if (e.tipo === 'autor') {
+          return (
+            <li class="evento evento-autor" data-evento="autor">
+              <time datetime={iso(e.data)}>{formatarData(idioma, e.data, { year: undefined })}</time>
+              <span>
+                {autor} {t.log.entrou}
+              </span>
+            </li>
+          );
+        }
+        const r = e.review;
+        const item = (
+          <a class={`item r-${r.raridade.id}`} href={url(idioma, 'reviews', r.slug)} data-ficha={`/fichas/${idioma}/${r.slug}/`}>
+            [{r.entry.data.titulo}]
+          </a>
+        );
+        if (e.tipo === 'atualizacao') {
+          const edicoes = t.log.edicoes(e.edicoes);
+          return (
+            <li class="evento" data-slug={r.slug} data-evento="atualizacao" data-roll={r.entry.data.roll}>
+              <time datetime={iso(e.data)}>{formatarData(idioma, e.data, { year: undefined })}</time>
+              <span>
+                {autor} {t.log.atualizou} {item}
+                {edicoes && <span class="extra"> · {edicoes}</span>}
+              </span>
+            </li>
+          );
+        }
+        const roll = r.entry.data.roll;
+        return (
+          <li class={`evento roll-${roll}`} data-slug={r.slug} data-evento="review" data-roll={roll}>
+            <time datetime={iso(e.data)}>{formatarData(idioma, e.data, { year: undefined })}</time>
+            <span>
+              {autor} {t.log.rolou}{' '}
+              <span class="roll">
+                <MarcaRoll roll={roll} tamanho={8} />
+                {t.rolls[roll].nome}
+              </span>{' '}
+              <span class="valor">({r.valorRoll})</span> {t.log.para} {item}
+            </span>
+          </li>
+        );
+      })
+    }
+  </ol>
+</section>
+
+<script>
+  /**
+   * Tooltip do item: parar o mouse (ou focar pelo teclado) no [Nome] do log mostra a ficha mini.
+   * Um elemento só por página, preenchido com o fragmento /fichas/<idioma>/<slug>/ (buscado uma vez
+   * e guardado). Abre à esquerda do link (o log fica à direita da tela) e vira para a direita, ou
+   * para cima/baixo, se não couber. Nunca cobre o nome. Em tela de toque não existe: o toque abre a review.
+   */
+  const ID = 'tooltip-ficha';
+  const ATRASO_ABRIR = 150;
+  const ATRASO_FECHAR = 120;
+  const MARGEM = 10;
+  const temMouse = matchMedia('(hover: hover) and (pointer: fine)');
+
+  const cache = new Map<string, Promise<string>>();
+  const buscar = (url: string) => {
+    if (!cache.has(url)) {
+      cache.set(
+        url,
+        fetch(url)
+          .then((r) => (r.ok ? r.text() : ''))
+          .catch(() => ''),
+      );
+    }
+    return cache.get(url)!;
+  };
+
+  let tooltip: HTMLElement | null = null;
+  let atual: HTMLAnchorElement | null = null;
+  let timerAbrir: number | undefined;
+  let timerFechar: number | undefined;
+
+  const elemento = () => {
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.id = ID;
+      tooltip.className = 'tooltip-ficha';
+      tooltip.setAttribute('role', 'tooltip');
+      tooltip.hidden = true;
+      // O mouse pode passar por cima do tooltip sem ele sumir.
+      tooltip.addEventListener('pointerenter', () => clearTimeout(timerFechar));
+      tooltip.addEventListener('pointerleave', () => agendarFechar());
+      document.body.append(tooltip);
+    }
+    return tooltip;
+  };
+
+  const posicionar = (link: HTMLElement, tip: HTMLElement) => {
+    const r = link.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const h = tip.offsetHeight;
+    const vw = document.documentElement.clientWidth;
+    const vh = innerHeight;
+    let x: number;
+    let y = Math.min(Math.max(r.top + r.height / 2 - h / 2, MARGEM), vh - h - MARGEM);
+    if (r.left - w - MARGEM >= MARGEM) x = r.left - w - MARGEM;
+    else if (r.right + MARGEM + w <= vw - MARGEM) x = r.right + MARGEM;
+    else {
+      // Sem espaço dos lados: em cima ou embaixo do link, sem cobrir o nome.
+      x = Math.min(Math.max(r.left, MARGEM), vw - w - MARGEM);
+      y = r.top - h - MARGEM >= MARGEM ? r.top - h - MARGEM : r.bottom + MARGEM;
+    }
+    tip.style.left = `${Math.round(x)}px`;
+    tip.style.top = `${Math.round(y)}px`;
+  };
+
+  const abrir = async (link: HTMLAnchorElement) => {
+    const html = await buscar(link.dataset.ficha!);
+    if (!html || atual !== link) return;
+    const tip = elemento();
+    tip.innerHTML = html;
+    tip.hidden = false;
+    tip.classList.remove('visivel');
+    posicionar(link, tip);
+    // Reposiciona quando a capa carregar (a altura pode mudar).
+    tip.querySelector('img')?.addEventListener('load', () => atual === link && posicionar(link, tip), { once: true });
+    requestAnimationFrame(() => tip.classList.add('visivel'));
+    link.setAttribute('aria-describedby', ID);
+  };
+
+  const fechar = () => {
+    clearTimeout(timerAbrir);
+    if (atual) atual.removeAttribute('aria-describedby');
+    atual = null;
+    if (tooltip) {
+      tooltip.hidden = true;
+      tooltip.classList.remove('visivel');
+    }
+  };
+
+  const agendarAbrir = (link: HTMLAnchorElement, imediato = false) => {
+    clearTimeout(timerFechar);
+    clearTimeout(timerAbrir);
+    if (atual && atual !== link) atual.removeAttribute('aria-describedby');
+    // Já tem um aberto: troca na hora, sem piscar a cada linha.
+    const jaAberto = tooltip && !tooltip.hidden;
+    atual = link;
+    buscar(link.dataset.ficha!);
+    if (jaAberto || imediato) abrir(link);
+    else timerAbrir = window.setTimeout(() => abrir(link), ATRASO_ABRIR);
+  };
+
+  const agendarFechar = () => {
+    clearTimeout(timerAbrir);
+    clearTimeout(timerFechar);
+    timerFechar = window.setTimeout(fechar, ATRASO_FECHAR);
+  };
+
+  const linkDe = (e: Event) => (e.target as Element | null)?.closest?.<HTMLAnchorElement>('a[data-ficha]') ?? null;
+
+  document.addEventListener('pointerover', (e) => {
+    if (!temMouse.matches || (e as PointerEvent).pointerType !== 'mouse') return;
+    const link = linkDe(e);
+    if (link) agendarAbrir(link);
+  });
+  document.addEventListener('pointerout', (e) => {
+    const link = linkDe(e);
+    if (link && !link.contains((e as PointerEvent).relatedTarget as Node)) agendarFechar();
+  });
+  document.addEventListener('focusin', (e) => {
+    const link = linkDe(e);
+    if (link && link.matches(':focus-visible')) agendarAbrir(link, true);
+  });
+  document.addEventListener('focusout', (e) => {
+    if (linkDe(e)) fechar();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && tooltip && !tooltip.hidden) fechar();
+  });
+  addEventListener('scroll', () => tooltip && !tooltip.hidden && fechar(), { passive: true, capture: true });
+</script>
+
+<style>
+  :global(.tooltip-ficha) {
+    position: fixed;
+    z-index: 50;
+    pointer-events: auto;
+    opacity: 0;
+    transform: scale(0.97);
+    transform-origin: right center;
+    transition:
+      opacity 120ms var(--ease),
+      transform 120ms var(--ease);
+  }
+  :global(.tooltip-ficha.visivel) {
+    opacity: 1;
+    transform: none;
+  }
+  :global(.tooltip-ficha[hidden]) {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.tooltip-ficha) {
+      transition: none;
+      transform: none;
+    }
+  }
+
+  .log {
+    font-family: var(--mono);
+    font-size: 0.78125rem;
+    line-height: 1.5;
+    color: var(--texto-2);
+    font-variant-numeric: tabular-nums;
+    border-top: 1px solid var(--ouro);
+    padding-top: 10px;
+  }
+  .topo-log {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  h2 {
+    margin: 0;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ouro);
+  }
+  .topo-log a {
+    font-size: 0.75rem;
+    color: var(--texto-3);
+    text-decoration: none;
+  }
+  .topo-log a:hover {
+    color: var(--ouro);
+    text-decoration: underline;
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .evento {
+    padding: 7px 0;
+    border-bottom: 1px dashed #2a241c;
+    transition: opacity 0.3s var(--ease);
+  }
+  .evento:last-child {
+    border-bottom: 0;
+  }
+  time {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--texto-3);
+  }
+  .quem {
+    color: var(--texto);
+    text-decoration: none;
+  }
+  .quem:hover {
+    color: var(--ouro);
+    text-decoration: underline;
+  }
+  .roll {
+    color: var(--roll);
+    white-space: nowrap;
+  }
+  .valor,
+  .extra {
+    color: var(--texto-3);
+  }
+  .item {
+    color: var(--cor);
+    text-decoration: none;
+  }
+  .item:hover {
+    text-decoration: underline;
+  }
+  .evento-autor span {
+    color: var(--frase);
+  }
+  /* Já lida: esmaece, mas continua legível. */
+  .evento.lido {
+    opacity: 0.72;
+  }
+  .evento.lido:hover {
+    opacity: 1;
+  }
+  .vazio {
+    margin: 8px 0;
+  }
+</style>

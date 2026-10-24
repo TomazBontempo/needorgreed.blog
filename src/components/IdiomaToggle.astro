@@ -1,0 +1,50 @@
+---
+/**
+ * Troca de idioma. Fica sempre visível no header e é escrita na OUTRA língua,
+ * para quem não lê a atual achar o caminho de volta ("Read in English").
+ *
+ * O link leva ?lang=xx: o Worker grava o cookie e redireciona para a URL limpa.
+ * O script do Base.astro também grava cookie e localStorage no clique, para funcionar
+ * mesmo onde o Worker não roda (astro dev).
+ */
+import { caminhoEm, dicionario, type Idioma } from '../i18n';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const outro: Idioma = idioma === 'en' ? 'pt' : 'en';
+const t = dicionario(idioma);
+const href = `${caminhoEm(Astro.url.pathname, outro)}?lang=${outro}`;
+---
+
+<a class="idioma-toggle" href={href} hreflang={dicionario(outro).hreflang} lang={dicionario(outro).hreflang} data-idioma={outro}>
+  <span class="codigo" aria-hidden="true">{t.idiomaToggle.curto}</span>
+  <span class="rotulo">{t.idiomaToggle.rotulo}</span>
+</a>
+
+<style>
+  .idioma-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--borda-forte);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    color: var(--texto-2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      border-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+  .idioma-toggle:hover {
+    border-color: var(--ouro);
+    color: var(--texto);
+  }
+  .codigo {
+    color: var(--ouro);
+  }
+</style>

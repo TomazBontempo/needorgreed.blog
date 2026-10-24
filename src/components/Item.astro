@@ -1,0 +1,102 @@
+---
+/**
+ * A ficha do item: cada review é um colecionável numerado.
+ * Painel escuro, borda na cor da raridade e uma segunda borda solta por fora.
+ *
+ * variante "grande": a ficha completa.
+ * variante "bolso":  a ficha nas listagens ("Mais loot", Jogos, Telas...), com link e hover.
+ * variante "mini":   a ficha completa em tamanho pequeno, no tooltip do loot log.
+ *
+ * Os estilos ficam em src/styles/item.css (globais, com prefixo it-), porque a mini é
+ * carregada sob demanda dentro do tooltip, em páginas que não renderizam nenhuma ficha.
+ */
+import { Image } from 'astro:assets';
+import MarcaRoll from './MarcaRoll.astro';
+import { dicionario, url, type Idioma } from '../i18n';
+import { notaFormatada } from '../lib/raridade';
+import { numeroDeColecao, type ReviewCompleta, type VersaoReview } from '../lib/reviews';
+
+interface Props {
+  review: ReviewCompleta;
+  data: VersaoReview['data'];
+  idioma: Idioma;
+  variante?: 'grande' | 'bolso' | 'mini';
+  /** Carrega a capa sem lazy (primeira dobra). */
+  prioridade?: boolean;
+}
+
+const { review, data, idioma, variante = 'grande', prioridade = false } = Astro.props;
+const t = dicionario(idioma);
+const { raridade } = review;
+const nomeRaridade = t.raridades[raridade.id].nome;
+const set = review.secao === 'jogos' ? t.nav.jogos : t.nav.telas;
+const numero = numeroDeColecao(review.numero);
+const href = variante === 'bolso' ? url(idioma, 'reviews', review.slug) : undefined;
+const linhaTipo = [t.tipos[data.tipo], data.plataforma].filter(Boolean).join(' · ');
+const Titulo = variante === 'bolso' ? 'h3' : 'p';
+---
+
+<div
+  class:list={['it', `it--${variante}`, `r-${raridade.id}`, `roll-${data.roll}`]}
+  data-slug={review.slug}
+>
+  <div class="it-capa">
+    {
+      data.capa ? (
+        <Image
+          src={data.capa}
+          alt=""
+          widths={variante === 'grande' ? [400, 640] : [320, 560]}
+          sizes={variante === 'mini' ? '240px' : variante === 'bolso' ? '(max-width: 640px) 112px, 300px' : '(max-width: 900px) 92vw, 272px'}
+          loading={prioridade ? 'eager' : 'lazy'}
+          fetchpriority={prioridade ? 'high' : undefined}
+        />
+      ) : (
+        <span class="it-sem-capa" aria-hidden="true">
+          {numero}
+        </span>
+      )
+    }
+  </div>
+
+  <div class="it-dados">
+    <Titulo class="it-nome">
+      {href ? <a href={href}>{data.titulo}</a> : data.titulo}
+    </Titulo>
+    <p class="it-tipo mono">
+      <span>{linhaTipo}</span>
+      {data.duracao && <span>{data.duracao}</span>}
+    </p>
+
+    {
+      variante !== 'bolso' && data.atributos.length > 0 && (
+        <ul class="it-atributos mono">
+          {data.atributos.map((a) => (
+            <li class={a.valor.trim().startsWith('-') ? 'it-neg' : 'it-pos'}>
+              {a.valor} {a.nome}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {data.frase && <p class="it-frase">“{data.frase}”</p>}
+
+    {
+      variante !== 'grande' && (
+        <p class="it-roll mono">
+          <MarcaRoll roll={data.roll} />
+          {t.rolls[data.roll].nome}
+          {variante === 'mini' && <span class="it-valor"> ({review.valorRoll})</span>}
+        </p>
+      )
+    }
+
+    <p class="it-pe mono">
+      <span class="it-numero" data-lido={t.log.lido}>{t.item.numero} {numero} · {set}</span>
+      <span class="it-raridade">
+        {nomeRaridade}{raridade.id !== 'heranca' && <> · {notaFormatada(data.nota)}</>}
+      </span>
+    </p>
+  </div>
+</div>

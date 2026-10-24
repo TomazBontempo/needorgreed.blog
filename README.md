@@ -16,11 +16,14 @@ Blog de críticas de jogos, séries, filmes e animes. Cada obra é um loot: **Ne
 
 ```bash
 npm install
-npm run dev
+npx astro dev --background   # sobe o dev em segundo plano
+npx astro dev logs           # vê o que o dev está mostrando
+npx astro dev stop           # desliga
 ```
 
-- Site: http://localhost:4321
+- Site: http://localhost:4321 (inglês) e http://localhost:4321/pt/ (português)
 - Painel: http://localhost:4321/keystatic (no dev ele salva direto nos arquivos do seu disco, sem login)
+- No dev não existe o Worker, então não há redirecionamento por país. Para testar isso, veja "Idiomas".
 
 ## Postando uma review
 
@@ -40,6 +43,8 @@ titulo: Hollow Knight
 tipo: jogo            # jogo | filme | serie | anime
 nota: 9.2             # 0 a 10, define a raridade
 roll: need            # need | greed | pass
+motivoRoll: Uma linha explicando o roll. Essencial no Greed.
+idioma: pt            # pt | en: a língua em que você escreveu (a outra é traduzida sozinha)
 data: 2026-10-23
 plataforma: Switch
 duracao: 45h
@@ -75,13 +80,96 @@ Os dois jeitos geram o mesmo resultado. Não existe campo "autor": ele vem do Gi
 O número do roll é a nota vezes dez: nota 9.4 vira `Need (94)`.
 Cores e faixas ficam em `src/lib/raridade.ts` e `src/styles/global.css`.
 
+## Idiomas
+
+Inglês na raiz (`/`, `/reviews/<slug>/`) e português em `/pt/`. As duas versões são estáticas.
+
+- **Quem decide o idioma é o Worker** (`src/worker.ts` + `src/i18n/deteccao.ts`), antes de servir a página:
+  `?lang=` do toggle grava o cookie `lang`; cookie vence tudo; sem cookie, Brasil e Portugal veem português
+  e o resto, inglês. Bots nunca são redirecionados.
+- `wrangler.jsonc` liga `assets.run_worker_first` para as rotas HTML. Sem isso a Cloudflare serve o HTML
+  direto e o Worker nem é chamado.
+- Testar local: `npm run build && npx wrangler dev` e simular o país com o header `cf-ipcountry`:
+  `curl -I -A Firefox -H 'cf-ipcountry: BR' http://localhost:8787/`
+- Textos de interface: `src/i18n/en.ts` e `src/i18n/pt.ts`. Rotas por idioma: `src/i18n/rotas.ts`.
+
+## Tradução automática das reviews
+
+`npm run translate` gera `index.en.mdx` (ou `index.pt.mdx`) ao lado de cada original, com o hash do original.
+Só retraduz quando o original muda. Arquivo com `revisado: true` nunca é sobrescrito (o script só avisa).
+A Action `.github/workflows/translate.yml` roda a cada push em reviews e uma vez por dia, e commita o resultado.
+
+Sem token ainda? `npm run translate -- --mock` usa um tradutor de mentira (marca `modelo: mock`, e o primeiro
+run de verdade substitui).
+
+**Token da Cloudflare (grátis, sem cartão):** painel da Cloudflare → Workers AI → *Use REST API* →
+*Create a Workers AI API Token*. Permissões: só **Workers AI: Read** e **Workers AI: Edit**, na sua conta.
+Copie também o *Account ID* da mesma página. No GitHub: Settings → Secrets and variables → Actions:
+
+| Secret | Valor |
+|---|---|
+| `CLOUDFLARE_ACCOUNT_ID` | Account ID |
+| `CLOUDFLARE_AI_TOKEN` | o token |
+
+Modelo: `@cf/google/gemma-4-26b-a4b-it` (troque com `TRANSLATE_MODEL`). Uma review de ~2.000 palavras gasta
+perto de 150 neurons; a cota grátis é de 10.000 por dia. Passou da cota, a API devolve erro (no Free não existe
+cobrança), a review fica sem tradução e o próximo run tenta de novo.
+
+## Imagens e vídeos nas reviews
+
+Tudo funciona igual pelo painel e pela IDE. Exemplo completo: `src/content/reviews/outer-wilds/index.mdx`.
+
+**Imagem.** Fica na pasta da própria review e o Astro otimiza no build. Escreva o caminho com o slug,
+que é o formato que o painel gera e reconhece:
+
+```mdx
+![Descrição da imagem](../outer-wilds/foto.jpg)
+```
+
+Pelo painel, o botão de imagem do editor salva o arquivo na pasta da review e escreve exatamente isso.
+
+> `./foto.jpg` também funciona no site, mas o painel não reconhece esse formato: ele mostra a linha como
+> texto e, se a review for salva por lá, estraga a imagem. Nesse caso o `npm run build` para e diz qual
+> linha consertar. Use sempre `../<slug>/foto.jpg`.
+
+**Imagem com legenda.** Bloco "Imagem com legenda" no painel (insira a imagem dentro dele). Na IDE:
+
+```mdx
+<Figure legenda="O registro da nave liga cada pista.">
+
+![O registro da nave](../outer-wilds/registro.jpg)
+
+</Figure>
+```
+
+**YouTube.** Bloco "Vídeo do YouTube" no painel, ou:
+
+```mdx
+<YouTube id="dQw4w9WgXcQ" titulo="Trailer de Outer Wilds" />
+```
+
+**Clipe curto ou GIF.** Bloco "Clipe curto / GIF" no painel, ou coloque os arquivos em `public/videos/<slug>/` e:
+
+```mdx
+<Clipe src="/videos/outer-wilds/clipe.mp4" poster="/videos/outer-wilds/clipe.jpg" legenda="Legenda opcional" descricao="O que acontece no vídeo, para leitor de tela" />
+```
+
+- Só `.mp4` ou `.webm`. GIF precisa virar mp4 antes: `ffmpeg -i anim.gif -movflags +faststart -pix_fmt yuv420p -an anim.mp4`.
+- Toca sozinho, sem som, em loop, com controles. Quem pede movimento reduzido no sistema não vê autoplay.
+- Use a pasta `public/videos/<slug>/`: é o único lugar que o painel reconhece. Fora dela, salvar pelo painel apaga o vídeo do bloco.
+- **Limite: 25 MB por arquivo**, o máximo da Cloudflare Workers para arquivo estático. Acima disso o
+  `npm run build` (e o deploy depois do Salvar no painel) para com uma mensagem dizendo qual arquivo e como comprimir.
+  Vídeo longo vai para o YouTube.
+
+As legendas, descrições e títulos dos componentes também são traduzidos pelo `npm run translate`.
+
 ---
 
 ## Deploy (uma vez)
 
 ### 1. Repositório no GitHub
 
-Crie `TomazBontempo/needorgreed` (pode ser privado) e suba o projeto.
+Crie `TomazBontempo/needorgreed.blog` (pode ser privado) e suba o projeto.
 Se usar outro nome, troque em `src/site.config.ts` (`SITE.repo`, `GISCUS.repo`) e `keystatic.config.tsx` (`REPO`).
 
 ### 2. GitHub App do Keystatic (login do painel)
@@ -112,7 +200,7 @@ No painel da Cloudflare: **Workers & Pages → Create → Import a repository** 
 
 | Nome | Valor |
 |---|---|
-| `GITHUB_REPO` | `TomazBontempo/needorgreed` |
+| `GITHUB_REPO` | `TomazBontempo/needorgreed.blog` |
 | `GITHUB_TOKEN` | token fine-grained, só leitura de *Contents* e *Metadata* do repo |
 | `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` | do `.env` do passo 2 |
 
@@ -160,17 +248,21 @@ e cruza com `src/content/autores/*.json`. Se outra pessoa editar depois, aparece
 ## Estrutura
 
 ```
-keystatic.config.tsx      painel: campos das reviews e autores
-src/site.config.ts        nome, repo, autor padrão, Giscus
-src/content.config.ts     schema das coleções
-src/content/reviews/      uma pasta por review
+keystatic.config.tsx      painel: campos das reviews e autores, blocos de mídia
+src/site.config.ts        repo, autor padrão, Giscus
+src/content.config.ts     schema das coleções (reviews, traduções, autores)
+src/content/reviews/      uma pasta por review (index.mdx + tradução + imagens)
 src/content/autores/      um JSON por autor
-src/assets/               imagens enviadas pelo painel
-src/lib/raridade.ts       faixas de raridade, rolls, tipos
-src/lib/autores.ts        descoberta do autor via GitHub
-src/lib/reviews.ts        junta tudo para as páginas
-src/components/           tooltip de item, linha de roll, YouTube, comentários
-src/pages/                home, review, jogos, telas, raridade, autores, arquivo, sobre, RSS
+src/worker.ts             Worker: escolhe o idioma antes de servir a página
+src/i18n/                 dicionários en/pt, rotas por idioma, regra de idioma
+src/views/                as páginas (home, review, listagens, arquivo, sobre, 404)
+src/pages/                rotas finas por idioma, que chamam as views
+src/components/           ficha do item, loot log, destaque, mídia (Figure, Clipe, YouTube)
+src/lib/                  reviews, loot log, autores, comentários, RSS, raridade
+src/integrations/         checagem de tamanho de arquivo e de imagem estragada
+scripts/translate.mjs     tradução automática (npm run translate)
 ```
 
-As três reviews em `src/content/reviews/` são exemplos. Apague quando publicar as suas.
+Detalhes e padrões no `CLAUDE.md`; estado atual e pendências no `ESTADO.md`.
+
+As reviews em `src/content/reviews/` são exemplos. Apague quando publicar as suas (lista no `ESTADO.md`).

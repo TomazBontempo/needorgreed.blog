@@ -1,0 +1,249 @@
+/*
+ * A ficha do item (src/components/Item.astro).
+ * Global e com prefixo it-: a variante mini é injetada no tooltip do loot log em qualquer página.
+ */
+
+.it {
+  --cor-borda: color-mix(in srgb, var(--cor) 55%, var(--borda));
+  position: relative;
+  isolation: isolate;
+  background: var(--painel);
+  border: 1px solid var(--cor-borda);
+  /* segunda borda, solta, por fora */
+  outline: 1px solid var(--borda);
+  outline-offset: 3px;
+  padding: 10px;
+  transition:
+    transform 180ms var(--ease),
+    border-color 180ms var(--ease),
+    outline-color 180ms var(--ease),
+    box-shadow 180ms var(--ease);
+}
+
+.it-capa {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--painel-fundo);
+  border: 1px solid var(--borda);
+}
+.it-capa img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.it-sem-capa {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(3rem, 9vw, 5.5rem);
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--cor) 35%, var(--borda));
+}
+
+.it-dados {
+  padding: 0 2px;
+}
+.it-nome {
+  margin: 12px 0 2px;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.875rem;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--cor);
+}
+.it-nome a {
+  color: inherit;
+  text-decoration: none;
+}
+.it-tipo {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+  font-size: 0.71875rem;
+  color: var(--texto-2);
+}
+.it-atributos {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--borda);
+  font-size: 0.78125rem;
+  line-height: 1.45;
+}
+.it-atributos li {
+  padding: 2px 0;
+}
+.it-pos {
+  color: var(--positivo);
+}
+.it-neg {
+  color: var(--negativo);
+}
+.it-frase {
+  margin: 6px 0 12px;
+  font-family: var(--serifa);
+  font-style: italic;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--frase);
+}
+.it-roll {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  color: var(--roll);
+}
+.it-valor {
+  color: var(--texto-3);
+}
+.it-pe {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--borda);
+  font-size: 0.6875rem;
+  color: var(--texto-3);
+}
+.it-raridade {
+  color: var(--cor);
+  text-align: right;
+}
+
+/* Bolso: a ficha nas listagens. A ficha inteira é clicável: o link do nome cobre o item todo. */
+.it--bolso {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.it--bolso .it-dados {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.it--bolso .it-nome {
+  font-size: 1.5rem;
+}
+.it--bolso .it-nome a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.it--bolso .it-frase {
+  font-size: 0.8125rem;
+}
+.it--bolso .it-pe {
+  margin-top: auto;
+}
+/* Hover nas listagens: sobe um pouco, cresce 2%, a borda acende na cor da raridade.
+   Só em aparelho com hover de verdade: no toque não existe (e não fica "grudado" depois do tap). */
+@media (hover: hover) {
+  .it--bolso:hover {
+    border-color: var(--cor);
+    outline-color: color-mix(in srgb, var(--cor) 45%, var(--borda));
+    box-shadow: 0 10px 24px -8px rgb(0 0 0 / 0.6);
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+/* Foco pelo teclado: o mesmo destaque do hover (o toque não gera foco visível). */
+.it--bolso:has(a:focus-visible) {
+  border-color: var(--cor);
+  outline-color: color-mix(in srgb, var(--cor) 45%, var(--borda));
+  box-shadow: 0 10px 24px -8px rgb(0 0 0 / 0.6);
+  transform: translateY(-4px) scale(1.02);
+}
+@media (prefers-reduced-motion: reduce) {
+  .it--bolso:hover,
+  .it--bolso:has(a:focus-visible) {
+    transform: none;
+    box-shadow: none;
+  }
+}
+.it--bolso:has(a:focus-visible) {
+  outline: 2px solid var(--ouro);
+}
+.it--bolso .it-nome a:focus-visible {
+  outline: none;
+}
+
+/* Mini: a ficha completa em tamanho pequeno (tooltip do loot log). */
+.it--mini {
+  width: 248px;
+  padding: 8px;
+  box-shadow: 0 14px 32px -10px rgb(0 0 0 / 0.75);
+}
+.it--mini .it-capa {
+  aspect-ratio: 16 / 9;
+}
+.it--mini .it-sem-capa {
+  font-size: 2.5rem;
+}
+.it--mini .it-nome {
+  margin-top: 8px;
+  font-size: 1.25rem;
+}
+.it--mini .it-tipo {
+  margin-bottom: 6px;
+  font-size: 0.65625rem;
+}
+.it--mini .it-atributos {
+  padding: 5px 0;
+  font-size: 0.6875rem;
+}
+.it--mini .it-atributos li {
+  padding: 1px 0;
+}
+.it--mini .it-frase {
+  margin: 4px 0 8px;
+  font-size: 0.75rem;
+}
+.it--mini .it-roll {
+  margin-bottom: 6px;
+  font-size: 0.6875rem;
+}
+.it--mini .it-pe {
+  padding-top: 6px;
+  font-size: 0.625rem;
+}
+
+/* No celular, o bolso vira uma linha: capa pequena à esquerda, ficha à direita. */
+@media (max-width: 640px) {
+  .it--bolso {
+    flex-direction: row;
+    gap: 12px;
+  }
+  .it--bolso .it-capa {
+    flex: none;
+    width: 104px;
+    aspect-ratio: 3 / 4;
+  }
+  .it--bolso .it-sem-capa {
+    font-size: 2rem;
+  }
+  .it--bolso .it-nome {
+    margin-top: 2px;
+    font-size: 1.3rem;
+  }
+  .it--bolso .it-frase {
+    display: none;
+  }
+  .it--bolso .it-tipo {
+    margin-bottom: 6px;
+  }
+}
+
+/* Já lida (marcado no navegador do leitor, ver Base.astro) */
+.it.lido .it-capa {
+  filter: saturate(0.35) brightness(0.8);
+}
+.it.lido .it-numero::after {
+  content: ' · ' attr(data-lido);
+}

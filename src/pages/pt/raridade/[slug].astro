@@ -1,0 +1,13 @@
+---
+import Raridade from '../../../views/Raridade.astro';
+import { caminhosDeRaridade } from '../../../lib/caminhos';
+import type { RaridadeId } from '../../../lib/raridade';
+
+export const getStaticPaths = () => caminhosDeRaridade('pt');
+
+interface Props {
+  raridade: RaridadeId;
+}
+---
+
+<Raridade raridade={Astro.props.raridade} />

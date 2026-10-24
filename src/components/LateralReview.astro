@@ -1,0 +1,251 @@
+---
+/**
+ * Coluna esquerda da página da review (só desktop), fixa ao rolar:
+ *  - veredito compacto: raridade na cor, nota, roll e motivo, plataforma e duração;
+ *  - progresso de leitura;
+ *  - sumário com os títulos da review, marcando a seção atual. Sem títulos, não aparece.
+ */
+import MarcaRoll from './MarcaRoll.astro';
+import { dicionario, type Idioma } from '../i18n';
+import { notaFormatada } from '../lib/raridade';
+import type { ReviewCompleta, VersaoReview } from '../lib/reviews';
+
+interface Props {
+  idioma: Idioma;
+  review: ReviewCompleta;
+  versao: VersaoReview;
+  titulos: Array<{ depth: number; slug: string; text: string }>;
+}
+
+const { idioma, review, versao, titulos } = Astro.props;
+const t = dicionario(idioma);
+const { data } = versao;
+const sumario = titulos.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<div class:list={['lateral-review', `r-${review.raridade.id}`, `roll-${data.roll}`]}>
+  <section class="veredito" aria-labelledby="titulo-veredito">
+    <h2 id="titulo-veredito" class="rotulo">{t.review.veredito}</h2>
+    <dl>
+      <div>
+        <dt>{t.review.raridade}</dt>
+        <dd class="raridade">
+          {t.raridades[review.raridade.id].nome}
+          {review.raridade.id !== 'heranca' && <span class="nota">{notaFormatada(data.nota)}</span>}
+        </dd>
+      </div>
+      <div>
+        <dt>{t.review.roll}</dt>
+        <dd class="roll">
+          <MarcaRoll roll={data.roll} />
+          {t.rolls[data.roll].nome} <span class="valor">({review.valorRoll})</span>
+        </dd>
+      </div>
+      {
+        data.plataforma && (
+          <div>
+            <dt>{t.review.plataforma}</dt>
+            <dd>{data.plataforma}</dd>
+          </div>
+        )
+      }
+      {
+        data.duracao && (
+          <div>
+            <dt>{t.review.duracao}</dt>
+            <dd>{data.duracao}</dd>
+          </div>
+        )
+      }
+    </dl>
+    {data.motivoRoll && <p class="motivo">{data.motivoRoll}</p>}
+  </section>
+
+  <div class="progresso" data-progresso>
+    <div class="barra" role="progressbar" aria-label={t.review.progresso} aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="enchimento"></span>
+    </div>
+    <p class="pct" data-modelo={t.review.lido(999)} aria-hidden="true">
+      {t.review.lido(0)}
+    </p>
+  </div>
+
+  {
+    sumario.length > 0 && (
+      <nav class="sumario" aria-labelledby="titulo-sumario">
+        <h2 id="titulo-sumario" class="rotulo">
+          {t.review.sumario}
+        </h2>
+        <ol>
+          {sumario.map((h) => (
+            <li class={`nivel-${h.depth}`}>
+              <a href={`#${h.slug}`} data-secao={h.slug}>
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )
+  }
+</div>
+
+<script>
+  // Progresso de leitura e seção atual do sumário.
+  const lateral = document.querySelector<HTMLElement>('.lateral-review');
+  const corpo = document.querySelector<HTMLElement>('[data-corpo-review]');
+  if (lateral && corpo) {
+    const barra = lateral.querySelector<HTMLElement>('[role=progressbar]')!;
+    const enchimento = lateral.querySelector<HTMLElement>('.enchimento')!;
+    const pct = lateral.querySelector<HTMLElement>('.pct')!;
+    const modelo = pct.dataset.modelo!;
+    const links = [...lateral.querySelectorAll<HTMLAnchorElement>('[data-secao]')];
+    const titulos = links
+      .map((a) => document.getElementById(a.dataset.secao!))
+      .filter((h): h is HTMLElement => !!h);
+
+    let agendado = false;
+    const atualizar = () => {
+      agendado = false;
+      const r = corpo.getBoundingClientRect();
+      const total = r.height - innerHeight * 0.6;
+      const valor = Math.round(Math.min(1, Math.max(0, (innerHeight * 0.4 - r.top) / Math.max(total, 1))) * 100);
+      enchimento.style.transform = `scaleX(${valor / 100})`;
+      barra.setAttribute('aria-valuenow', String(valor));
+      pct.textContent = modelo.replace('999', String(valor));
+
+      // Seção atual: o último título que já passou de 30% da área visível (abaixo do header fixo).
+      const topoUtil = document.querySelector('.cabecalho')?.getBoundingClientRect().bottom ?? 0;
+      let atual: string | undefined;
+      for (const h of titulos) if (h.getBoundingClientRect().top < topoUtil + (innerHeight - topoUtil) * 0.3) atual = h.id;
+      links.forEach((a) => {
+        const ativo = a.dataset.secao === atual;
+        a.classList.toggle('ativo', ativo);
+        if (ativo) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    };
+    const agendar = () => {
+      if (!agendado) {
+        agendado = true;
+        requestAnimationFrame(atualizar);
+      }
+    };
+    addEventListener('scroll', agendar, { passive: true });
+    addEventListener('resize', agendar);
+    atualizar();
+  }
+</script>
+
+<style>
+  .lateral-review {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--texto-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .rotulo {
+    margin: 0 0 8px;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ouro);
+  }
+
+  .veredito {
+    padding-top: 10px;
+    border-top: 1px solid var(--ouro);
+  }
+  dl {
+    margin: 0;
+  }
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    border-bottom: 1px dashed #2a241c;
+  }
+  dt {
+    color: var(--texto-3);
+  }
+  dd {
+    margin: 0;
+    text-align: right;
+    color: var(--texto);
+  }
+  .raridade {
+    color: var(--cor);
+  }
+  .nota {
+    margin-left: 8px;
+  }
+  .roll {
+    color: var(--roll);
+  }
+  .valor {
+    color: var(--texto-3);
+  }
+  .motivo {
+    margin: 10px 0 0;
+    font-family: var(--serifa);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--texto);
+  }
+
+  .progresso {
+    margin-top: 22px;
+  }
+  .barra {
+    height: 2px;
+    background: var(--borda);
+    overflow: hidden;
+  }
+  .enchimento {
+    display: block;
+    height: 100%;
+    background: var(--ouro);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .pct {
+    margin: 6px 0 0;
+    color: var(--texto-3);
+  }
+
+  .sumario {
+    margin-top: 22px;
+  }
+  .sumario ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .sumario li {
+    margin: 0;
+  }
+  .sumario a {
+    display: block;
+    padding: 4px 0 4px 12px;
+    border-left: 1px solid var(--borda);
+    color: var(--texto-2);
+    text-decoration: none;
+    transition:
+      color 150ms var(--ease),
+      border-color 150ms var(--ease);
+  }
+  .sumario .nivel-3 a {
+    padding-left: 24px;
+  }
+  .sumario a:hover {
+    color: var(--texto);
+  }
+  .sumario a.ativo {
+    color: var(--ouro);
+    border-left-color: var(--ouro);
+  }
+</style>

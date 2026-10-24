@@ -1,0 +1,47 @@
+---
+/**
+ * Clipe curto ou GIF em vídeo (mp4/webm): toca sozinho, sem som, em loop, com controles.
+ *
+ *   <Clipe src="/videos/<slug>/clipe.mp4" poster="/videos/<slug>/clipe.jpg" legenda="..." descricao="..." />
+ *
+ * Os arquivos ficam em public/videos/<slug>/ (é onde o painel salva e o único lugar que ele reconhece). Limite: 25 MiB por arquivo,
+ * que é o máximo da Cloudflare Workers para arquivo estático; o build falha acima disso.
+ * Vídeo longo vai para o YouTube: <YouTube id="..." />.
+ */
+interface Props {
+  src: string;
+  poster?: string;
+  legenda?: string;
+  /** Descrição para leitor de tela. */
+  descricao?: string;
+}
+const { src, poster, legenda, descricao } = Astro.props;
+
+if (!src) {
+  throw new Error('<Clipe> sem vídeo (src). Escolha o arquivo no bloco "Clipe curto / GIF" do painel, ou escreva src="/videos/<slug>/clipe.mp4".');
+}
+const tipo = src.toLowerCase().endsWith('.webm') ? 'video/webm' : src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : undefined;
+if (!tipo) {
+  throw new Error(`<Clipe src="${src}">: use um arquivo .mp4 ou .webm. GIF animado precisa ser convertido para mp4 antes.`);
+}
+if (!src.startsWith('/')) {
+  throw new Error(`<Clipe src="${src}">: coloque o vídeo em public/videos/<slug>/ e use src="/videos/<slug>/${src.split('/').pop()}".`);
+}
+---
+
+<figure class="figura clipe">
+  <video autoplay muted loop playsinline controls preload="metadata" poster={poster} aria-label={descricao} data-clipe>
+    <source src={src} type={tipo} />
+  </video>
+  {legenda && <figcaption>{legenda}</figcaption>}
+</figure>
+
+<script>
+  // Movimento reduzido: não toca sozinho (o leitor ainda pode dar play).
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLVideoElement>('video[data-clipe]').forEach((v) => {
+      v.autoplay = false;
+      v.pause();
+    });
+  }
+</script>

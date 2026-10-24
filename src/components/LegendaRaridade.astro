@@ -1,55 +1,59 @@
 ---
-import { TODAS_RARIDADES } from '../lib/raridade';
+/** As raridades em linha, cada uma com sua cor e quantas reviews tem. Leva às páginas de raridade. */
+import { dicionario, url, type Idioma } from '../i18n';
+import { TODAS_RARIDADES, type RaridadeId } from '../lib/raridade';
+import { getReviews } from '../lib/reviews';
+
+interface Props {
+  idioma: Idioma;
+  atual?: RaridadeId;
+}
+const { idioma, atual } = Astro.props;
+const t = dicionario(idioma);
+const reviews = await getReviews();
+const contagem = (id: RaridadeId) => reviews.filter((r) => r.raridade.id === id).length;
 ---
 
-<ul class="legenda">
-  {
-    TODAS_RARIDADES.map((r) => (
-      <li class={`r-${r.id}`}>
-        <a href={`/raridade/${r.id}/`}>
-          <span class="ponto" />
-          {r.nome}
-          <span class="faixa mono">{r.faixa}</span>
-        </a>
-      </li>
-    ))
-  }
-</ul>
+<nav class="legenda" aria-label={t.paginas.raridades}>
+  <ul>
+    {
+      TODAS_RARIDADES.map((r) => (
+        <li class={`r-${r.id}`}>
+          <a href={url(idioma, 'raridade', r.id)} aria-current={atual === r.id ? 'page' : undefined}>
+            {t.raridades[r.id].nome}
+          </a>
+          <span class="n">{contagem(r.id)}</span>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
 
 <style>
-  .legenda {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .legenda ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
   }
   a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 12px;
-    border: 1px solid var(--borda);
-    border-radius: 999px;
     color: var(--cor);
     text-decoration: none;
-    font-size: 14px;
-    background: var(--bg-2);
   }
   a:hover {
-    border-color: var(--cor);
-    color: var(--cor);
+    text-decoration: underline;
   }
-  .ponto {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--cor);
-    box-shadow: 0 0 8px var(--cor);
+  a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
   }
-  .faixa {
+  .n {
+    margin-left: 6px;
     color: var(--texto-3);
-    font-size: 12px;
   }
 </style>

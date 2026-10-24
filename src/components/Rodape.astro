@@ -1,0 +1,49 @@
+---
+import { dicionario, url, type Idioma } from '../i18n';
+
+interface Props {
+  idioma: Idioma;
+}
+const { idioma } = Astro.props;
+const t = dicionario(idioma);
+const rss = idioma === 'en' ? '/rss.xml' : '/pt/rss.xml';
+---
+
+<footer class="rodape">
+  <div class="container linha mono">
+    <p>Need or Greed · {t.rodape.assinatura}</p>
+    <p>
+      <a href={url(idioma, 'sobre')}>{t.nav.sobre}</a>
+      <a href={rss}>{t.rodape.rss}</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    margin-top: 96px;
+    border-top: 1px solid var(--borda);
+  }
+  .linha {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding-block: 24px 40px;
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  p {
+    margin: 0;
+    display: flex;
+    gap: 20px;
+  }
+  a {
+    color: var(--texto-2);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--ouro);
+    text-decoration: underline;
+  }
+</style>

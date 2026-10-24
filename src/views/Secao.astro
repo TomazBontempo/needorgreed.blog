@@ -1,0 +1,123 @@
+---
+/**
+ * Jogos e Telas: as fichas da seção, da mais nova para a mais antiga.
+ * Em Telas, um filtro por tipo (filmes, séries, animes) que só aparece com JavaScript;
+ * sem ele, a lista inteira continua lá.
+ */
+import Base from '../layouts/Base.astro';
+import TopoPagina from '../components/TopoPagina.astro';
+import Fichario from '../components/Fichario.astro';
+import LegendaRaridade from '../components/LegendaRaridade.astro';
+import { dicionario, idiomaDe } from '../i18n';
+import { getReviews, versaoEm } from '../lib/reviews';
+import type { TipoId } from '../lib/raridade';
+
+interface Props {
+  secao: 'jogos' | 'telas';
+}
+const { secao } = Astro.props;
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const reviews = (await getReviews()).filter((r) => r.secao === secao);
+const itens = await Promise.all(reviews.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma) })));
+const titulo = secao === 'jogos' ? t.paginas.jogos : t.paginas.telas;
+const descricao = secao === 'jogos' ? t.paginas.jogosDescricao : t.paginas.telasDescricao;
+const tipos = secao === 'telas' ? (['filme', 'serie', 'anime'] as TipoId[]).filter((tp) => reviews.some((r) => r.entry.data.tipo === tp)) : [];
+---
+
+<Base titulo={titulo} descricao={descricao}>
+  <div class="container">
+    <TopoPagina titulo={titulo} descricao={descricao}>
+      <p class="contagem mono">{t.paginas.contagem(reviews.length)}</p>
+    </TopoPagina>
+
+    <div class="barra">
+      {
+        tipos.length > 1 && (
+          <fieldset class="filtro mono" hidden data-filtro-tipo>
+            <legend>{t.paginas.filtroTipo}</legend>
+            <label>
+              <input type="radio" name="tipo" value="" checked />
+              {t.paginas.filtroTodos}
+            </label>
+            {tipos.map((tp) => (
+              <label>
+                <input type="radio" name="tipo" value={tp} />
+                {t.tipos[tp]}
+              </label>
+            ))}
+          </fieldset>
+        )
+      }
+      <LegendaRaridade idioma={idioma} />
+    </div>
+
+    {itens.length > 0 ? <Fichario idioma={idioma} itens={itens} rotulo={titulo} /> : <p class="vazio mono">{t.paginas.vazio}</p>}
+  </div>
+</Base>
+
+<script>
+  // Filtro de tipo em Telas: esconde as fichas de outros tipos.
+  const filtro = document.querySelector<HTMLFieldSetElement>('[data-filtro-tipo]');
+  if (filtro) {
+    filtro.hidden = false;
+    const fichas = [...document.querySelectorAll<HTMLElement>('.fichario-lista > li')];
+    filtro.addEventListener('change', (e) => {
+      const tipo = (e.target as HTMLInputElement).value;
+      fichas.forEach((li) => (li.hidden = !!tipo && li.dataset.tipo !== tipo));
+    });
+  }
+</script>
+
+<style>
+  .contagem {
+    margin: 14px 0 0;
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .barra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 32px;
+    margin-bottom: 20px;
+  }
+  .filtro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 0.8125rem;
+  }
+  .filtro[hidden] {
+    display: none;
+  }
+  .filtro legend {
+    float: left;
+    margin-right: 6px;
+    padding: 0;
+    color: var(--texto-3);
+  }
+  .filtro label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--texto-2);
+    cursor: pointer;
+  }
+  .filtro label:has(input:checked) {
+    color: var(--ouro);
+  }
+  .filtro input {
+    margin: 0;
+  }
+  .vazio {
+    margin: 24px 0;
+    font-size: 0.875rem;
+    color: var(--texto-3);
+  }
+</style>

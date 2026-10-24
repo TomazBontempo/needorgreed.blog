@@ -1,0 +1,116 @@
+---
+/**
+ * Topo de uma review: linha de roll, motivo colado nela, título e meta.
+ * Usado no destaque da home (título com link) e na página da review (título como h1).
+ */
+import LinhaRoll from './LinhaRoll.astro';
+import { dicionario, formatarData, url, type Idioma } from '../i18n';
+import { minutosDeLeitura, type ReviewCompleta, type VersaoReview } from '../lib/reviews';
+
+interface Props {
+  idioma: Idioma;
+  review: ReviewCompleta;
+  versao: VersaoReview;
+  /** Com href, o título vira link (home, h3 abaixo de "Última crítica"). Sem, é o h1 da página. */
+  href?: string;
+  /** Página da review: título primeiro, depois a linha de roll e o motivo. */
+  tituloPrimeiro?: boolean;
+}
+
+const { idioma, review, versao, href, tituloPrimeiro = false } = Astro.props;
+const t = dicionario(idioma);
+const { data } = versao;
+const Titulo = href ? 'h3' : 'h1';
+---
+
+<header class:list={['cab-review', { 'titulo-primeiro': tituloPrimeiro }]}>
+  {tituloPrimeiro && <Titulo class="titulo">{data.titulo}</Titulo>}
+  <LinhaRoll
+    idioma={idioma}
+    nick={review.autor.nick}
+    autorSlug={review.autor.slug}
+    roll={data.roll}
+    valor={review.valorRoll}
+    titulo={data.titulo}
+    raridade={review.raridade.id}
+  />
+  {data.motivoRoll && <p class="motivo">{data.motivoRoll}</p>}
+  {!tituloPrimeiro && <Titulo class="titulo">{href ? <a href={href}>{data.titulo}</a> : data.titulo}</Titulo>}
+  <p class="meta">
+    <time datetime={data.data.toISOString().slice(0, 10)}>{formatarData(idioma, data.data)}</time>
+    <span>{t.review.leitura(minutosDeLeitura(versao.entry.body))}</span>
+    <span>
+      {t.review.escritoPor} <a href={url(idioma, 'autores', review.autor.slug)}>{review.autor.nick}</a>
+      {
+        review.editor && (
+          <>
+            , {t.review.editadoPor} <a href={url(idioma, 'autores', review.editor.slug)}>{review.editor.nick}</a>
+          </>
+        )
+      }
+    </span>
+  </p>
+</header>
+
+<style>
+  .motivo {
+    position: relative;
+    margin: 8px 0 0;
+    padding-left: 14px;
+    max-width: 60ch;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .motivo::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25em;
+    bottom: 0.25em;
+    width: 1px;
+    background: var(--roll);
+  }
+  /* Página da review: título, depois linha de roll e motivo. */
+  .titulo-primeiro .titulo {
+    margin: 0 0 14px;
+  }
+  .titulo-primeiro .meta {
+    margin-top: 12px;
+  }
+  .titulo {
+    margin: 22px 0 8px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    line-height: 0.92;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+  }
+  .titulo a {
+    color: var(--texto);
+    text-decoration: none;
+  }
+  .titulo a:hover {
+    color: var(--cor);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.12em;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 0 0 26px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .meta a {
+    color: var(--texto-2);
+    text-decoration: none;
+  }
+  .meta a:hover {
+    color: var(--ouro);
+    text-decoration: underline;
+  }
+</style>

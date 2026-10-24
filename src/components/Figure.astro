@@ -1,0 +1,22 @@
+---
+/**
+ * Imagem com legenda. A imagem vai DENTRO, como Markdown normal, e o Astro otimiza:
+ *
+ *   <Figure legenda="O sol, cinco segundos antes de explodir.">
+ *
+ *   ![Descrição da imagem](./foto.jpg)
+ *
+ *   </Figure>
+ *
+ * No painel, é o bloco "Imagem com legenda": insira a imagem dentro dele.
+ */
+interface Props {
+  legenda?: string;
+}
+const { legenda } = Astro.props;
+---
+
+<figure class="figura">
+  <slot />
+  {legenda && <figcaption>{legenda}</figcaption>}
+</figure>

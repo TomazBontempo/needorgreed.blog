@@ -1,0 +1,193 @@
+---
+/**
+ * Arquivo: o loot log completo, agrupado por mês, com filtros simples (tipo de evento e roll).
+ * Os filtros só aparecem com JavaScript; sem ele, o log inteiro fica visível.
+ */
+import Base from '../layouts/Base.astro';
+import TopoPagina from '../components/TopoPagina.astro';
+import LootLog from '../components/LootLog.astro';
+import MarcaRoll from '../components/MarcaRoll.astro';
+import { dicionario, formatarData, idiomaDe } from '../i18n';
+import { getLootLog, type EventoLog } from '../lib/lootlog';
+import { ROLL_IDS } from '../lib/raridade';
+
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const { eventos } = await getLootLog();
+
+const meses = new Map<string, EventoLog[]>();
+for (const e of eventos) {
+  const chave = formatarData(idioma, e.data, { day: undefined, month: 'long', year: 'numeric' });
+  if (!meses.has(chave)) meses.set(chave, []);
+  meses.get(chave)!.push(e);
+}
+const tiposEvento = [
+  ['', t.arquivo.todos],
+  ['review', t.arquivo.reviews],
+  ['atualizacao', t.arquivo.atualizacoes],
+  ['autor', t.arquivo.autores],
+] as const;
+---
+
+<Base titulo={t.paginas.arquivo} descricao={t.arquivo.descricao}>
+  <div class="container arquivo">
+    <TopoPagina titulo={t.paginas.arquivo} descricao={t.arquivo.descricao}>
+      <p class="contagem mono">
+        <span data-contagem data-um={t.arquivo.total(1)} data-varios={t.arquivo.total(0).replace('0', '#')}>
+          {t.arquivo.total(eventos.length)}
+        </span>
+      </p>
+    </TopoPagina>
+
+    <form class="filtros mono" aria-label={t.arquivo.filtros} hidden data-filtros>
+      <fieldset>
+        <legend>{t.arquivo.evento}</legend>
+        {
+          tiposEvento.map(([valor, nome]) => (
+            <label>
+              <input type="radio" name="evento" value={valor} checked={valor === ''} />
+              {nome}
+            </label>
+          ))
+        }
+      </fieldset>
+      <fieldset>
+        <legend>{t.arquivo.roll}</legend>
+        <label>
+          <input type="radio" name="roll" value="" checked />
+          {t.arquivo.todos}
+        </label>
+        {
+          ROLL_IDS.map((r) => (
+            <label class={`roll-${r}`}>
+              <input type="radio" name="roll" value={r} />
+              <span class="roll">
+                <MarcaRoll roll={r} />
+                {t.rolls[r].nome}
+              </span>
+            </label>
+          ))
+        }
+      </fieldset>
+    </form>
+
+    <p class="nenhum mono" hidden data-nenhum>{t.arquivo.nenhum}</p>
+
+    {
+      [...meses].map(([mes, lista]) => (
+        <section class="mes" data-mes>
+          <h2>{mes}</h2>
+          <LootLog idioma={idioma} eventos={lista} cabecalho={false} class="log-arquivo" />
+        </section>
+      ))
+    }
+    {eventos.length === 0 && <p class="nenhum mono">{t.log.vazio}</p>}
+  </div>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-filtros]');
+  if (form) {
+    form.hidden = false;
+    const meses = [...document.querySelectorAll<HTMLElement>('[data-mes]')];
+    const nenhum = document.querySelector<HTMLElement>('[data-nenhum]')!;
+    const contagem = document.querySelector<HTMLElement>('[data-contagem]')!;
+    const texto = (n: number) => (n === 1 ? contagem.dataset.um! : contagem.dataset.varios!.replace('#', String(n)));
+    const aplicar = () => {
+      const evento = (form.elements.namedItem('evento') as RadioNodeList).value;
+      const roll = (form.elements.namedItem('roll') as RadioNodeList).value;
+      let visiveis = 0;
+      meses.forEach((mes) => {
+        let noMes = 0;
+        mes.querySelectorAll<HTMLElement>('li[data-evento]').forEach((li) => {
+          const ok = (!evento || li.dataset.evento === evento) && (!roll || li.dataset.roll === roll);
+          li.hidden = !ok;
+          if (ok) noMes++;
+        });
+        mes.hidden = noMes === 0;
+        visiveis += noMes;
+      });
+      nenhum.hidden = visiveis > 0;
+      contagem.textContent = texto(visiveis);
+    };
+    form.addEventListener('change', aplicar);
+  }
+</script>
+
+<style>
+  .arquivo {
+    max-width: 960px;
+  }
+  .contagem {
+    margin: 14px 0 0;
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 40px;
+    margin-bottom: 28px;
+    padding: 14px 18px;
+    background: var(--painel-fundo);
+    border: 1px solid var(--borda);
+    font-size: 0.8125rem;
+  }
+  .filtros[hidden] {
+    display: none;
+  }
+  fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  legend {
+    float: left;
+    margin-right: 4px;
+    padding: 0;
+    color: var(--texto-3);
+  }
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--texto-2);
+    cursor: pointer;
+  }
+  label:has(input:checked) {
+    color: var(--ouro);
+  }
+  label .roll {
+    color: var(--roll);
+  }
+  input {
+    margin: 0;
+  }
+  .mes {
+    margin-bottom: 32px;
+  }
+  .mes h2 {
+    margin: 0 0 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--ouro);
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ouro);
+  }
+  .mes :global(.log-arquivo) {
+    border-top: 0;
+    padding-top: 0;
+    font-size: 0.8125rem;
+  }
+  .nenhum {
+    font-size: 0.875rem;
+    color: var(--texto-3);
+  }
+</style>

@@ -1,158 +1,111 @@
 ---
+import { Font } from 'astro:assets';
+import Cabecalho from '../components/Cabecalho.astro';
+import Rodape from '../components/Rodape.astro';
+import { alternativas, dicionario, idiomaDe } from '../i18n';
 import '../styles/global.css';
-import Dado from '../components/Dado.astro';
-import { SITE } from '../site.config';
+import '../styles/item.css';
 
 interface Props {
   titulo?: string;
   descricao?: string;
+  /** URL absoluta ou relativa da imagem de compartilhamento. */
   imagem?: string;
+  /** Página de review: og:type article. */
+  artigo?: boolean;
+  /** Largura máxima do conteúdo nesta página (padrão: --largura do global.css). Header e conteúdo seguem a mesma. */
+  largura?: string;
+  /** Fora dos buscadores (404). */
+  noindex?: boolean;
 }
 
-const { titulo, descricao = SITE.descricao, imagem } = Astro.props;
-const tituloCompleto = titulo ? `${titulo} | ${SITE.nome}` : SITE.nome;
-const canonical = new URL(Astro.url.pathname, Astro.site);
-const atual = Astro.url.pathname;
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const { titulo, descricao = t.site.descricao, imagem, artigo = false, largura, noindex = false } = Astro.props;
+const tituloCompleto = titulo ? `${titulo} · Need or Greed` : 'Need or Greed';
+const site = Astro.site ?? new URL('https://needorgreed.blog');
+const { canonical, links } = alternativas(Astro.url.pathname, site);
+const imagemAbs = imagem ? new URL(imagem, site).href : undefined;
+const rss = idioma === 'en' ? '/rss.xml' : '/pt/rss.xml';
 
-const nav = [
-  { href: '/jogos/', nome: 'Jogos' },
-  { href: '/telas/', nome: 'Telas' },
-  { href: '/arquivo/', nome: 'Arquivo' },
-  { href: '/sobre/', nome: 'Sobre' },
-];
+// Contrato da direção visual (Impeccable). Fica como comentário no HTML publicado.
+const contrato = `
+THESIS: every review is a numbered loot drop logged by the system; one glance at the first screen shows everything the home offers; refuses the score-circle plus card-grid review site.
+OWN-WORLD: tavern-night ground, dark item panels with a rarity-coloured edge and a loose second outline, no foil, no hover tricks; condensed display caps, a reading serif, a mono for system text; gold only where you can click.
+STORY: the reader sees how good a work is (rarity) and whether it is worth their time (roll) as two separate claims, reads the latest review whole, then joins the discussion.
+FIRST VIEWPORT: logo left, menu and language toggle right; three-line hero; latest review in a fixed-height scrolling window (dvh) with the loot log right; the top of More loot visible below.
+FORM: item binder (cards kept for listings, TCG trappings removed on user feedback), 6th of 7 on the ordered list, seed 763e2d68.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+`;
 ---
 
 <!doctype html>
-<html lang={SITE.idioma}>
+<html lang={t.hreflang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0f0d0b" />
     <title>{tituloCompleto}</title>
     <meta name="description" content={descricao} />
-    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {!noindex && links.map((l) => <link rel="alternate" hreflang={l.hreflang} href={l.href} />)}
+    <link rel="alternate" type="application/rss+xml" title="Need or Greed" href={rss} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={SITE.nome} href="/rss.xml" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:site_name" content="Need or Greed" />
+    <meta property="og:type" content={artigo ? 'article' : 'website'} />
+    <meta property="og:title" content={titulo ?? 'Need or Greed'} />
     <meta property="og:description" content={descricao} />
     <meta property="og:url" content={canonical} />
-    {imagem && <meta property="og:image" content={new URL(imagem, Astro.site)} />}
+    <meta property="og:locale" content={t.locale.replace('-', '_')} />
+    {imagemAbs && <meta property="og:image" content={imagemAbs} />}
+    <meta name="twitter:card" content={imagemAbs ? 'summary_large_image' : 'summary'} />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <Font cssVariable="--fonte-display" preload />
+    <Font cssVariable="--fonte-texto" preload={[{ style: 'normal' }]} />
+    <Font cssVariable="--fonte-mono" preload={[{ style: 'normal' }]} />
   </head>
-  <body>
-    <header class="topo">
-      <div class="container topo-inner">
-        <a href="/" class="marca">
-          <span class="marca-dado"><Dado tamanho={30} /></span>
-          <span class="marca-nome">Need <em>or</em> Greed</span>
-        </a>
-        <nav aria-label="Principal">
-          {
-            nav.map((item) => (
-              <a href={item.href} aria-current={atual.startsWith(item.href) ? 'page' : undefined}>
-                {item.nome}
-              </a>
-            ))
-          }
-        </nav>
-      </div>
-    </header>
-
-    <main>
+  <body style={largura ? `--largura: ${largura}` : undefined}>
+    <Fragment set:html={`<!--${contrato}-->`} />
+    <a class="pular" href="#conteudo">{t.nav.pularParaConteudo}</a>
+    <Cabecalho idioma={idioma} />
+    <main id="conteudo">
       <slot />
     </main>
+    <Rodape idioma={idioma} />
 
-    <footer class="rodape">
-      <div class="container rodape-inner">
-        <p class="mono">Master Looter: Snufupugos</p>
-        <p>
-          <a href="/rss.xml">RSS</a> · <a href="/sobre/">Como funcionam as notas</a>
-        </p>
-      </div>
-    </footer>
+    <script>
+      // Escolha de idioma: grava cookie (o Worker lê) e espelha no localStorage.
+      const UM_ANO = 60 * 60 * 24 * 365;
+      const gravar = (lang: string) => {
+        document.cookie = `lang=${lang}; Path=/; Max-Age=${UM_ANO}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+        try {
+          localStorage.setItem('lang', lang);
+        } catch {}
+      };
+      // Escolha antiga que só ficou no localStorage: devolve para o cookie.
+      try {
+        const salvo = localStorage.getItem('lang');
+        if (salvo && !document.cookie.includes('lang=')) gravar(salvo);
+      } catch {}
+      document.querySelectorAll<HTMLAnchorElement>('[data-idioma]').forEach((a) =>
+        a.addEventListener('click', () => gravar(a.dataset.idioma!)),
+      );
+
+      // Reviews já lidas: marca no log e nas fichas quando o leitor volta.
+      try {
+        const lidos = new Set<string>(JSON.parse(localStorage.getItem('lidos') ?? '[]'));
+        const atual = document.body.querySelector<HTMLElement>('[data-lendo]')?.dataset.lendo;
+        if (atual) {
+          lidos.add(atual);
+          localStorage.setItem('lidos', JSON.stringify([...lidos].slice(-300)));
+        }
+        document.querySelectorAll<HTMLElement>('[data-slug]').forEach((el) => {
+          if (lidos.has(el.dataset.slug!) && el.dataset.slug !== atual) el.classList.add('lido');
+        });
+      } catch {}
+    </script>
   </body>
 </html>
-
-<style>
-  .topo {
-    border-bottom: 1px solid var(--borda);
-    background: #0f0d0bcc;
-    backdrop-filter: blur(8px);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  .topo-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    min-height: 64px;
-    flex-wrap: wrap;
-  }
-  .marca {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: var(--texto);
-  }
-  .marca-dado {
-    color: var(--ouro);
-    display: flex;
-  }
-  .marca-nome {
-    font-family: var(--fonte-titulo);
-    font-size: 1.35rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-  .marca-nome em {
-    font-style: italic;
-    font-weight: 500;
-    color: var(--texto-2);
-  }
-  nav {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-  nav a {
-    color: var(--texto-2);
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: var(--raio);
-    font-size: 15px;
-  }
-  nav a:hover,
-  nav a[aria-current='page'] {
-    color: var(--texto);
-    background: var(--bg-2);
-  }
-  main {
-    min-height: 70vh;
-  }
-  .rodape {
-    margin-top: 96px;
-    border-top: 1px solid var(--borda);
-    color: var(--texto-3);
-    font-size: 14px;
-  }
-  .rodape-inner {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-block: 24px;
-  }
-  .rodape a {
-    color: var(--texto-2);
-  }
-</style>

@@ -1,0 +1,260 @@
+---
+/** Sobre: como funcionam raridade e roll, e quem escreve. Os textos ficam nos dicionários. */
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import TopoPagina from '../components/TopoPagina.astro';
+import MarcaRoll from '../components/MarcaRoll.astro';
+import { dicionario, idiomaDe, url } from '../i18n';
+import { RARIDADES, ROLL_IDS, valorDoRoll } from '../lib/raridade';
+import { getReviews } from '../lib/reviews';
+
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const s = t.sobre;
+const reviews = await getReviews();
+const autores = await getCollection('autores');
+const contagem = (slug: string) => reviews.filter((r) => r.autor.slug === slug).length;
+/** Faixa do número do roll de cada raridade: "70 a 89". A última (Lendário) é só "100". */
+const faixaRoll = (min: number, i: number) => {
+  const prox = RARIDADES[i + 1];
+  return prox ? s.faixa(valorDoRoll(min), valorDoRoll(prox.min) - 1) : String(valorDoRoll(min));
+};
+---
+
+<Base titulo={t.paginas.sobre} descricao={s.intro}>
+  <div class="container"><div class="sobre">
+    <TopoPagina titulo={s.titulo} descricao={s.intro} />
+
+    <section aria-labelledby="s-raridade">
+      <h2 id="s-raridade">{s.raridadeTitulo}</h2>
+      <p>{s.raridadeTexto}</p>
+      <table class="tabela mono">
+        <thead>
+          <tr>
+            <th scope="col">{t.review.raridade}</th>
+            <th scope="col">{s.nota}</th>
+            <th scope="col">{s.numero}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            RARIDADES.map((r, i) => (
+              <tr class={`r-${r.id}`}>
+                <th scope="row">
+                  <a href={url(idioma, 'raridade', r.id)} title={s.verRaridade(t.raridades[r.id].nome)}>
+                    {t.raridades[r.id].nome}
+                  </a>
+                </th>
+                <td>{t.raridades[r.id].faixa}</td>
+                <td>{faixaRoll(r.min, i)}</td>
+              </tr>
+            ))
+          }
+          <tr class="r-heranca">
+            <th scope="row">
+              <a href={url(idioma, 'raridade', 'heranca')}>{t.raridades.heranca.nome}</a>
+            </th>
+            <td colspan="2">{t.raridades.heranca.faixa}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>{s.herancaTexto}</p>
+    </section>
+
+    <section aria-labelledby="s-roll">
+      <h2 id="s-roll">{s.rollTitulo}</h2>
+      <p>{s.rollTexto}</p>
+      <dl class="rolls">
+        {
+          ROLL_IDS.map((r) => (
+            <div class={`roll-${r}`}>
+              <dt class="mono">
+                <MarcaRoll roll={r} tamanho={10} />
+                {t.rolls[r].nome}
+              </dt>
+              <dd>{t.rolls[r].descricao}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section aria-labelledby="s-divergencia">
+      <h2 id="s-divergencia">{s.divergenciaTitulo}</h2>
+      <ul class="exemplos">
+        <li class="r-epico roll-greed">{s.divergencias.epicoGreed}</li>
+        <li class="r-incomum roll-need">{s.divergencias.incomumNeed}</li>
+        <li class="r-raro roll-pass">{s.divergencias.raroPass}</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="s-numero">
+      <h2 id="s-numero">{s.numeroTitulo}</h2>
+      <p>{s.numeroTexto}</p>
+    </section>
+
+    <section aria-labelledby="s-log">
+      <h2 id="s-log">{s.logTitulo}</h2>
+      <p>
+        {s.logTexto} <a href={url(idioma, 'arquivo')}>{t.paginas.arquivo}</a>
+      </p>
+    </section>
+
+    <section aria-labelledby="s-traducao">
+      <h2 id="s-traducao">{s.traducaoTitulo}</h2>
+      <p>{s.traducaoTexto}</p>
+    </section>
+
+    <section aria-labelledby="s-quem">
+      <h2 id="s-quem">{s.quemTitulo}</h2>
+      <p>{s.quemTexto}</p>
+      <ul class="autores">
+        {
+          autores.map((a) => (
+            <li>
+              {a.data.avatar && <Image src={a.data.avatar} alt="" width={48} height={48} class="avatar" />}
+              <div>
+                <a class="nick" href={url(idioma, 'autores', a.id)}>
+                  {a.data.nick}
+                </a>
+                <span class="mono n">{t.paginas.contagem(contagem(a.id))}</span>
+                {a.data.bio && <p lang="pt-BR">{a.data.bio}</p>}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div></div>
+</Base>
+
+<style>
+  .sobre {
+    max-width: 720px;
+  }
+  section {
+    margin-top: 40px;
+  }
+  h2 {
+    margin: 0 0 10px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.75rem;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  p {
+    margin: 0 0 1em;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+  .tabela {
+    width: 100%;
+    margin: 6px 0 18px;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .tabela th,
+  .tabela td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px dashed #2a241c;
+  }
+  .tabela thead th {
+    font-weight: 400;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--texto-3);
+    border-bottom: 1px solid var(--borda-forte);
+  }
+  .tabela tbody th {
+    font-weight: 400;
+  }
+  .tabela tbody a {
+    color: var(--cor);
+    text-decoration: none;
+  }
+  .tabela tbody a:hover {
+    text-decoration: underline;
+  }
+  .tabela td {
+    color: var(--texto-2);
+  }
+  .rolls {
+    margin: 0;
+  }
+  .rolls div {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #2a241c;
+  }
+  .rolls dt {
+    font-size: 0.875rem;
+    color: var(--roll);
+  }
+  .rolls dd {
+    margin: 0;
+    line-height: 1.5;
+  }
+  .exemplos {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .exemplos li {
+    position: relative;
+    margin: 0 0 10px;
+    padding-left: 16px;
+    line-height: 1.5;
+  }
+  .exemplos li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.3em;
+    bottom: 0.3em;
+    width: 1px;
+    background: var(--cor);
+  }
+  .autores {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .autores li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-top: 1px solid var(--borda);
+  }
+  .autores :global(.avatar) {
+    border: 1px solid var(--borda-forte);
+  }
+  .nick {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.35rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--texto);
+  }
+  .nick:hover {
+    color: var(--ouro);
+  }
+  .autores .n {
+    margin-left: 10px;
+    font-size: 0.75rem;
+    color: var(--texto-3);
+  }
+  .autores p {
+    margin: 4px 0 0;
+    font-size: 0.9375rem;
+    color: var(--texto-2);
+  }
+</style>

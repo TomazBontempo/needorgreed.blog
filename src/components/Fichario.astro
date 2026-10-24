@@ -1,0 +1,46 @@
+---
+/**
+ * Grade de fichas das listagens (Jogos, Telas, Raridade, Autor).
+ * A mesma ficha do "Mais loot" da home; as colunas aumentam com a largura da tela.
+ */
+import Item from './Item.astro';
+import type { Idioma } from '../i18n';
+import type { ReviewCompleta, VersaoReview } from '../lib/reviews';
+
+interface Props {
+  idioma: Idioma;
+  itens: Array<{ review: ReviewCompleta; versao: VersaoReview }>;
+  rotulo?: string;
+}
+const { idioma, itens, rotulo } = Astro.props;
+---
+
+<ul class="fichario-lista" aria-label={rotulo}>
+  {
+    itens.map(({ review, versao }) => (
+      <li data-tipo={versao.data.tipo}>
+        <Item review={review} data={versao.data} idioma={idioma} variante="bolso" />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .fichario-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 28px;
+    margin: 0;
+    padding: 24px;
+    list-style: none;
+    background: var(--painel-fundo);
+    border: 1px solid var(--borda);
+  }
+  @media (max-width: 640px) {
+    .fichario-lista {
+      grid-template-columns: minmax(0, 1fr);
+      padding: 12px;
+      gap: 12px;
+    }
+  }
+</style>
