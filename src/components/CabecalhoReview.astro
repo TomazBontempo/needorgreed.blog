@@ -115,11 +115,10 @@ const Titulo = href ? 'h3' : 'h1';
     color: var(--texto);
     text-decoration: none;
   }
+  /* Só o destaque da home tem título com link: no hover ele ganha a cor do roll, sem sublinhado.
+     (A cor da raridade não serve: Comum é quase igual ao texto.) */
   .titulo a:hover {
-    color: var(--cor);
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.12em;
+    color: var(--roll);
   }
   .meta {
     display: flex;
