@@ -112,11 +112,6 @@ export default config({
           step: 0.1,
           validation: { isRequired: true, min: 0, max: 10 },
         }),
-        heranca: fields.checkbox({
-          label: 'Herança',
-          description: 'Obra da sua vida: fica fora da escala, sem raridade.',
-          defaultValue: false,
-        }),
         roll: fields.select({
           label: 'Roll',
           description: 'Need: vale agora, preço cheio. Greed: vale, com condição. Pass: não vale.',

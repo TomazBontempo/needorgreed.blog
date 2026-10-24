@@ -7,8 +7,11 @@
  * conjunto de fichas e um script inline sorteia quais aparecem, antes da primeira pintura.
  * Sem JavaScript, ficam as primeiras na ordem do build.
  *
- * No desktop, tudo cabe na primeira tela: a altura de hero + destaque é a altura da tela
- * menos o header e menos uma faixa (--espiar) onde aparecem o título e o topo de "Mais loot".
+ * No desktop, a primeira tela (hero + destaque) tem a altura da tela menos o header e menos uma
+ * faixa (--espiar) onde aparecem o título e o topo de "Mais loot". O hero tem até 65px de respiro
+ * em cima e embaixo: esse respiro empurra a página em vez de espremer o destaque, até o limite em
+ * que ainda dá para ver o título de "Mais loot" e uma ponta das fichas (--espiar-minimo).
+ * Em tela baixa, o respiro diminui para respeitar esse limite; em tela muito baixa, o destaque também.
  */
 import Base from '../layouts/Base.astro';
 import DestaqueHome from '../components/DestaqueHome.astro';
@@ -129,8 +132,12 @@ const SORTEIO = `(() => {
   <div class="primeira-tela">
     <section class="hero">
       <div class="container">
-        <h1><span>{t.hero.linha1}</span> <span class="ouro">{t.hero.linha2}</span></h1>
-        <p>{t.hero.descricao}</p>
+        <h1>{t.hero.titulo}</h1>
+        <p>
+          <span>{t.hero.descricao1}</span>
+          <span>{t.hero.descricao2}</span>
+        </p>
+        <p class="saiba"><a href={url(idioma, 'sobre')}>{t.hero.saibaMais}</a></p>
       </div>
     </section>
 
@@ -232,8 +239,17 @@ const SORTEIO = `(() => {
   .primeira-tela {
     /* Altura da tela, menos o header, menos a faixa onde "Mais loot" aparece. */
     --espiar: clamp(200px, 26dvh, 300px);
-    height: calc(100dvh - var(--cabecalho-h) - var(--espiar));
-    min-height: 500px;
+    /* O mínimo que precisa aparecer de "Mais loot": título (116px até a ficha) e 32px de ficha. */
+    --espiar-minimo: 148px;
+    /* Altura com o respiro mínimo do hero (36px e 38px); o destaque fica sempre com este tamanho. */
+    --base: max(500px, calc(100dvh - var(--cabecalho-h) - var(--espiar)));
+    /* Quanto sobra (positivo) ou falta (negativo) para o limite de "Mais loot". */
+    --folga: calc(100dvh - var(--cabecalho-h) - var(--base) - var(--espiar-minimo));
+    /* O respiro do hero cresce até 56px a mais ou encolhe até 56px a menos. */
+    --extra: clamp(-56px, var(--folga), 56px);
+    /* Se nem o respiro mínimo resolve (tela muito baixa), o destaque encolhe, até 380px de primeira tela. */
+    height: calc(var(--base) + min(56px, var(--folga)));
+    min-height: 380px;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
   }
@@ -241,7 +257,9 @@ const SORTEIO = `(() => {
   /* Largura total, mesmo fundo da página; o conteúdo usa a largura do header. */
   .hero .container {
     max-width: var(--largura-cabecalho);
-    padding-block: 36px 38px;
+    /* 36px e 38px de base, até 65px nos dois quando a tela deixa (ver --extra). */
+    padding-top: calc(36px + var(--extra) * 29 / 56);
+    padding-bottom: calc(38px + var(--extra) * 27 / 56);
   }
   .mesa {
     margin-top: 20px;
@@ -250,19 +268,20 @@ const SORTEIO = `(() => {
     margin: 0;
     font-family: var(--display);
     font-weight: 800;
-    font-size: clamp(1.75rem, 1.1rem + 1.3vw, 2.375rem);
+    font-size: clamp(2.125rem, 1.3rem + 1.7vw, 2.875rem);
     line-height: 1;
     letter-spacing: 0.005em;
     text-transform: uppercase;
   }
-  .hero h1 span {
+  .hero p span {
     display: block;
   }
-  .hero .ouro {
-    color: var(--ouro);
+  /* Uma linha em branco entre a explicação e o link. */
+  .hero .saiba {
+    margin-top: 1.45em;
   }
   .hero p {
-    margin: 6px 0 0;
+    margin: 10px 0 0;
     font-size: 0.9375rem;
     line-height: 1.45;
     color: var(--texto-2);

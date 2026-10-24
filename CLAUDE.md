@@ -57,7 +57,6 @@ Este arquivo é a fonte da verdade do projeto. Leia inteiro antes de qualquer ta
   | Raro | `#3f8ef5` | raridade |
   | Épico | `#b360f2` | raridade |
   | Lendário | `#f28a26` | raridade |
-  | Herança | `#4fd3db` | raridade |
   | Need / Greed / Pass | `#f2c94c` / `#9fd36b` / `#8d8a84` | rolls |
 
 ---
@@ -78,7 +77,6 @@ Derivada da nota (0 a 10, uma casa decimal).
 | Raro | 7 a 8.9 |
 | Épico | 9 a 9.9 |
 | Lendário | 10 (raríssimo) |
-| Herança | fora da escala, campo `heranca: true`. As obras da vida do autor, sem imparcialidade |
 
 ### Roll: vale seu tempo e dinheiro agora?
 
@@ -177,7 +175,7 @@ outros países lusófonos recebem o português do Brasil.
   conjunto no `sitemap.xml` (`src/pages/sitemap.xml.ts`), citado no `robots.txt`.
 - **Textos de interface:** dicionários `src/i18n/en.ts`, `pt.ts` e `es.ts` (nav, rótulos, nomes de raridade,
   datas, 404, Sobre, seletor, faixa). Nomes de raridade em inglês: Vendor Trash, Common, Uncommon, Rare, Epic,
-  Legendary, Heirloom; em espanhol: Basura de vendedor, Común, Poco común, Raro, Épico, Legendario, Herencia.
+  Legendary; em espanhol: Basura de vendedor, Común, Poco común, Raro, Épico, Legendario.
   Need, Greed e Pass ficam iguais nas três línguas. Datas formatadas com o locale do idioma.
 - **Nova língua no futuro:** `IDIOMAS` em `rotas.ts` (e no `scripts/translate.mjs`), um dicionário novo,
   as seções e os slugs de raridade em `rotas.ts`, as rotas em `src/pages/<código>/`, o locale no
@@ -271,8 +269,11 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   home, nas laterais fixas, em `scroll-padding-top` e `scroll-margin-top`. Popovers ficam acima (z-index 50).
 - **Larguras:** layout padrão até 1600px (`--largura`). A home usa 1232px (`<Base largura="1232px">`).
   Na review, a coluna de texto para em 720px (~70 caracteres) e a largura extra vai para as laterais.
-- **Home desktop:** cabe numa tela (header, hero, destaque com log e o topo de "Mais loot"), altura
-  calculada com dvh. O destaque é uma janela de altura fixa com rolagem interna, focável, com rótulo,
+- **Home desktop:** a primeira tela mostra header, hero, destaque com log e o título de "Mais loot" com
+  uma ponta das fichas (no mínimo 32px), altura calculada com dvh. O respiro do hero (até 65px em cima e
+  embaixo) empurra a página em vez de espremer o destaque; se passar do limite, o respiro diminui
+  conforme a tela (e, em tela muito baixa, o destaque também). Ver `--espiar-minimo` em `views/Home.astro`.
+  O destaque é uma janela de altura fixa com rolagem interna, focável, com rótulo,
   degradê no pé e sem prender a rolagem da página. Título "Última crítica" / "Latest review" fora da janela.
 - **"Mais loot":** sorteado no navegador por um script inline antes da primeira pintura (sem layout shift),
   nunca inclui o destaque, prefere reviews fora do log, botão d100 para rolar de novo. Sem JS: ordem do build.

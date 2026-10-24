@@ -52,7 +52,7 @@ const tipos = secao === 'telas' ? (['filme', 'serie', 'anime'] as TipoId[]).filt
       <LegendaRaridade idioma={idioma} />
     </div>
 
-    {itens.length > 0 ? <Fichario idioma={idioma} itens={itens} rotulo={titulo} /> : <p class="vazio mono">{t.paginas.vazio}</p>}
+    {itens.length > 0 ? <Fichario idioma={idioma} itens={itens} rotulo={titulo} nivel={2} /> : <p class="vazio mono">{t.paginas.vazio}</p>}
   </div>
 </Base>
 

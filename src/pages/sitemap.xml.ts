@@ -7,7 +7,7 @@ import type { APIContext } from 'astro';
 import { IDIOMAS, IDIOMA_PADRAO, url, type Idioma, type Secao } from '../i18n';
 import { dicionario } from '../i18n';
 import { getReviews } from '../lib/reviews';
-import { TODAS_RARIDADES } from '../lib/raridade';
+import { RARIDADES } from '../lib/raridade';
 import { caminhosDeAutor } from '../lib/caminhos';
 import { SITE } from '../site.config';
 
@@ -24,7 +24,7 @@ export async function GET(context: APIContext) {
   const paginas: Pagina[] = [
     { caminho: (l) => url(l), data: reviews[0]?.entry.data.data },
     ...secoes.map((s) => ({ caminho: (l: Idioma) => url(l, s) })),
-    ...TODAS_RARIDADES.map((r) => ({ caminho: (l: Idioma) => url(l, 'raridade', r.id) })),
+    ...RARIDADES.map((r) => ({ caminho: (l: Idioma) => url(l, 'raridade', r.id) })),
     ...autores.map((a) => ({ caminho: (l: Idioma) => url(l, 'autores', a.params.slug) })),
     ...reviews.map((r) => ({ caminho: (l: Idioma) => url(l, 'reviews', r.slug), data: r.entry.data.data })),
   ];

@@ -23,9 +23,11 @@ interface Props {
   variante?: 'grande' | 'bolso' | 'mini';
   /** Carrega a capa sem lazy (primeira dobra). */
   prioridade?: boolean;
+  /** Nível do título da ficha "bolso": 2 logo abaixo do h1 da página, 3 abaixo de um h2. */
+  nivel?: 2 | 3;
 }
 
-const { review, data, idioma, variante = 'grande', prioridade = false } = Astro.props;
+const { review, data, idioma, variante = 'grande', prioridade = false, nivel = 3 } = Astro.props;
 const t = dicionario(idioma);
 const { raridade } = review;
 const nomeRaridade = t.raridades[raridade.id].nome;
@@ -33,7 +35,7 @@ const set = review.secao === 'jogos' ? t.nav.jogos : t.nav.telas;
 const numero = numeroDeColecao(review.numero);
 const href = variante === 'bolso' ? url(idioma, 'reviews', review.slug) : undefined;
 const linhaTipo = [t.tipos[data.tipo], data.plataforma].filter(Boolean).join(' · ');
-const Titulo = variante === 'bolso' ? 'h3' : 'p';
+const Titulo = variante === 'bolso' ? (`h${nivel}` as const) : 'p';
 ---
 
 <div
@@ -87,7 +89,7 @@ const Titulo = variante === 'bolso' ? 'h3' : 'p';
     <p class="it-pe mono">
       <span class="it-numero" data-lido={t.log.lido}>{t.item.numero} {numero} · {set}</span>
       <span class="it-raridade">
-        {nomeRaridade}{raridade.id !== 'heranca' && <> · {notaFormatada(data.nota)}</>}
+        {nomeRaridade} · {notaFormatada(data.nota)}
       </span>
     </p>
   </div>

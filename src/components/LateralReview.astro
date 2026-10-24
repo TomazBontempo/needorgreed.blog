@@ -1,7 +1,7 @@
 ---
 /**
  * Coluna esquerda da página da review (só desktop), fixa ao rolar:
- *  - veredito compacto: raridade na cor, nota, roll e motivo, plataforma e duração;
+ *  - veredito compacto: raridade na cor, nota, roll, plataforma e duração (o motivo fica no cabeçalho);
  *  - progresso de leitura;
  *  - sumário com os títulos da review, marcando a seção atual. Sem títulos, não aparece.
  */
@@ -20,7 +20,8 @@ interface Props {
 const { idioma, review, versao, titulos } = Astro.props;
 const t = dicionario(idioma);
 const { data } = versao;
-const sumario = titulos.filter((h) => h.depth === 2 || h.depth === 3);
+// Um "#" no texto é mostrado como h2 (ver components/mdx.ts), então entra no sumário como seção.
+const sumario = titulos.filter((h) => h.depth <= 3).map((h) => ({ ...h, depth: Math.max(h.depth, 2) }));
 ---
 
 <div class:list={['lateral-review', `r-${review.raridade.id}`, `roll-${data.roll}`]}>
@@ -31,7 +32,7 @@ const sumario = titulos.filter((h) => h.depth === 2 || h.depth === 3);
         <dt>{t.review.raridade}</dt>
         <dd class="raridade">
           {t.raridades[review.raridade.id].nome}
-          {review.raridade.id !== 'heranca' && <span class="nota">{notaFormatada(data.nota)}</span>}
+          <span class="nota">{notaFormatada(data.nota)}</span>
         </dd>
       </div>
       <div>
@@ -58,7 +59,6 @@ const sumario = titulos.filter((h) => h.depth === 2 || h.depth === 3);
         )
       }
     </dl>
-    {data.motivoRoll && <p class="motivo">{data.motivoRoll}</p>}
   </section>
 
   <div class="progresso" data-progresso>
@@ -189,14 +189,6 @@ const sumario = titulos.filter((h) => h.depth === 2 || h.depth === 3);
   .valor {
     color: var(--texto-3);
   }
-  .motivo {
-    margin: 10px 0 0;
-    font-family: var(--serifa);
-    font-size: 0.875rem;
-    line-height: 1.45;
-    color: var(--texto);
-  }
-
   .progresso {
     margin-top: 22px;
   }

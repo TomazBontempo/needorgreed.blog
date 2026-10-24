@@ -39,7 +39,7 @@ export function getReviews(): Promise<ReviewCompleta[]> {
         return {
           entry,
           slug: entry.id,
-          raridade: raridadeDaNota(entry.data.nota, entry.data.heranca),
+          raridade: raridadeDaNota(entry.data.nota),
           valorRoll: valorDoRoll(entry.data.nota),
           secao: TIPOS[entry.data.tipo].secao,
           numero: i + 1,

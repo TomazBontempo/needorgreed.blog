@@ -57,7 +57,6 @@ atributos:
   - nome: Dificuldade
     valor: "+20"
 tags: [metroidvania]
-# heranca: true       # obra da vida, fora da escala
 # rascunho: true      # não aparece no site publicado
 ---
 
@@ -78,7 +77,6 @@ Os dois jeitos geram o mesmo resultado. Não existe campo "autor": ele vem do Gi
 | Raro | 7 a 8.9 |
 | Épico | 9 a 9.9 |
 | Lendário | 10 |
-| Herança | fora da escala (`heranca: true`) |
 
 O número do roll é a nota vezes dez: nota 9.4 vira `Need (94)`.
 Cores e faixas ficam em `src/lib/raridade.ts` e `src/styles/global.css`.

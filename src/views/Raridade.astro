@@ -17,7 +17,7 @@ const t = dicionario(idioma);
 const reviews = (await getReviews()).filter((r) => r.raridade.id === raridade);
 const itens = await Promise.all(reviews.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma) })));
 const nome = t.raridades[raridade].nome;
-const descricao = raridade === 'heranca' ? t.paginas.herancaDescricao : t.paginas.faixaNota(t.raridades[raridade].faixa);
+const descricao = t.paginas.faixaNota(t.raridades[raridade].faixa);
 ---
 
 <Base titulo={nome} descricao={descricao}>
@@ -28,7 +28,7 @@ const descricao = raridade === 'heranca' ? t.paginas.herancaDescricao : t.pagina
     <div class="barra">
       <LegendaRaridade idioma={idioma} atual={raridade} />
     </div>
-    {itens.length > 0 ? <Fichario idioma={idioma} itens={itens} rotulo={nome} /> : <p class="vazio mono">{t.paginas.vazio}</p>}
+    {itens.length > 0 ? <Fichario idioma={idioma} itens={itens} rotulo={nome} nivel={2} /> : <p class="vazio mono">{t.paginas.vazio}</p>}
   </div>
 </Base>
 

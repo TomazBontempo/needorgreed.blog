@@ -14,9 +14,10 @@ const en = {
   },
 
   hero: {
-    linha1: 'Every work is a loot drop:',
-    linha2: 'Need, Greed or Pass.',
-    descricao: 'Reviews of games, films, series and anime. Rarity says how good the work is, and the roll says if it is worth your time.',
+    titulo: 'Every work is a loot drop.',
+    descricao1: 'Reviews of games, films, series and anime.',
+    descricao2: 'Rarity says how good the work is, and the roll says if it is worth your time.',
+    saibaMais: 'More about our ratings',
   },
 
   nav: {
@@ -51,7 +52,6 @@ const en = {
     raro: { nome: 'Rare', faixa: '7 to 8.9' },
     epico: { nome: 'Epic', faixa: '9 to 9.9' },
     lendario: { nome: 'Legendary', faixa: '10' },
-    heranca: { nome: 'Heirloom', faixa: 'off the scale' },
   },
 
   rolls: {
@@ -72,8 +72,7 @@ const en = {
     // "Snufupugos rolled Need (94) for [Outer Wilds]". A ordem é a mesma nas três línguas.
     rolou: 'rolled',
     para: 'for',
-    atualizou: 'updated',
-    edicoes: (n: number) => (n > 1 ? `${n} edits` : ''),
+    rerolou: 're-rolled',
     entrou: 'joined the party',
     vazio: 'Nothing dropped yet.',
     verTudo: 'Full log',
@@ -135,7 +134,6 @@ const en = {
     vazio: 'Nothing dropped here yet.',
     contagem: (n: number) => (n === 1 ? '1 review' : `${n} reviews`),
     raridades: 'Rarities',
-    herancaDescricao: 'The works of a lifetime. Off the scale, zero impartiality.',
     faixaNota: (faixa: string) => `Score ${faixa}.`,
     arquivo: 'Archive',
     sobre: 'About',
@@ -186,11 +184,24 @@ const en = {
     titulo: 'How the loot works',
     intro:
       'Every work reviewed here is treated like an item that dropped in an MMO raid. It gets two verdicts, and they are not the same thing: how good it is, and whether it is worth your time right now.',
+    glossarioTitulo: 'Glossary',
+    /** Na ordem em que aparecem. Need, Greed e Pass entram depois de "roll", com o texto de `rolls`. */
+    glossario: {
+      loot: { termo: 'Loot', definicao: 'Every work reviewed here. It dropped; the question is whether you pick it up.' },
+      raridade: { termo: 'Rarity', definicao: 'How good the work is, from Vendor Trash to Legendary. It is the colour of the name.' },
+      nota: { termo: 'Score', definicao: 'From 0 to 10, with one decimal. It sets the rarity.' },
+      roll: { termo: 'Roll', definicao: 'The practical verdict: is it worth your time and money right now? Need, Greed or Pass.' },
+      numero: { termo: 'Roll number', definicao: 'The number in brackets, like (94): the score times ten.' },
+      motivo: { termo: 'Reason', definicao: 'The line right next to the roll that explains it. Essential when the roll is Greed.' },
+      linha: { termo: 'Roll line', definicao: 'The signature of every review: Snufupugos rolled Need (94) for [Outer Wilds].' },
+      reroll: { termo: 'Re-roll', definicao: 'The review was edited. The log shows the roll again, with the current verdict.' },
+      ficha: { termo: 'Item card', definicao: 'The card for each work: cover, collection number, rarity, roll and a one-liner.' },
+      log: { termo: 'Loot log', definicao: 'The system messages on the side: reviews rolled and re-rolled, new authors joining the party.' },
+      d100: { termo: 'd100', definicao: 'The die next to More loot. Click it to roll a new set of cards.' },
+    },
     raridadeTitulo: 'Rarity: how good it is',
     raridadeTexto:
       'Comes straight from the score, 0 to 10 with one decimal. The colour of the item name tells you the rarity at a glance, anywhere on the site.',
-    herancaTexto:
-      'Heirloom is off the scale: the works of the author\'s life, reviewed with zero impartiality and full disclosure.',
     rollTitulo: 'Roll: is it worth it now?',
     rollTexto:
       'The roll is the practical verdict. It weighs price, length and who the work is for. Every roll comes with a one-line reason right next to it.',
@@ -205,7 +216,7 @@ const en = {
       'In "Snufupugos rolled Need (94)", the number is the score times ten. It always falls inside the rarity band: 70 to 89 is Rare, 90 to 99 is Epic, 100 is Legendary.',
     logTitulo: 'The loot log',
     logTexto:
-      'The column of system messages records what happens on the site: a review rolled, a review updated, someone new joining the party. The archive keeps the full log.',
+      'The column of system messages records what happens on the site: a review rolled, a review re-rolled (edited), someone new joining the party. The archive keeps the full log.',
     traducaoTitulo: 'Three languages',
     traducaoTexto:
       'Reviews are written in English, Portuguese or Spanish, and the other versions are machine translated, with a note at the top and a link to the original. Comments are shared between all versions.',

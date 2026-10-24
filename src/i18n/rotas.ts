@@ -37,7 +37,6 @@ export const SLUGS_RARIDADE = {
   raro: { en: 'rare', pt: 'raro', es: 'raro' },
   epico: { en: 'epic', pt: 'epico', es: 'epico' },
   lendario: { en: 'legendary', pt: 'lendario', es: 'legendario' },
-  heranca: { en: 'heirloom', pt: 'heranca', es: 'herencia' },
 } as const satisfies Record<string, Record<Idioma, string>>;
 
 const prefixo = (idioma: Idioma) => (idioma === IDIOMA_PADRAO ? '' : `/${idioma}`);

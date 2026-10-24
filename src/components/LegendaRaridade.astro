@@ -1,7 +1,7 @@
 ---
 /** As raridades em linha, cada uma com sua cor e quantas reviews tem. Leva às páginas de raridade. */
 import { dicionario, url, type Idioma } from '../i18n';
-import { TODAS_RARIDADES, type RaridadeId } from '../lib/raridade';
+import { RARIDADES, type RaridadeId } from '../lib/raridade';
 import { getReviews } from '../lib/reviews';
 
 interface Props {
@@ -17,7 +17,7 @@ const contagem = (id: RaridadeId) => reviews.filter((r) => r.raridade.id === id)
 <nav class="legenda" aria-label={t.paginas.raridades}>
   <ul>
     {
-      TODAS_RARIDADES.map((r) => (
+      RARIDADES.map((r) => (
         <li class={`r-${r.id}`}>
           <a href={url(idioma, 'raridade', r.id)} aria-current={atual === r.id ? 'page' : undefined}>
             {t.raridades[r.id].nome}

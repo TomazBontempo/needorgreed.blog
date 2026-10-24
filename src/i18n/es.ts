@@ -16,9 +16,10 @@ const es: Dicionario = {
   },
 
   hero: {
-    linha1: 'Cada obra es un botín:',
-    linha2: 'Need, Greed o Pass.',
-    descricao: 'Reseñas de juegos, películas, series y anime. La rareza dice qué tan buena es la obra, y el roll dice si vale tu tiempo.',
+    titulo: 'Cada obra es un loot.',
+    descricao1: 'Reseñas de juegos, películas, series y anime.',
+    descricao2: 'La rareza dice qué tan buena es la obra, y el roll dice si vale tu tiempo.',
+    saibaMais: 'Más sobre nuestras notas',
   },
 
   nav: {
@@ -51,7 +52,6 @@ const es: Dicionario = {
     raro: { nome: 'Raro', faixa: '7 a 8.9' },
     epico: { nome: 'Épico', faixa: '9 a 9.9' },
     lendario: { nome: 'Legendario', faixa: '10' },
-    heranca: { nome: 'Herencia', faixa: 'fuera de la escala' },
   },
 
   rolls: {
@@ -71,8 +71,7 @@ const es: Dicionario = {
     titulo: 'Loot log',
     rolou: 'tiró',
     para: 'por',
-    atualizou: 'actualizó',
-    edicoes: (n: number) => (n > 1 ? `${n} ediciones` : ''),
+    rerolou: 're-tiró',
     entrou: 'se unió al grupo',
     vazio: 'Todavía no cayó nada.',
     verTudo: 'Log completo',
@@ -134,7 +133,6 @@ const es: Dicionario = {
     vazio: 'Todavía no cayó nada aquí.',
     contagem: (n: number) => (n === 1 ? '1 reseña' : `${n} reseñas`),
     raridades: 'Rarezas',
-    herancaDescricao: 'Las obras de una vida. Fuera de la escala, cero imparcialidad.',
     faixaNota: (faixa: string) => `Nota ${faixa}.`,
     arquivo: 'Archivo',
     sobre: 'Acerca',
@@ -185,11 +183,24 @@ const es: Dicionario = {
     titulo: 'Cómo funciona el botín',
     intro:
       'Cada obra reseñada aquí se trata como un objeto que cayó en una raid de MMO. Recibe dos veredictos, y no son lo mismo: qué tan buena es, y si vale tu tiempo ahora.',
+    glossarioTitulo: 'Glosario',
+    /** Na ordem em que aparecem. Need, Greed e Pass entram depois de "roll", com o texto de `rolls`. */
+    glossario: {
+      loot: { termo: 'Loot', definicao: 'Cada obra reseñada aquí. Ya cayó; la pregunta es si vale la pena recogerla.' },
+      raridade: { termo: 'Rareza', definicao: 'Qué tan buena es la obra, de Basura de vendedor a Legendario. Es el color del nombre.' },
+      nota: { termo: 'Nota', definicao: 'De 0 a 10, con un decimal. Es la que define la rareza.' },
+      roll: { termo: 'Roll', definicao: 'El veredicto práctico: ¿vale tu tiempo y tu dinero ahora? Need, Greed o Pass.' },
+      numero: { termo: 'Número del roll', definicao: 'El número entre paréntesis, como (94): la nota por diez.' },
+      motivo: { termo: 'Motivo', definicao: 'La línea pegada al roll que explica el veredicto. Esencial cuando el roll es Greed.' },
+      linha: { termo: 'Línea de roll', definicao: 'La firma de cada reseña: Snufupugos tiró Need (94) por [Outer Wilds].' },
+      reroll: { termo: 'Re-roll', definicao: 'La reseña se editó. El log muestra el roll otra vez, con el veredicto actual.' },
+      ficha: { termo: 'Ficha', definicao: 'La tarjeta de cada obra: portada, número de colección, rareza, roll y una frase.' },
+      log: { termo: 'Loot log', definicao: 'Los mensajes del sistema al costado: reseñas tiradas y re-tiradas, autores nuevos que se unen al grupo.' },
+      d100: { termo: 'd100', definicao: 'El dado junto a Más botín. Haz clic para sortear otras fichas.' },
+    },
     raridadeTitulo: 'Rareza: qué tan bueno es',
     raridadeTexto:
       'Sale directo de la nota, de 0 a 10 con un decimal. El color del nombre del objeto te dice la rareza de un vistazo, en cualquier parte del sitio.',
-    herancaTexto:
-      'Herencia queda fuera de la escala: las obras de la vida del autor, reseñadas sin ninguna imparcialidad y avisándolo de entrada.',
     rollTitulo: 'Roll: ¿vale la pena ahora?',
     rollTexto:
       'El roll es el veredicto práctico. Pesa el precio, la duración y para quién es la obra. Cada roll viene con el motivo en una línea, pegado a él.',
@@ -204,7 +215,7 @@ const es: Dicionario = {
       'En "Snufupugos tiró Need (94)", el número es la nota por diez. Siempre cae dentro del rango de la rareza: de 70 a 89 es Raro, de 90 a 99 es Épico, 100 es Legendario.',
     logTitulo: 'El loot log',
     logTexto:
-      'La columna de mensajes del sistema registra lo que pasa en el sitio: una reseña tirada, una reseña actualizada, alguien nuevo que se une al grupo. El archivo guarda el log completo.',
+      'La columna de mensajes del sistema registra lo que pasa en el sitio: una reseña tirada, una reseña re-tirada (editada), alguien nuevo que se une al grupo. El archivo guarda el log completo.',
     traducaoTitulo: 'Tres idiomas',
     traducaoTexto:
       'Las reseñas se escriben en inglés, portugués o español, y las otras versiones se traducen automáticamente, con un aviso arriba y un enlace al original. Los comentarios son los mismos en todas las versiones.',

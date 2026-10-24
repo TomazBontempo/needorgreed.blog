@@ -14,9 +14,10 @@ const pt: Dicionario = {
   },
 
   hero: {
-    linha1: 'Cada obra é um loot:',
-    linha2: 'Need, Greed ou Pass.',
-    descricao: 'Críticas de jogos, filmes, séries e animes. A raridade diz o quão boa é a obra, e o roll diz se vale seu tempo.',
+    titulo: 'Cada obra é um loot.',
+    descricao1: 'Críticas de jogos, filmes, séries e animes.',
+    descricao2: 'A raridade diz o quão boa é a obra, e o roll diz se vale seu tempo.',
+    saibaMais: 'Saiba mais sobre nossas notas',
   },
 
   nav: {
@@ -49,7 +50,6 @@ const pt: Dicionario = {
     raro: { nome: 'Raro', faixa: '7 a 8.9' },
     epico: { nome: 'Épico', faixa: '9 a 9.9' },
     lendario: { nome: 'Lendário', faixa: '10' },
-    heranca: { nome: 'Herança', faixa: 'fora da escala' },
   },
 
   rolls: {
@@ -69,8 +69,7 @@ const pt: Dicionario = {
     titulo: 'Loot log',
     rolou: 'rolou',
     para: 'para',
-    atualizou: 'atualizou',
-    edicoes: (n: number) => (n > 1 ? `${n} edições` : ''),
+    rerolou: 're-rolou',
     entrou: 'entrou no grupo',
     vazio: 'Nada caiu ainda.',
     verTudo: 'Log completo',
@@ -132,7 +131,6 @@ const pt: Dicionario = {
     vazio: 'Nada caiu aqui ainda.',
     contagem: (n: number) => (n === 1 ? '1 review' : `${n} reviews`),
     raridades: 'Raridades',
-    herancaDescricao: 'As obras da vida. Fora da escala, sem imparcialidade nenhuma.',
     faixaNota: (faixa: string) => `Nota ${faixa}.`,
     arquivo: 'Arquivo',
     sobre: 'Sobre',
@@ -183,11 +181,24 @@ const pt: Dicionario = {
     titulo: 'Como funciona o loot',
     intro:
       'Toda obra criticada aqui é tratada como um item que caiu numa raid de MMO. Ela recebe dois vereditos, e eles não são a mesma coisa: o quão boa ela é, e se vale o seu tempo agora.',
+    glossarioTitulo: 'Glossário',
+    /** Na ordem em que aparecem. Need, Greed e Pass entram depois de "roll", com o texto de `rolls`. */
+    glossario: {
+      loot: { termo: 'Loot', definicao: 'Toda obra criticada aqui. Ela caiu; a pergunta é se vale pegar.' },
+      raridade: { termo: 'Raridade', definicao: 'O quão boa é a obra, de Lixo de vendedor a Lendário. É a cor do nome.' },
+      nota: { termo: 'Nota', definicao: 'De 0 a 10, com uma casa decimal. É ela que define a raridade.' },
+      roll: { termo: 'Roll', definicao: 'O veredito prático: vale seu tempo e seu dinheiro agora? Need, Greed ou Pass.' },
+      numero: { termo: 'Número do roll', definicao: 'O número entre parênteses, como (94): a nota vezes dez.' },
+      motivo: { termo: 'Motivo', definicao: 'A linha colada no roll que explica o veredito. Essencial quando o roll é Greed.' },
+      linha: { termo: 'Linha de roll', definicao: 'A assinatura de toda review: Snufupugos rolou Need (94) para [Outer Wilds].' },
+      reroll: { termo: 'Re-roll', definicao: 'A review foi editada. O log mostra o roll de novo, com o veredito atual.' },
+      ficha: { termo: 'Ficha', definicao: 'O card de cada obra: capa, número de coleção, raridade, roll e uma frase de efeito.' },
+      log: { termo: 'Loot log', definicao: 'As mensagens de sistema na lateral: reviews roladas e re-roladas, autores novos entrando no grupo.' },
+      d100: { termo: 'd100', definicao: 'O dado ao lado de Mais loot. Clique para sortear outras fichas.' },
+    },
     raridadeTitulo: 'Raridade: o quão bom é',
     raridadeTexto:
       'Sai direto da nota, de 0 a 10 com uma casa decimal. A cor do nome do item mostra a raridade de longe, em qualquer lugar do site.',
-    herancaTexto:
-      'Herança fica fora da escala: as obras da vida do autor, criticadas sem imparcialidade nenhuma e avisando isso de cara.',
     rollTitulo: 'Roll: vale agora?',
     rollTexto:
       'O roll é o veredito prático. Ele pesa preço, duração e para quem a obra é. Todo roll vem com o motivo numa linha, colado nele.',
@@ -202,7 +213,7 @@ const pt: Dicionario = {
       'Em "Snufupugos rolou Need (94)", o número é a nota vezes dez. Ele sempre cai na faixa da raridade: 70 a 89 é Raro, 90 a 99 é Épico, 100 é Lendário.',
     logTitulo: 'O loot log',
     logTexto:
-      'A coluna de mensagens de sistema registra o que acontece no site: uma review rolada, uma review atualizada, alguém novo entrando no grupo. O arquivo guarda o log inteiro.',
+      'A coluna de mensagens de sistema registra o que acontece no site: uma review rolada, uma review re-rolada (editada), alguém novo entrando no grupo. O arquivo guarda o log inteiro.',
     traducaoTitulo: 'Três línguas',
     traducaoTexto:
       'As reviews são escritas em português, inglês ou espanhol, e as outras versões são traduzidas automaticamente, com um aviso no topo e o link para o original. Os comentários são os mesmos em todas as versões.',

@@ -1,12 +1,12 @@
 ---
-/** Sobre: como funcionam raridade e roll, e quem escreve. Os textos ficam nos dicionários. */
+/** Sobre: glossário, como funcionam raridade e roll, e quem escreve. Os textos ficam nos dicionários. */
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import TopoPagina from '../components/TopoPagina.astro';
 import MarcaRoll from '../components/MarcaRoll.astro';
 import { dicionario, idiomaDe, url } from '../i18n';
-import { RARIDADES, ROLL_IDS, valorDoRoll } from '../lib/raridade';
+import { RARIDADES, ROLL_IDS, valorDoRoll, type RollId } from '../lib/raridade';
 import { getReviews } from '../lib/reviews';
 
 const idioma = idiomaDe(Astro);
@@ -20,11 +20,33 @@ const faixaRoll = (min: number, i: number) => {
   const prox = RARIDADES[i + 1];
   return prox ? s.faixa(valorDoRoll(min), valorDoRoll(prox.min) - 1) : String(valorDoRoll(min));
 };
+/** Glossário na ordem do dicionário; Need, Greed e Pass entram logo depois de "Roll", na cor de cada um. */
+const glossario = Object.entries(s.glossario).flatMap(([chave, { termo, definicao }]) => [
+  { termo, definicao, roll: undefined as RollId | undefined },
+  ...(chave === 'roll' ? ROLL_IDS.map((r) => ({ termo: t.rolls[r].nome, definicao: t.rolls[r].descricao, roll: r })) : []),
+]);
 ---
 
 <Base titulo={t.paginas.sobre} descricao={s.intro}>
   <div class="container"><div class="sobre">
     <TopoPagina titulo={s.titulo} descricao={s.intro} />
+
+    <section aria-labelledby="s-glossario">
+      <h2 id="s-glossario">{s.glossarioTitulo}</h2>
+      <dl class="termos">
+        {
+          glossario.map((g) => (
+            <div class={g.roll && `roll-${g.roll}`}>
+              <dt class="mono">
+                {g.roll && <MarcaRoll roll={g.roll} tamanho={10} />}
+                {g.termo}
+              </dt>
+              <dd>{g.definicao}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
 
     <section aria-labelledby="s-raridade">
       <h2 id="s-raridade">{s.raridadeTitulo}</h2>
@@ -51,15 +73,8 @@ const faixaRoll = (min: number, i: number) => {
               </tr>
             ))
           }
-          <tr class="r-heranca">
-            <th scope="row">
-              <a href={url(idioma, 'raridade', 'heranca')}>{t.raridades.heranca.nome}</a>
-            </th>
-            <td colspan="2">{t.raridades.heranca.faixa}</td>
-          </tr>
         </tbody>
       </table>
-      <p>{s.herancaTexto}</p>
     </section>
 
     <section aria-labelledby="s-roll">
@@ -183,23 +198,42 @@ const faixaRoll = (min: number, i: number) => {
   .tabela td {
     color: var(--texto-2);
   }
-  .rolls {
+  .rolls,
+  .termos {
     margin: 0;
   }
-  .rolls div {
+  .rolls div,
+  .termos div {
     display: grid;
     grid-template-columns: 90px minmax(0, 1fr);
     gap: 16px;
     padding: 8px 0;
     border-bottom: 1px dashed #2a241c;
   }
-  .rolls dt {
+  .termos div {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+  .rolls dt,
+  .termos dt {
     font-size: 0.875rem;
     color: var(--roll);
   }
-  .rolls dd {
+  .termos dt {
+    color: var(--ouro);
+  }
+  .termos [class*='roll-'] dt {
+    color: var(--roll);
+  }
+  .rolls dd,
+  .termos dd {
     margin: 0;
     line-height: 1.5;
+  }
+  @media (max-width: 520px) {
+    .termos div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
   }
   .exemplos {
     margin: 0;

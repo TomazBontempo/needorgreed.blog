@@ -13,7 +13,6 @@ const camposReview = ({ image }: SchemaContext) =>
     titulo: z.string(),
     tipo: z.enum(['jogo', 'filme', 'serie', 'anime']),
     nota: z.number().min(0).max(10),
-    heranca: z.boolean().default(false),
     roll: z.enum(['need', 'greed', 'pass']),
     /** Uma linha explicando o roll. Opcional, mas essencial no Greed. */
     motivoRoll: z.string().optional(),

@@ -3,12 +3,12 @@
  */
 import { getCollection } from 'astro:content';
 import { SLUGS_RARIDADE, type Idioma } from '../i18n/rotas';
-import { TODAS_RARIDADES } from './raridade';
+import { RARIDADES } from './raridade';
 import { getReviews } from './reviews';
 
 /** /rarity/epic/ e /pt/raridade/epico/ */
 export function caminhosDeRaridade(idioma: Idioma) {
-  return TODAS_RARIDADES.map((r) => ({ params: { slug: SLUGS_RARIDADE[r.id][idioma] }, props: { raridade: r.id } }));
+  return RARIDADES.map((r) => ({ params: { slug: SLUGS_RARIDADE[r.id][idioma] }, props: { raridade: r.id } }));
 }
 
 /** Uma página para cada autor cadastrado e para cada login sem cadastro que já publicou. */

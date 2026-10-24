@@ -2,7 +2,7 @@
  * Loot log: a atividade do site em forma de mensagens de sistema.
  *
  *   review criada     Snufupugos rolou Greed (72) para [Jogo]
- *   review atualizada Snufupugos atualizou [Jogo]          (edições do mesmo dia viram uma só)
+ *   review atualizada Snufupugos re-rolou Greed (72) para [Jogo]   (edições do mesmo dia viram uma só)
  *   autor novo        OutroNick entrou no grupo
  *
  * Fonte, no build: histórico de commits do GitHub. Igual a src/lib/autores.ts, quem fez cada

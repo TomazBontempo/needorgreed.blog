@@ -59,24 +59,14 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
             [{r.entry.data.titulo}]
           </a>
         );
-        if (e.tipo === 'atualizacao') {
-          const edicoes = t.log.edicoes(e.edicoes);
-          return (
-            <li class="evento" data-slug={r.slug} data-evento="atualizacao" data-roll={r.entry.data.roll}>
-              <time datetime={iso(e.data)}>{formatarData(idioma, e.data, { year: undefined })}</time>
-              <span>
-                {autor} {t.log.atualizou} {item}
-                {edicoes && <span class="extra"> · {edicoes}</span>}
-              </span>
-            </li>
-          );
-        }
+        // Edição é um re-roll: mesma linha do roll original, com o roll atual da review.
         const roll = r.entry.data.roll;
+        const verbo = e.tipo === 'atualizacao' ? t.log.rerolou : t.log.rolou;
         return (
-          <li class={`evento roll-${roll}`} data-slug={r.slug} data-evento="review" data-roll={roll}>
+          <li class={`evento roll-${roll}`} data-slug={r.slug} data-evento={e.tipo} data-roll={roll}>
             <time datetime={iso(e.data)}>{formatarData(idioma, e.data, { year: undefined })}</time>
             <span>
-              {autor} {t.log.rolou}{' '}
+              {autor} {verbo}{' '}
               <span class="roll">
                 <MarcaRoll roll={roll} tamanho={8} />
                 {t.rolls[roll].nome}
@@ -310,8 +300,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     color: var(--roll);
     white-space: nowrap;
   }
-  .valor,
-  .extra {
+  .valor {
     color: var(--texto-3);
   }
   .item {

@@ -30,7 +30,6 @@
   --r-raro: #3f8ef5;
   --r-epico: #b360f2;
   --r-lendario: #f28a26;
-  --r-heranca: #4fd3db;
 
   /* Rolls */
   --need: #f2c94c;
@@ -81,7 +80,6 @@
 .r-raro { --cor: var(--r-raro); }
 .r-epico { --cor: var(--r-epico); }
 .r-lendario { --cor: var(--r-lendario); }
-.r-heranca { --cor: var(--r-heranca); }
 .roll-need { --roll: var(--need); }
 .roll-greed { --roll: var(--greed); }
 .roll-pass { --roll: var(--pass); }
