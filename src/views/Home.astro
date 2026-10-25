@@ -20,6 +20,7 @@ import Item from '../components/Item.astro';
 import { dicionario, idiomaDe, url } from '../i18n';
 import { getReviews, versaoEm } from '../lib/reviews';
 import { getLootLog } from '../lib/lootlog';
+import { SITE } from '../site.config';
 
 /** Quantos eventos o log da home mostra (as reviews que aparecem nele vão para o fim da fila do sorteio). */
 const EVENTOS_NO_LOG = 14;
@@ -34,6 +35,17 @@ const reviews = await getReviews();
 const [destaque, ...resto] = reviews;
 const versaoDestaque = destaque && (await versaoEm(destaque, idioma));
 const { eventos } = await getLootLog();
+
+// Dados estruturados: o nome do site nos resultados do Google.
+const site = Astro.site ?? new URL(SITE.url);
+const dados = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.nome,
+  url: new URL(url(idioma), site).href,
+  inLanguage: t.hreflang,
+  description: t.site.descricao,
+};
 
 // Sorteio: nunca a review em destaque; primeiro as que não aparecem no log, depois as que aparecem.
 const noLog = new Set(eventos.slice(0, EVENTOS_NO_LOG).flatMap((e) => (e.tipo === 'autor' ? [] : [e.review.slug])));
@@ -122,7 +134,7 @@ const SORTEIO = `(() => {
 })();`;
 ---
 
-<Base largura="1232px">
+<Base largura="1232px" dados={dados}>
   <div class="primeira-tela">
     <section class="hero">
       <div class="container">

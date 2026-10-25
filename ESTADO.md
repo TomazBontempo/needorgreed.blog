@@ -65,7 +65,12 @@ nada; ou registrar o domínio num registrador que cobre em reais e só apontar o
 Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed.blog` é o `site` do
 `astro.config.mjs` (canonical, hreflang, sitemap, RSS, imagem de compartilhamento) e o login do painel online.
 
-**Próximo passo: o 8, com o checklist de estreia abaixo.**
+**Em andamento (2026-10-25):** domínio `needorgreed.blog` comprado na Hostinger, zona criada na Cloudflare
+(plano Free, sem registros DNS; o custom domain do Worker cria o dele) e nameservers trocados para
+`clarissa.ns.cloudflare.com` e `vasilii.ns.cloudflare.com` (DNSSEC desligado). Sem e-mail no domínio por
+enquanto. Itens 1, 3 e 6 do checklist feitos. Próximo: criar o Worker ligado ao repositório (item 4) e,
+com o domínio ativo, conferir em **AI Crawl Control** da Cloudflare que os robôs de busca e resposta de IA
+não estão bloqueados (o `robots.txt` só bloqueia os de treino).
 
 ### Checklist para subir o site
 
@@ -78,7 +83,7 @@ Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed
 4. **Comprar o domínio** e criar o projeto na Cloudflare Workers ligado ao repositório (README, "Deploy").
 5. **Configurar segredos e serviços** (ver "Configuração externa"): `GITHUB_TOKEN` no build, token do
    Workers AI na Action, Giscus, GitHub App do Keystatic.
-6. **Apagar as reviews de exemplo** (inclusive `teste-do-snufu`) e publicar.
+6. **Apagar as reviews de exemplo** (inclusive `teste-do-snufu`): feito em 2026-10-25 (continuam no histórico do git).
 
 O **mobile** foi revisto em 2026-10-24 (header compacto, piso de 13px, toque de 44px, home empilhada sem
 carrossel, fichas com uma moldura só, veredito e progresso na review). Também a faixa de idioma em uma linha e
@@ -97,7 +102,11 @@ os filtros do Arquivo em fileiras. O desktop foi conferido pixel a pixel e não 
   Nas outras páginas, a faixa de sugestão (fixa no pé da tela) oferece a troca. Testado no `wrangler dev` e
   no Playwright (com `locale` no contexto) em 2026-10-24.
 - **SEO:** `hreflang` (en, pt-BR, es, x-default) e `canonical` em todas as páginas; `sitemap.xml` com 66 URLs
-  (22 páginas x 3 línguas) citado no `robots.txt`.
+  (22 páginas x 3 línguas) citado no `robots.txt`. JSON-LD `Review` em cada review (obra, tipo, nota de 0 a 10,
+  autor, data) e `WebSite` na home. Imagem de compartilhamento padrão `public/og.jpg` (1200x630, d100 do
+  placeholder, gerada pelo Codex) nas páginas sem capa. `robots.txt` com Content Signals
+  (`search=yes, ai-input=yes, ai-train=no`) e os robôs de treino bloqueados (GPTBot, ClaudeBot, CCBot,
+  Google-Extended, Applebot-Extended, meta-externalagent, Bytespider).
 - **Tradução:** `npm run translate` (Workers AI, modelo Gemma 4 26B), hash do original, respeita
   `revisado: true`, traduz legendas e descrições dos componentes, trata cota esgotada sem quebrar.
   Traduz o original para todas as outras línguas (en, pt, es; espanhol neutro da América Latina).

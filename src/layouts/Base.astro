@@ -10,7 +10,7 @@ import '../styles/item.css';
 interface Props {
   titulo?: string;
   descricao?: string;
-  /** URL absoluta ou relativa da imagem de compartilhamento. */
+  /** URL absoluta ou relativa da imagem de compartilhamento. Sem ela, vale a imagem padrão do site. */
   imagem?: string;
   /** Página de review: og:type article. */
   artigo?: boolean;
@@ -18,15 +18,17 @@ interface Props {
   largura?: string;
   /** Fora dos buscadores (404). */
   noindex?: boolean;
+  /** Dados estruturados (JSON-LD) da página, para o Google e as IAs. */
+  dados?: Record<string, unknown>;
 }
 
 const idioma = idiomaDe(Astro);
 const t = dicionario(idioma);
-const { titulo, descricao = t.site.descricao, imagem, artigo = false, largura, noindex = false } = Astro.props;
+const { titulo, descricao = t.site.descricao, imagem = '/og.jpg', artigo = false, largura, noindex = false, dados } = Astro.props;
 const tituloCompleto = titulo ? `${titulo} · Need or Greed` : 'Need or Greed';
 const site = Astro.site ?? new URL('https://needorgreed.blog');
 const { canonical, links } = alternativas(Astro.url.pathname, site);
-const imagemAbs = imagem ? new URL(imagem, site).href : undefined;
+const imagemAbs = new URL(imagem, site).href;
 const rss = idioma === 'en' ? '/rss.xml' : `/${idioma}/rss.xml`;
 
 // Contrato da direção visual (Impeccable). Fica como comentário no HTML publicado.
@@ -62,8 +64,12 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <meta property="og:description" content={descricao} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={t.locale.replace('-', '_')} />
-    {imagemAbs && <meta property="og:image" content={imagemAbs} />}
-    <meta name="twitter:card" content={imagemAbs ? 'summary_large_image' : 'summary'} />
+    <meta property="og:image" content={imagemAbs} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {
+      /* "<" escapado: um título com "</script>" não fecha a tag antes da hora. */
+      dados && <script type="application/ld+json" set:html={JSON.stringify(dados).replace(/</g, '\\u003c')} />
+    }
 
     <Font cssVariable="--fonte-display" preload />
     <Font cssVariable="--fonte-texto" preload={[{ style: 'normal' }]} />

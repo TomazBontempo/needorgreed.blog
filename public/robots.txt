@@ -1,4 +1,21 @@
+# Need or Greed
+# Busca e respostas de IA com link para cá: pode ler. Treino de modelo: não.
+# Padrão Content Signals (contentsignals.org): search = resultados de busca,
+# ai-input = usar a página para responder alguém, ai-train = treinar modelos.
+
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
 Disallow: /fichas/
+
+# Robôs de treino de modelos
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Bytespider
+Disallow: /
 
 Sitemap: https://needorgreed.blog/sitemap.xml
