@@ -169,10 +169,27 @@ function promptSistema(de, para) {
 
 function textoDaResposta(json) {
   const r = json?.result;
-  const texto = typeof r?.response === 'string' ? r.response : r?.choices?.[0]?.message?.content;
-  if (typeof texto !== 'string') throw new Error(`resposta sem texto: ${JSON.stringify(json).slice(0, 200)}`);
+  const escolha = r?.choices?.[0];
+  const texto = typeof r?.response === 'string' ? r.response : escolha?.message?.content;
+  if (typeof texto !== 'string' || !texto.trim()) {
+    // Sem o resto da resposta não dá para saber por que veio vazia (limite de tokens, raciocínio, recusa).
+    throw new Error(`resposta sem texto (finish_reason: ${escolha?.finish_reason ?? '?'}): ${JSON.stringify(json).slice(0, 1500)}`);
+  }
   // Alguns modelos devolvem o raciocínio junto: fica só a resposta.
   return texto.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+}
+
+/** Uma linha de log por pedido: tempo, motivo do fim, tokens e se o modelo raciocinou. */
+function medir(json, inicio) {
+  const r = json?.result ?? {};
+  const escolha = r.choices?.[0];
+  const raciocinio = escolha?.message?.reasoning_content ?? escolha?.message?.reasoning ?? '';
+  const uso = r.usage ?? {};
+  const pensou = typeof raciocinio === 'string' && raciocinio.trim() ? `, raciocinou (${raciocinio.length} caracteres)` : ', sem raciocínio';
+  info(
+    `    pedido: ${((Date.now() - inicio) / 1000).toFixed(1)}s, fim ${escolha?.finish_reason ?? '?'}, ` +
+      `tokens ${uso.prompt_tokens ?? '?'} de entrada e ${uso.completion_tokens ?? '?'} de saída${pensou}`,
+  );
 }
 
 function workersAi() {
@@ -184,6 +201,7 @@ function workersAi() {
   return {
     modelo,
     async traduzir(texto, de, para) {
+      const inicio = Date.now();
       const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${conta}/ai/run/${modelo}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -194,10 +212,14 @@ function workersAi() {
           ],
           max_tokens: 8192,
           temperature: 0.3,
+          // O Gemma 4 pode raciocinar antes de responder. Para traduzir isso só gasta tempo e cota,
+          // e o raciocínio pode consumir o limite de tokens e deixar a resposta vazia.
+          chat_template_kwargs: { enable_thinking: false },
         }),
         signal: AbortSignal.timeout(180_000),
       });
       const json = await res.json().catch(() => ({}));
+      medir(json, inicio);
       const erros = JSON.stringify(json?.errors ?? '');
       // Plano Free: passar dos 10.000 neurons do dia gera erro (nunca cobrança).
       if (res.status === 429 || /4006|neuron|daily free allocation|quota/i.test(erros)) {
@@ -223,6 +245,28 @@ function mock() {
 // Tradução de uma review
 // ---------------------------------------------------------------------------------------------
 
+/** Quantas vezes um pedido é refeito quando a resposta vem vazia ou perde um trecho protegido. */
+const RETENTATIVAS = 2;
+
+/**
+ * Traduz um pedaço e confere a resposta: todo ⟦n⟧ do pedaço tem que voltar. Se falhar, refaz só
+ * esse pedaço (até RETENTATIVAS vezes) em vez de descartar a review inteira. Cota esgotada não se refaz.
+ */
+async function traduzirConferido(tradutor, texto, de, para) {
+  const marcas = texto.match(/⟦\d+⟧/g) ?? [];
+  for (let tentativa = 0; ; tentativa++) {
+    try {
+      const saida = await tradutor.traduzir(texto, de, para);
+      const perdida = marcas.find((m) => !saida.includes(m));
+      if (perdida) throw new Error(`o modelo perdeu o trecho protegido ${perdida}`);
+      return saida;
+    } catch (erro) {
+      if (erro instanceof CotaEsgotada || tentativa >= RETENTATIVAS) throw erro;
+      info(`    tentativa ${tentativa + 1} falhou (${erro.message.slice(0, 120)}), tentando de novo`);
+    }
+  }
+}
+
 /** Atributos de componente que são texto para o leitor: legenda, descrição, título. */
 const RE_ATRIBUTO = /\b(legenda|descricao|titulo|alt)="([^"]*)"/g;
 
@@ -247,7 +291,7 @@ async function traduzirCorpo(tradutor, corpo, de, para) {
     else {
       const inicio = p.match(/^\s*/)[0];
       const fim = p.match(/\s*$/)[0];
-      partes.push(inicio + (await tradutor.traduzir(p.trim(), de, para)) + fim);
+      partes.push(inicio + (await traduzirConferido(tradutor, p.trim(), de, para)) + fim);
     }
   }
   return semTravessao(restaurar(partes.join(''), guardados));
@@ -281,7 +325,7 @@ async function traduzirLista(tradutor, linhas, de, para, oQueSao) {
     `Translate each numbered line. These are ${oQueSao}. ` +
     'Answer with the same numbers, one per line, in the format "N. translation", and nothing else.\n\n' +
     linhas.map((l, i) => `${i + 1}. ${l.replace(/\n/g, ' ')}`).join('\n');
-  const resposta = await tradutor.traduzir(pedido, de, para);
+  const resposta = await traduzirConferido(tradutor, pedido, de, para);
 
   const porNumero = new Map();
   for (const l of resposta.split('\n')) {
@@ -363,7 +407,7 @@ async function traduzirBio(tradutor, arquivo) {
       }
     }
     if (resultado === 'traduzida') {
-      const bio = semTravessao((await tradutor.traduzir(autor.bio.trim(), de, para)).trim());
+      const bio = semTravessao((await traduzirConferido(tradutor, autor.bio.trim(), de, para)).trim());
       await mkdir(join(PASTA_AUTORES, 'traducoes'), { recursive: true });
       // Editou à mão? Mude "revisado" para true e o script nunca mais sobrescreve.
       await writeFile(alvo, JSON.stringify({ bio, origemHash, revisado: false, modelo: tradutor.modelo }, null, 2) + '\n');
