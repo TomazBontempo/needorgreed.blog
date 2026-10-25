@@ -283,7 +283,7 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   O destaque é uma janela de altura fixa com rolagem interna, focável, com rótulo,
   degradê no pé e sem prender a rolagem da página. Título "Última crítica" / "Latest review" fora da janela.
 - **"Mais loot":** sorteado no navegador por um script inline antes da primeira pintura (sem layout shift),
-  nunca inclui o destaque, prefere reviews fora do log, botão d100 para rolar de novo. Sem JS: ordem do build.
+  nunca inclui o destaque (exceto quando ele é a única review, decisão do Tomaz em 2026-10-25), prefere reviews fora do log, botão d100 para rolar de novo. Sem JS: ordem do build.
 - **Home mobile (<900px):** empilhada, sem carrossel (removido em 2026-10-24): hero com a frase (28px), "Última
   crítica" em resumo (título, linha de roll, motivo, meta e o link, sem o texto), loot log com os 5 últimos
   eventos e "Mais loot" em lista com o d100.

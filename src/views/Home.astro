@@ -47,9 +47,11 @@ const dados = {
   description: t.site.descricao,
 };
 
-// Sorteio: nunca a review em destaque; primeiro as que não aparecem no log, depois as que aparecem.
+// Sorteio: nunca a review em destaque (a não ser que ela seja a única, para a seção não sumir);
+// primeiro as que não aparecem no log, depois as que aparecem.
+const sorteaveis = resto.length ? resto : reviews;
 const noLog = new Set(eventos.slice(0, EVENTOS_NO_LOG).flatMap((e) => (e.tipo === 'autor' ? [] : [e.review.slug])));
-const fila = [...resto.filter((r) => !noLog.has(r.slug)), ...resto.filter((r) => noLog.has(r.slug))].slice(0, TAMANHO_DO_SORTEIO);
+const fila = [...sorteaveis.filter((r) => !noLog.has(r.slug)), ...sorteaveis.filter((r) => noLog.has(r.slug))].slice(0, TAMANHO_DO_SORTEIO);
 const mais = await Promise.all(fila.map(async (r) => ({ review: r, versao: await versaoEm(r, idioma), noLog: noLog.has(r.slug) })));
 
 /**
