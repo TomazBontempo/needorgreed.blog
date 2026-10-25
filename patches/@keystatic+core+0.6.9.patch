@@ -1,0 +1,13 @@
+diff --git a/node_modules/@keystatic/core/dist/index-3c244051.js b/node_modules/@keystatic/core/dist/index-3c244051.js
+index 233c8ca..5368fbb 100644
+--- a/node_modules/@keystatic/core/dist/index-3c244051.js
++++ b/node_modules/@keystatic/core/dist/index-3c244051.js
+@@ -22968,7 +22968,7 @@ function ImageDialog(props) {
+           props.onSubmit({
+             alt: state.alt,
+             title: state.title,
+-            filename: [fileName, filenameExtension].join('.')
++            filename: fileName === filenameWithoutExtension ? props.filename : schema.config.image.transformFilename([fileName.split('/').pop(), filenameExtension].join('.'))
+           });
+         }
+       },

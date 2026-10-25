@@ -1,6 +1,6 @@
 import { config, collection, fields } from '@keystatic/core';
 import { block, wrapper } from '@keystatic/core/content-components';
-import { limparNome } from './src/lib/nomes-de-arquivo';
+import { limparNome, nomeDaImagem } from './src/lib/nomes-de-arquivo';
 
 /**
  * Painel de escrita em /keystatic.
@@ -31,7 +31,7 @@ const videos = {
 
 const imagensTexto = {
   ...pastaDaReview,
-  transformFilename: (nome: string) => `imagens/${limparNome(nome)}`,
+  transformFilename: (nome: string) => `imagens/${nomeDaImagem(nome)}`,
   schema: {
     alt: fields.text({
       label: 'Texto alternativo',

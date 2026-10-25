@@ -22,3 +22,14 @@ export function limparNome(original: string): string {
       .replace(/^-+|-+$/g, '') || 'arquivo';
   return extensao ? `${limpo}.${extensao}` : limpo;
 }
+
+/**
+ * Imagem colada (Ctrl+V) chega sempre como "image.png", e duas com o mesmo nome se sobrescrevem
+ * ao salvar. Só nesse caso o nome ganha um sufixo único: "image.png" -> "image-mh7k2x1a.png".
+ */
+export function nomeDaImagem(original: string): string {
+  const nome = limparNome(original);
+  const ponto = nome.lastIndexOf('.');
+  if (nome.slice(0, ponto) !== 'image') return nome;
+  return `image-${Date.now().toString(36)}${nome.slice(ponto)}`;
+}
