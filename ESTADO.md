@@ -197,10 +197,29 @@ Fica só nos painéis, não no código. Os valores dos tokens nunca entram no re
 Ainda não existe aviso automático de vencimento (o Tomaz quer planejar um). O GitHub manda e-mail alguns dias
 antes de um token fine-grained vencer.
 
-**Falta (fase D):**
-- **Giscus:** `repoId` e `categoryId` vazios em `src/site.config.ts`. Enquanto isso, a página da review
-  mostra "Os comentários abrem em breve" e a home mostra o link sem a contagem.
-- **GitHub App do Keystatic** para o painel em produção.
+**Fase D:**
+- **Comentários: em espera, decisão do Tomaz (2026-10-25).** Hoje a página da review mostra "Os comentários
+  abrem em breve" e a home mostra o link sem a contagem (`repoId` e `categoryId` vazios em `src/site.config.ts`).
+  Dois candidatos pesquisados:
+  - **Giscus** (o que o código já suporta): comentários viram GitHub Discussions do repositório; sem banco,
+    grátis, sem anúncio, moderação pelo GitHub, 5 minutos de configuração. Contra: quem comenta precisa de
+    conta do GitHub, barreira para o público de jogos, filmes e anime.
+  - **Garrul** (github.com/KingPin/Garrul, Apache 2.0): Worker próprio na conta da Cloudflare com D1, KV e
+    Turnstile, no plano Free. Login com Google, Discord, GitHub, Facebook e X (e anônimo opcional), interface
+    em pt e es, sem rastreamento, fila de moderação, anti-spam, bot no Telegram, exportar e apagar dados
+    (LGPD), exemplo para Astro, visual por variáveis CSS, importa de Disqus e Remark42. Contra: projeto novo
+    (maio de 2026, 52 estrelas) e de um autor só; uma auditoria achou 2 falhas críticas, já corrigidas. Os dados
+    ficam no D1 do Tomaz. Instalação de 1 a 2 horas (Worker, apps de login no Google Cloud e no Discord,
+    Turnstile, visual). Próximo passo sugerido: rodar o Garrul localmente (`npm run dev`) e mostrar screenshots
+    com o visual do site antes de criar algo nas contas.
+  - Descartados: Remark42 e Artalk (maduros, com Google e Discord, mas exigem servidor 24h, sem hospedagem
+    grátis sem cartão), Waline (login social por serviço intermediário), Isso e Cusdis (sem login social),
+    Disqus (anúncios e rastreamento).
+- **Painel online (Keystatic):** GitHub App `needorgreed-keystatic` criado em 2026-10-25 na conta
+  TomazBontempo, instalado só neste repositório (contents write). Secrets do Worker:
+  `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`; build variable
+  `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=needorgreed-keystatic`. Os valores estão só no `.env` local do Tomaz
+  (fora do git) e na Cloudflare.
 - A cota grátis do Workers AI (10.000 neurons por dia) é por conta: dividida com os sites da agência se algum
   deles usar Workers AI.
 
