@@ -49,7 +49,8 @@ jobs:
         run: |
           # O script só escreve traduções (index.<língua>.mdx e autores/traducoes/). Listar padrões por língua
           # quebrava quando uma língua não tinha nenhum arquivo (git add falha com padrão que não encontra nada).
-          git add -A -- src/content/reviews src/content/autores
+          # Pelo mesmo motivo, src/content inteiro: src/content/reviews não existe enquanto não houver review.
+          git add -A -- src/content
           if git diff --cached --quiet; then
             echo "Nenhuma tradução nova."
             exit 0

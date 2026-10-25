@@ -385,7 +385,8 @@ async function main() {
 
   const slugs = SO.length
     ? SO
-    : (await readdir(PASTA, { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name).sort();
+    : // Sem nenhuma review ainda, a pasta nem existe no git: segue para as bios.
+      (await readdir(PASTA, { withFileTypes: true }).catch(() => [])).filter((d) => d.isDirectory()).map((d) => d.name).sort();
 
   const contagem = {};
   let cotaEsgotada = false;
