@@ -269,16 +269,28 @@ async function traduzirConferido(tradutor, texto, de, para) {
 
 /** Atributos de componente que são texto para o leitor: legenda, descrição, título. */
 const RE_ATRIBUTO = /\b(legenda|descricao|titulo|alt)="([^"]*)"/g;
+/** Texto alternativo de imagem em Markdown: ![alt](caminho). Sozinho no texto, o modelo costuma pular. */
+const RE_ALT = /!\[([^\]\n]*)\]\(/g;
 
-/** Traduz, num pedido só, os textos dentro de atributos dos componentes MDX. */
+/** Traduz, num pedido só, os textos dos atributos dos componentes MDX e o alt das imagens. */
 async function traduzirAtributos(tradutor, corpo, de, para) {
-  const valores = [...new Set([...corpo.matchAll(RE_ATRIBUTO)].map((m) => m[2]).filter((v) => v.trim()))];
+  const achados = [...[...corpo.matchAll(RE_ATRIBUTO)].map((m) => m[2]), ...[...corpo.matchAll(RE_ALT)].map((m) => m[1])];
+  const valores = [...new Set(achados.filter((v) => v.trim()))];
   if (!valores.length) return corpo;
   const traduzidos = await traduzirLista(tradutor, valores, de, para, 'captions and accessibility descriptions of images and videos');
-  return corpo.replace(RE_ATRIBUTO, (tudo, nome, valor) => {
+  const traduzido = (valor) => {
     const i = valores.indexOf(valor);
-    return i < 0 ? tudo : `${nome}="${traduzidos[i].replace(/"/g, '&quot;')}"`;
-  });
+    return i < 0 ? undefined : traduzidos[i];
+  };
+  return corpo
+    .replace(RE_ATRIBUTO, (tudo, nome, valor) => {
+      const v = traduzido(valor);
+      return v === undefined ? tudo : `${nome}="${v.replace(/"/g, '&quot;')}"`;
+    })
+    .replace(RE_ALT, (tudo, valor) => {
+      const v = traduzido(valor);
+      return v === undefined ? tudo : `![${v.replace(/[[\]]/g, '')}](`;
+    });
 }
 
 async function traduzirCorpo(tradutor, corpo, de, para) {
@@ -310,29 +322,44 @@ async function traduzirCampos(tradutor, dados, de, para) {
   const novo = structuredClone(dados);
   add(dados.frase, (v) => (novo.frase = v));
   add(dados.motivoRoll, (v) => (novo.motivoRoll = v));
+  add(dados.duracao, (v) => (novo.duracao = v));
   (dados.atributos ?? []).forEach((a, i) => add(a?.nome, (v) => (novo.atributos[i].nome = v)));
   (dados.tags ?? []).forEach((t, i) => add(t, (v) => (novo.tags[i] = v)));
   if (!linhas.length) return novo;
 
-  const traduzidas = await traduzirLista(tradutor, linhas, de, para, 'short fields of one review: a tagline, a one-line verdict, item stat names and tags');
+  const traduzidas = await traduzirLista(tradutor, linhas, de, para, 'short fields of one review: a tagline, a one-line verdict, how long the work is, item stat names and tags');
   traduzidas.forEach((v, i) => destino[i](v));
   return novo;
 }
 
-/** Traduz uma lista de textos curtos num pedido só, uma linha numerada por texto. */
+/**
+ * Traduz uma lista de textos curtos num pedido só, uma linha numerada por texto.
+ * O que voltar igual ao original (ou faltar) vai num segundo pedido, só com essas linhas: às vezes o
+ * modelo pula uma ("Trilha sonora" ficou em português no espanhol). Se voltar igual de novo, fica:
+ * nome próprio e palavra que já é igual nas duas línguas ("Cyberpunk", "anime") não mudam mesmo.
+ */
 async function traduzirLista(tradutor, linhas, de, para, oQueSao) {
-  const pedido =
-    `Translate each numbered line. These are ${oQueSao}. ` +
-    'Answer with the same numbers, one per line, in the format "N. translation", and nothing else.\n\n' +
-    linhas.map((l, i) => `${i + 1}. ${l.replace(/\n/g, ' ')}`).join('\n');
-  const resposta = await traduzirConferido(tradutor, pedido, de, para);
+  const pedir = async (lista) => {
+    const pedido =
+      `Translate each numbered line. These are ${oQueSao}. ` +
+      'Answer with the same numbers, one per line, in the format "N. translation", and nothing else.\n\n' +
+      lista.map((l, i) => `${i + 1}. ${l.replace(/\n/g, ' ')}`).join('\n');
+    const resposta = await traduzirConferido(tradutor, pedido, de, para);
+    const porNumero = new Map();
+    for (const l of resposta.split('\n')) {
+      const m = l.match(/^\s*(\d+)[.)]\s*(.+)$/);
+      if (m) porNumero.set(Number(m[1]), m[2].trim());
+    }
+    return lista.map((original, i) => porNumero.get(i + 1) ?? original);
+  };
 
-  const porNumero = new Map();
-  for (const l of resposta.split('\n')) {
-    const m = l.match(/^\s*(\d+)[.)]\s*(.+)$/);
-    if (m) porNumero.set(Number(m[1]), m[2].trim());
+  const traduzidas = await pedir(linhas);
+  const iguais = linhas.flatMap((original, i) => (traduzidas[i] === original ? [i] : []));
+  if (iguais.length) {
+    const denovo = await pedir(iguais.map((i) => linhas[i]));
+    iguais.forEach((i, k) => (traduzidas[i] = denovo[k]));
   }
-  return linhas.map((original, i) => semTravessao(porNumero.get(i + 1) ?? original));
+  return traduzidas.map(semTravessao);
 }
 
 async function traduzirReview(tradutor, slug) {
