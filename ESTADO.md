@@ -65,12 +65,10 @@ nada; ou registrar o domínio num registrador que cobre em reais e só apontar o
 Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed.blog` é o `site` do
 `astro.config.mjs` (canonical, hreflang, sitemap, RSS, imagem de compartilhamento) e o login do painel online.
 
-**Em andamento (2026-10-25):** domínio `needorgreed.blog` comprado na Hostinger, zona criada na Cloudflare
-(plano Free, sem registros DNS; o custom domain do Worker cria o dele) e nameservers trocados para
-`clarissa.ns.cloudflare.com` e `vasilii.ns.cloudflare.com` (DNSSEC desligado). Sem e-mail no domínio por
-enquanto. Itens 1, 3 e 6 do checklist feitos. Próximo: criar o Worker ligado ao repositório (item 4) e,
-com o domínio ativo, conferir em **AI Crawl Control** da Cloudflare que os robôs de busca e resposta de IA
-não estão bloqueados (o `robots.txt` só bloqueia os de treino).
+**No ar desde 2026-10-25** em `https://needorgreed.blog` (Cloudflare Workers, conta pessoal do Tomaz, que
+também tem os sites da agência dele). Domínio registrado na Hostinger, DNS na Cloudflare (nameservers
+`clarissa` e `vasilii.ns.cloudflare.com`, DNSSEC desligado). Sem e-mail no domínio. Próximo: fase D
+(tradução, Giscus, Keystatic), ver "Configuração externa".
 
 ### Checklist para subir o site
 
@@ -172,19 +170,39 @@ os filtros do Arquivo em fileiras. O desktop foi conferido pixel a pixel e não 
 
 ---
 
-## Configuração externa que ainda não existe
+## Configuração externa (Cloudflare e GitHub)
 
-Nada disso dá para fazer sem o Tomaz. Instruções completas no `README.md`.
+Fica só nos painéis, não no código. Os valores dos tokens nunca entram no repositório.
 
-- **Domínio `needorgreed.blog`:** ainda não comprado (ver "Onde paramos").
-- **Projeto na Cloudflare Workers:** ainda não criado. O repositório já existe e está em dia.
-- **Token da Cloudflare para tradução:** Workers AI Read + Workers AI Edit. Secrets da Action:
-  `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_AI_TOKEN`. Plano Free, sem cartão (regra inegociável do CLAUDE.md).
+**Cloudflare, Worker `needorgreed`** (Workers Builds ligado ao repositório: cada push no `main` publica):
+- Build `npm run build`, deploy `npx wrangler deploy`, preview builds desligados.
+- Build variables: `GITHUB_TOKEN` (secret) e `NODE_VERSION=24`.
+- Custom domain `needorgreed.blog`. O endereço `needorgreed.tomaz-bontempo.workers.dev` está desligado
+  (evita cópia do site nos buscadores).
+
+**Cloudflare, zona `needorgreed.blog`:**
+- **AI Crawl Control → Bot Preference Sync: desligado.** Ligado, a Cloudflare cola o robots.txt dela em cima
+  do nosso (duas regras `User-agent: *` que se contradizem). Os robôs de treino continuam barrados com 403.
+- **SSL/TLS → Edge Certificates → Always Use HTTPS: ligado.**
+- **Redirect Rule "www para needorgreed.blog":** `https://www.*` para `https://${1}`, 301, mantém a query
+  string. Registro DNS `A www 192.0.2.1` com proxy (endereço fictício, só para o `www` chegar à regra).
+- Bot Fight Mode desligado (desafiaria o Googlebot e os robôs de resposta de IA).
+
+**Tokens com validade (renovar antes de vencer):**
+| Token | Onde fica | Permissão | Vence | Se vencer |
+|---|---|---|---|---|
+| GitHub fine-grained `needorgreed-build` | Cloudflare, build variable `GITHUB_TOKEN` | Contents e Metadata, leitura, só este repositório | por volta de 2027-10-25 (1 ano) | loot log e autoria caem no limite de 60 requisições por hora e no autor padrão; contagem de comentários some |
+| Cloudflare `needorgreed-traducao` | GitHub, secret `CLOUDFLARE_AI_TOKEN` (+ `CLOUDFLARE_ACCOUNT_ID`) | Workers AI Read e Edit | por volta de 2027-10-25 (1 ano) | reviews novas ficam sem tradução (a página mostra o original com aviso) |
+
+Ainda não existe aviso automático de vencimento (o Tomaz quer planejar um). O GitHub manda e-mail alguns dias
+antes de um token fine-grained vencer.
+
+**Falta (fase D):**
 - **Giscus:** `repoId` e `categoryId` vazios em `src/site.config.ts`. Enquanto isso, a página da review
   mostra "Os comentários abrem em breve" e a home mostra o link sem a contagem.
-- **`GITHUB_TOKEN` no build** (Cloudflare): necessário para a contagem de comentários (GraphQL) e
-  recomendado para o loot log (limite de 60 requisições por hora sem token).
 - **GitHub App do Keystatic** para o painel em produção.
+- A cota grátis do Workers AI (10.000 neurons por dia) é por conta: dividida com os sites da agência se algum
+  deles usar Workers AI.
 
 ---
 
