@@ -1,0 +1,77 @@
+---
+/**
+ * Privacidade: o que o blog e os comentários guardam, por quanto tempo e como apagar.
+ * Os textos ficam nos dicionários; {email} vira o link para SITE.contato.
+ * Ao mudar o que os comentários guardam (Garrul) ou o que o site grava no navegador, atualize aqui.
+ */
+import Base from '../layouts/Base.astro';
+import TopoPagina from '../components/TopoPagina.astro';
+import { dicionario, idiomaDe } from '../i18n';
+import { SITE } from '../site.config';
+
+const idioma = idiomaDe(Astro);
+const t = dicionario(idioma);
+const s = t.privacidade;
+
+const secoes = [
+  { id: 'leitor', titulo: s.leitorTitulo, texto: s.leitorTexto },
+  { id: 'comentario', titulo: s.comentarioTitulo, texto: s.comentarioTexto },
+  { id: 'onde', titulo: s.ondeTitulo, texto: s.ondeTexto },
+  { id: 'apagar', titulo: s.apagarTitulo, texto: s.apagarTexto },
+  { id: 'quem', titulo: s.quemTitulo, texto: s.quemTexto },
+];
+---
+
+<Base titulo={s.titulo} descricao={s.intro}>
+  <div class="container"><div class="privacidade">
+    <TopoPagina titulo={s.titulo} descricao={s.intro} />
+    <p class="atualizado mono">{s.atualizado}</p>
+
+    {
+      secoes.map(({ id, titulo, texto }) => (
+        <section aria-labelledby={`p-${id}`}>
+          <h2 id={`p-${id}`}>{titulo}</h2>
+          {texto.map((paragrafo) => {
+            const [antes, depois] = paragrafo.split('{email}');
+            return depois === undefined ? (
+              <p>{paragrafo}</p>
+            ) : (
+              <p>
+                {antes}
+                <a href={`mailto:${SITE.contato}`}>{SITE.contato}</a>
+                {depois}
+              </p>
+            );
+          })}
+        </section>
+      ))
+    }
+  </div></div>
+</Base>
+
+<style>
+  .privacidade {
+    max-width: 720px;
+  }
+  .atualizado {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--texto-3);
+  }
+  section {
+    margin-top: 40px;
+  }
+  h2 {
+    margin: 0 0 10px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.75rem;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  p {
+    margin: 0 0 1em;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+</style>

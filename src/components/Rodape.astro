@@ -1,5 +1,6 @@
 ---
 import { dicionario, url, type Idioma } from '../i18n';
+import { SITE } from '../site.config';
 
 interface Props {
   idioma: Idioma;
@@ -14,6 +15,8 @@ const rss = idioma === 'en' ? '/rss.xml' : `/${idioma}/rss.xml`;
     <p>Need or Greed · {t.rodape.assinatura}</p>
     <p>
       <a href={url(idioma, 'sobre')}>{t.nav.sobre}</a>
+      <a href={url(idioma, 'privacidade')}>{t.rodape.privacidade}</a>
+      <a href={`mailto:${SITE.contato}`} title={SITE.contato}>{t.rodape.contato}</a>
       <a href={rss}>{t.rodape.rss}</a>
     </p>
   </div>

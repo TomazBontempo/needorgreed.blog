@@ -25,6 +25,7 @@ export const SECOES = {
   raridade: { en: 'rarity', pt: 'raridade', es: 'rareza' },
   autores: { en: 'authors', pt: 'autores', es: 'autores' },
   reviews: { en: 'reviews', pt: 'reviews', es: 'reviews' },
+  privacidade: { en: 'privacy', pt: 'privacidade', es: 'privacidad' },
 } as const satisfies Record<string, Record<Idioma, string>>;
 
 export type Secao = keyof typeof SECOES;

@@ -145,6 +145,8 @@ const pt: Dicionario = {
   rodape: {
     assinatura: 'Rolado à mão. Nenhum loot patrocinado.',
     rss: 'Feed RSS',
+    privacidade: 'Privacidade',
+    contato: 'Contato',
   },
 
   erro404: {
@@ -206,6 +208,39 @@ const pt: Dicionario = {
     nota: 'Nota',
     numero: 'Número do roll',
     faixa: (de: number, ate: number) => `${de} a ${ate}`,
+  },
+  privacidade: {
+    titulo: 'Privacidade',
+    intro: 'O que o Need or Greed guarda sobre você, e por quê. É curto, porque guardamos pouco.',
+    atualizado: 'Atualizado em 26 de outubro de 2026.',
+    leitorTitulo: 'Quem só lê',
+    leitorTexto: [
+      'Ler o blog não pede nada. Não há anúncios, rastreadores nem cookies de análise.',
+      'O site usa um cookie só, o lang, que lembra a língua que você escolheu. O seu navegador também anota, só no seu aparelho, quais reviews você já leu, para apagar a capa delas nas listas.',
+      'O site roda na Cloudflare, que registra dados técnicos de cada acesso, como o endereço IP, para manter o site no ar e protegido contra ataques.',
+    ],
+    comentarioTitulo: 'Quem comenta',
+    comentarioTexto: [
+      'Para comentar, responder ou votar, você entra com uma conta do Google ou do Discord. Eles nos passam o seu nome, a sua foto e o seu e-mail. A sua senha nunca passa por aqui.',
+      'Guardamos o nome e a foto, que aparecem ao lado dos seus comentários; o e-mail e o código da sua conta, para reconhecer você quando voltar; e o texto dos seus comentários e os seus votos. O e-mail não aparece para outros leitores, e não mandamos e-mail para você.',
+      'Contra spam, guardamos também uma versão embaralhada do seu IP (um código que não volta a ser o IP) e o tipo de navegador. Os dois se apagam sozinhos em 7 dias.',
+      'Ao entrar, o seu navegador guarda um cookie de sessão do servidor de comentários, que dura 30 dias.',
+    ],
+    ondeTitulo: 'Onde ficam',
+    ondeTexto: [
+      'Os comentários ficam num banco de dados da Cloudflare, nos Estados Unidos. Não vendemos, não alugamos e não compartilhamos esses dados com ninguém, e não usamos para anúncios nem para treinar inteligência artificial.',
+    ],
+    apagarTitulo: 'Apagar os seus dados',
+    apagarTexto: [
+      'Você apaga os seus próprios comentários quando quiser, pelo link Apagar embaixo de cada um.',
+      'Para apagar tudo (nome, foto, e-mail e conta), escreva para {email}. Respondemos em até 15 dias. Os seus comentários continuam no site sem o seu nome, para as conversas não perderem o sentido. Se algum deles identificar você, ou se preferir que sumam todos, apagamos o texto também.',
+      'Pelo mesmo e-mail você pode pedir uma cópia dos seus dados ou corrigir alguma coisa.',
+    ],
+    quemTitulo: 'Quem responde por isso',
+    quemTexto: [
+      'O Need or Greed é um blog pessoal, sem empresa por trás, escrito por Snufupugos, que responde pelos dados descritos aqui. Contato: {email}.',
+      'Se algo disso mudar, esta página muda junto, com a data lá em cima.',
+    ],
   },
 };
 

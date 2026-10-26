@@ -11,6 +11,9 @@ export const SITE = {
 
   /** Autor usado quando não dá para descobrir quem criou o arquivo (ex.: dev local sem git). */
   autorPadrao: 'TomazBontempo',
+
+  /** E-mail público (Email Routing da Cloudflare, encaminha para o Gmail do Tomaz). Só recebe. */
+  contato: 'contato@needorgreed.blog',
 };
 
 /**

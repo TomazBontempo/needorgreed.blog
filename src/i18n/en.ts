@@ -148,6 +148,8 @@ const en = {
   rodape: {
     assinatura: 'Rolled by hand. No sponsored loot.',
     rss: 'RSS feed',
+    privacidade: 'Privacy',
+    contato: 'Contact',
   },
 
   erro404: {
@@ -210,6 +212,39 @@ const en = {
     numero: 'Roll number',
     faixa: (de: number, ate: number) => `${de} to ${ate}`,
   },
+  privacidade: {
+    titulo: 'Privacy',
+    intro: 'What Need or Greed keeps about you, and why. It is short, because we keep very little.',
+    atualizado: 'Updated on October 26, 2026.',
+    leitorTitulo: 'If you just read',
+    leitorTexto: [
+      'Reading the blog asks nothing of you. No ads, no trackers, no analytics cookies.',
+      'The site uses a single cookie, lang, to remember the language you picked. Your browser also notes, only on your device, which reviews you have read, so their covers can fade in the lists.',
+      'The site runs on Cloudflare, which logs technical data about each visit, such as the IP address, to keep the site up and protected from attacks.',
+    ],
+    comentarioTitulo: 'If you comment',
+    comentarioTexto: [
+      'To comment, reply or vote, you sign in with a Google or Discord account. They give us your name, your picture and your email. Your password never comes through here.',
+      'We keep your name and picture, shown next to your comments; your email and account ID, to recognize you when you come back; and the text of your comments and your votes. Your email is never shown to other readers, and we never email you.',
+      'To fight spam, we also keep a scrambled version of your IP (a code that cannot be turned back into the IP) and your browser type. Both delete themselves after 7 days.',
+      'When you sign in, your browser keeps a session cookie from the comments server, valid for 30 days.',
+    ],
+    ondeTitulo: 'Where it lives',
+    ondeTexto: [
+      'Comments live in a Cloudflare database in the United States. We do not sell, rent or share this data with anyone, and we do not use it for ads or to train artificial intelligence.',
+    ],
+    apagarTitulo: 'Deleting your data',
+    apagarTexto: [
+      'You can delete your own comments whenever you want, with the Delete link under each one.',
+      'To delete everything (name, picture, email and account), write to {email}. We answer within 15 days. Your comments stay on the site without your name, so the conversations still make sense. If one of them identifies you, or if you would rather they all go, we delete the text too.',
+      'The same address works to ask for a copy of your data or to fix something.',
+    ],
+    quemTitulo: 'Who is responsible',
+    quemTexto: [
+      'Need or Greed is a personal blog, with no company behind it, written by Snufupugos, who is responsible for the data described here. Contact: {email}.',
+      'If any of this changes, this page changes too, with the date at the top.',
+    ],
+  },
 } as const;
 
 /** Formato de um dicionário: as mesmas chaves, qualquer texto. */
@@ -217,7 +252,9 @@ type Generalizar<T> = T extends string
   ? string
   : T extends (...args: infer A) => string
     ? (...args: A) => string
-    : { -readonly [K in keyof T]: Generalizar<T[K]> };
+    : T extends readonly (infer U)[]
+      ? readonly Generalizar<U>[]
+      : { -readonly [K in keyof T]: Generalizar<T[K]> };
 
 export type Dicionario = Generalizar<typeof en>;
 

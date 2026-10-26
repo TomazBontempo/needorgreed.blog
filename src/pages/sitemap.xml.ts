@@ -19,7 +19,7 @@ export async function GET(context: APIContext) {
 
   const reviews = await getReviews();
   const autores = await caminhosDeAutor();
-  const secoes: Secao[] = ['jogos', 'telas', 'arquivo', 'sobre'];
+  const secoes: Secao[] = ['jogos', 'telas', 'arquivo', 'sobre', 'privacidade'];
 
   const paginas: Pagina[] = [
     { caminho: (l) => url(l), data: reviews[0]?.entry.data.data },
