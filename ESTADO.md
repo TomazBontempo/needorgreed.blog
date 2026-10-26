@@ -207,12 +207,22 @@ antes de um token fine-grained vencer.
     hash de IP apagado em 7 dias (`IP_HASH_RETENTION_DAYS`). LGPD: pedido de exclusão por e-mail, apagado à mão
     no `/admin` (anonimiza o nome e mantém o texto, a não ser que o texto identifique a pessoa). O Marco Civil
     (6 meses de registro de acesso) só vale para pessoa jurídica com fins econômicos: revisar se o blog virar negócio.
-  - Feito: teste local (etapa 0), visual aprovado (etapa 2) e integração no blog (etapa 3): `COMENTARIOS.api`
-    vazio em `src/site.config.ts`, então a review continua mostrando "Os comentários abrem em breve" até o deploy.
-  - Falta: etapa 4 (repositório `needorgreed-comentarios`, `wrangler login`, Turnstile, `npm run setup`, domínio
-    `comentarios.needorgreed.blog`, apps de login no Google Cloud e no Discord, `ALLOWED_ORIGINS`), etapa 5
-    (testes de verdade, inclusive Safari no iPhone) e etapa 6 (página de privacidade nas três línguas, com link
-    no rodapé).
+  - **No ar desde 2026-10-26** em `https://comentarios.needorgreed.blog` (Worker `needorgreed-comentarios`, repositório
+    privado `TomazBontempo/needorgreed-comentarios`, pasta ao lado do blog, `upstream` = KingPin/Garrul, Actions e
+    Dependabot desligados). D1 `garrul-db`, 4 KV, Turnstile `needorgreed-comentarios` (hostname `needorgreed.blog`, que
+    cobre o subdomínio). Na nossa cópia: visual do site, textos sem travessão e **sem anônimo** (servidor recusa
+    comentário, voto e reação sem login; nunca cria usuário anônimo). Reações desligadas (`REACTIONS_ENABLED`).
+    `ADMIN_EMAILS` = Gmail do Tomaz; entrar no `/admin` pelo login do Google. Emergência: `npm run owner-link` na pasta
+    dos comentários (link de uso único, 10 minutos; nunca colar em chat).
+  - Logins: Discord (app "needorgreed.blog" no Developer Portal) e Google (projeto `needorgreed` no Google Cloud, Google
+    Auth Platform, External, **em produção**, sem logo para não exigir verificação, política de privacidade
+    `https://needorgreed.blog/privacy/`). Segredos só na Cloudflare (`wrangler secret put`).
+  - Privacidade: página `/privacy/`, `/pt/privacidade/`, `/es/privacidad/` e links Privacidade e Contato no rodapé.
+    Contato `contato@needorgreed.blog` (Email Routing da Cloudflare, grátis, só recebe, encaminha para o Gmail; catch-all
+    desligado). Se mudar o que os comentários guardam, atualizar `src/views/Privacidade.astro` e os dicionários.
+  - Atualizar o Garrul: `git fetch upstream && git merge upstream/main` na pasta dos comentários, conferir os trechos
+    marcados "Need or Greed" (CSS, `api.comments.ts`, `active-user.ts`, `embed.ts`, textos), testar com
+    `npx wrangler dev -c wrangler.toml.new.dev.toml` (cópia local sem a rota de produção) e `npm run deploy`.
   - Descartados: Giscus (só GitHub), Remark42 e Artalk (servidor 24h), Waline, Isso, Cusdis e Disqus.
 - **Painel online (Keystatic):** GitHub App `needorgreed-keystatic` criado em 2026-10-25 na conta
   TomazBontempo, instalado só neste repositório (contents write). Secrets do Worker:

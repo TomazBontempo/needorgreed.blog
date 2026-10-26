@@ -23,5 +23,5 @@ export const SITE = {
  */
 export const COMENTARIOS = {
   /** Endereço do Worker dos comentários, sem barra no fim. */
-  api: '',
+  api: 'https://comentarios.needorgreed.blog',
 };
