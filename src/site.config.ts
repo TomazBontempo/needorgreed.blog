@@ -14,16 +14,11 @@ export const SITE = {
 };
 
 /**
- * Comentários via Giscus (GitHub Discussions).
- * Gere os valores em https://giscus.app depois de ativar Discussions no repositório.
- * Enquanto repoId estiver vazio, a área de comentários não aparece.
+ * Comentários: Garrul (github.com/KingPin/Garrul), um Worker nosso na Cloudflare, separado do blog
+ * (repositório TomazBontempo/needorgreed-comentarios). Login com Google e Discord.
+ * Enquanto `api` estiver vazio, a área de comentários mostra só "Os comentários abrem em breve".
  */
-export const GISCUS = {
-  repo: 'TomazBontempo/needorgreed.blog',
-  repoId: '',
-  category: 'Comentários',
-  categoryId: '',
-  // Mapeia pelo slug da review, não pela URL: /reviews/x/ e /pt/reviews/x/ dividem a mesma discussão.
-  mapping: 'specific',
-  theme: 'dark_dimmed',
+export const COMENTARIOS = {
+  /** Endereço do Worker dos comentários, sem barra no fim. */
+  api: '',
 };

@@ -186,7 +186,7 @@ As legendas, descrições, textos alternativos e títulos também são traduzido
 ### 1. Repositório no GitHub
 
 Crie `TomazBontempo/needorgreed.blog` (pode ser privado) e suba o projeto.
-Se usar outro nome, troque em `src/site.config.ts` (`SITE.repo`, `GISCUS.repo`) e `keystatic.config.tsx` (`REPO`).
+Se usar outro nome, troque em `src/site.config.ts` (`SITE.repo`) e `keystatic.config.tsx` (`REPO`).
 
 ### 2. GitHub App do Keystatic (login do painel)
 
@@ -231,14 +231,12 @@ No painel da Cloudflare: **Workers & Pages → Create → Import a repository** 
 Por fim, **Settings → Domains & Routes → Add custom domain** → `needorgreed.blog`.
 O `needorgreed.com.br`, quando registrado, entra como redirecionamento para o `.blog`.
 
-### 4. Comentários (Giscus)
+### 4. Comentários (Garrul)
 
-1. No repo: Settings → General → Features → ative **Discussions** e crie a categoria "Comentários".
-2. Instale o app Giscus: https://github.com/apps/giscus
-3. Em https://giscus.app, gere `repoId` e `categoryId` e cole em `GISCUS` no `src/site.config.ts`.
-
-O repo precisa ser **público** para o Giscus funcionar. Se quiser manter o código privado,
-crie um repo público só para os comentários e aponte `GISCUS.repo` para ele.
+Os comentários rodam num Worker separado, com o Garrul (github.com/KingPin/Garrul), no repositório
+`TomazBontempo/needorgreed-comentarios`. A instalação, os apps de login (Google e Discord), o Turnstile e a
+moderação estão no README de lá. No blog, basta pôr o endereço do Worker em `COMENTARIOS.api`, no
+`src/site.config.ts`. Enquanto ele estiver vazio, a review mostra "Os comentários abrem em breve".
 
 ---
 
@@ -265,7 +263,7 @@ e cruza com `src/content/autores/*.json`. Se outra pessoa editar depois, aparece
 
 ```
 keystatic.config.tsx      painel: campos das reviews e autores, blocos de mídia
-src/site.config.ts        repo, autor padrão, Giscus
+src/site.config.ts        repo, autor padrão, comentários
 src/content.config.ts     schema das coleções (reviews, traduções, autores)
 src/content/reviews/      uma pasta por review (index.mdx + tradução + imagens)
 src/content/autores/      um JSON por autor

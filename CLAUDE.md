@@ -133,7 +133,7 @@ eventos do log e "Mais loot" em lista. Ver "Padrões estabelecidos".
 ### Demais páginas
 
 - **Review** (`/reviews/<slug>/`): capa, título, linha de roll, motivo, tooltip do item, texto, tags,
-  "escrito por / editado por", comentários (Giscus).
+  "escrito por / editado por", comentários (Garrul).
 - **Jogos** e **Telas**: listagem em cards. Telas = filmes, séries e animes. "Lugares" virá depois como terceira seção.
 - **Raridade** (`/raridade/<id>/`) e **Autor** (`/autores/<slug>/`).
 - **Arquivo:** o loot log completo.
@@ -215,7 +215,7 @@ O Tomaz escreve em português; parceiros podem escrever em inglês ou espanhol. 
   - A Action chama a API REST do Workers AI com um token da Cloudflare com permissão só de Workers AI,
     guardado em secret da GitHub Action, nunca no repositório nem no front.
   - Nunca sugira subir para o Workers Paid nem trocar para serviço pago. Se a cota não der conta, avise o Tomaz.
-- Os comentários (Giscus) são compartilhados entre todas as versões da mesma review (mapear pelo slug, não pela URL).
+- Os comentários (Garrul) são compartilhados entre todas as versões da mesma review (mapear pelo slug, não pela URL).
 - **A bio dos autores é traduzida do mesmo jeito**: campo `idioma` no JSON do autor, traduções em
   `src/content/autores/traducoes/<slug>.<língua>.json` (hash, `revisado: true`), lidas por `bioEm()` em `src/lib/autores.ts`.
 
@@ -231,7 +231,12 @@ O Tomaz escreve em português; parceiros podem escrever em inglês ou espanhol. 
 - **Autor automático:** não existe campo autor. No build, `src/lib/autores.ts` pergunta à API do GitHub qual
   **conta** criou cada arquivo e cruza com `src/content/autores/*.json`. Usar sempre o login da conta,
   nunca nome/email do commit (falsificável). Sem API, cai em `SITE.autorPadrao`.
-- **Comentários:** Giscus (GitHub Discussions), configurado em `src/site.config.ts`.
+- **Comentários:** Garrul (github.com/KingPin/Garrul), um Worker nosso na Cloudflare com D1, KV e Turnstile, no
+  plano Free, num repositório separado (`TomazBontempo/needorgreed-comentarios`). Login só com Google e Discord,
+  sem anônimo. No blog: `COMENTARIOS.api` em `src/site.config.ts` e `src/components/Comentarios.astro` (visual
+  por variáveis `--garrul-*`; o Garrul fica em Shadow DOM e o CSS do site não entra). A nossa cópia do Garrul tem
+  um bloco "Need or Greed" no fim de `src/widget/styles.css` (texto de sistema em mono, cantos retos, toque de
+  44px no celular) e textos sem travessão: conferir os dois a cada atualização do Garrul.
 - **Deploy: Cloudflare Workers** (não Pages: o adapter atual do Astro só suporta Workers).
 
 ### Armadilhas já resolvidas (não desfazer)
@@ -255,7 +260,7 @@ src/components/            Item (a ficha), LootLog, DestaqueHome, ReviewCompleta
                            LinhaRoll, MarcaRoll, Fichario, Prosa, Figure, Clipe, YouTube, mdx.ts (mapa do MDX),
                            SeletorIdioma (header), SugestaoIdioma (faixa fixa no pé da tela)
 src/lib/                   reviews (versaoEm por idioma), lootlog + lootlog-eventos (puro, testável), autores,
-                           comentarios (contagem Giscus), caminhos (getStaticPaths), rss, raridade
+                           comentarios (contagem do Garrul), caminhos (getStaticPaths), rss, raridade
 src/integrations/          midia.ts: capa obrigatória, mídia na pasta certa, texto alternativo, 25 MB, sem erro silencioso
 src/styles/                global.css (tokens) e item.css (a ficha, global com prefixo it-)
 scripts/translate.mjs      npm run translate (Workers AI, --mock para testar)

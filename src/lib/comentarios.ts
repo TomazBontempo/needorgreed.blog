@@ -1,39 +1,31 @@
 /**
- * Quantos comentários cada review tem, para o link "Ver discussão (N comentários)" da home.
+ * Quantos comentários cada review tem, para o link "Abrir review e comentários (N)" da home.
  *
- * Os comentários são do Giscus (GitHub Discussions), com uma discussão por review cujo
- * título é o slug (mapping 'specific'). No build, pergunta à API GraphQL do GitHub.
- * A GraphQL exige token: sem GITHUB_TOKEN, ou se falhar, devolve undefined e a home
- * mostra só "Ver discussão", sem número.
+ * Os comentários são do Garrul (ver COMENTARIOS em site.config). No build, uma chamada só a
+ * /api/v1/counts com os slugs de todas as reviews. O número fica fixo até o próximo build
+ * (cada review nova ou tradução publica de novo). Sem `api` configurada, ou se falhar,
+ * devolve undefined e a home mostra o link sem número.
  */
-import { GISCUS } from '../site.config';
+import { COMENTARIOS, SITE } from '../site.config';
+import { getReviews } from './reviews';
 
 let cache: Promise<Map<string, number> | undefined> | undefined;
 
 async function buscar(): Promise<Map<string, number> | undefined> {
-  const token = typeof process !== 'undefined' ? process.env.GITHUB_TOKEN : undefined;
-  if (!token || !GISCUS.categoryId) return undefined;
-  const [owner, name] = GISCUS.repo.split('/');
-  const query = `query($owner: String!, $name: String!, $cat: ID!) {
-    repository(owner: $owner, name: $name) {
-      discussions(first: 100, categoryId: $cat, orderBy: { field: UPDATED_AT, direction: DESC }) {
-        nodes { title comments { totalCount } }
-      }
-    }
-  }`;
+  if (!COMENTARIOS.api) return undefined;
+  // O Garrul aceita até 100 slugs por chamada.
+  const slugs = (await getReviews()).map((r) => r.slug).slice(0, 100);
+  if (!slugs.length) return new Map();
   try {
-    const res = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'User-Agent': 'needorgreed-build' },
-      body: JSON.stringify({ query, variables: { owner, name, cat: GISCUS.categoryId } }),
+    const res = await fetch(`${COMENTARIOS.api}/api/v1/counts?slugs=${slugs.map(encodeURIComponent).join(',')}`, {
+      // O Garrul só responde a origens da lista dele (ALLOWED_ORIGINS), mesmo em GET.
+      headers: { Origin: SITE.url },
       signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) return undefined;
-    const json = (await res.json()) as {
-      data?: { repository?: { discussions?: { nodes: Array<{ title: string; comments: { totalCount: number } }> } } };
-    };
-    const nodes = json.data?.repository?.discussions?.nodes;
-    return nodes && new Map(nodes.map((n) => [n.title, n.comments.totalCount]));
+    const json = (await res.json()) as { counts?: Record<string, number> };
+    // Review sem comentário não vem na resposta: vira 0 em contarComentarios.
+    return new Map(Object.entries(json.counts ?? {}));
   } catch {
     return undefined;
   }

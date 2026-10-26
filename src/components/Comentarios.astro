@@ -1,44 +1,64 @@
 ---
 /**
- * Comentários via Giscus (GitHub Discussions). Configure em src/site.config.ts (GISCUS).
- * Uma discussão por review, com o slug como título: as versões em inglês e português
- * dividem os mesmos comentários.
+ * Comentários via Garrul, um Worker nosso na Cloudflare. Configure em src/site.config.ts (COMENTARIOS).
+ * A conversa é identificada pelo slug: as versões em inglês, português e espanhol dividem os
+ * mesmos comentários. A caixa fala a língua da página (data-lang), nunca a do navegador.
+ * O script só baixa quando o leitor chega perto dos comentários: quem não rola até aqui não gasta
+ * nenhum pedido da cota grátis.
  */
-import { GISCUS } from '../site.config';
-import { dicionario, type Idioma } from '../i18n';
+import { COMENTARIOS, SITE } from '../site.config';
+import { dicionario, url, type Idioma } from '../i18n';
 
 interface Props {
   idioma: Idioma;
   slug: string;
+  /** Título da obra, que aparece no painel de moderação. */
+  titulo: string;
+  publicado: Date;
+  /** Língua original da review: o endereço dela é o que fica guardado na conversa. */
+  idiomaOriginal: Idioma;
 }
-const { idioma, slug } = Astro.props;
+const { idioma, slug, titulo, publicado, idiomaOriginal } = Astro.props;
 const t = dicionario(idioma);
-const ativo = Boolean(GISCUS.repoId && GISCUS.categoryId);
+const ativo = Boolean(COMENTARIOS.api);
 ---
 
 <section class="comentarios" id="discussao" aria-labelledby="titulo-discussao">
   <h2 id="titulo-discussao">{t.review.discussao}</h2>
   {
     ativo ? (
-      <script
-        is:inline
-        src="https://giscus.app/client.js"
-        data-repo={GISCUS.repo}
-        data-repo-id={GISCUS.repoId}
-        data-category={GISCUS.category}
-        data-category-id={GISCUS.categoryId}
-        data-mapping="specific"
-        data-term={slug}
-        data-strict="1"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="top"
-        data-theme={GISCUS.theme}
-        data-lang={idioma}
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async
-      />
+      <>
+        <div
+          id="garrul"
+          data-slug={slug}
+          data-api={COMENTARIOS.api}
+          data-title={titulo}
+          data-url={new URL(url(idiomaOriginal, 'reviews', slug), SITE.url).href}
+          data-published={publicado.toISOString()}
+          data-lang={idioma === 'en' ? undefined : idioma}
+          data-theme="dark"
+        />
+        <script is:inline>
+          (() => {
+            const caixa = document.getElementById('garrul');
+            if (!caixa) return;
+            const carregar = () => {
+              const s = document.createElement('script');
+              s.src = `${caixa.dataset.api}/embed.js`;
+              s.defer = true;
+              document.body.append(s);
+            };
+            if (!('IntersectionObserver' in window)) return carregar();
+            const io = new IntersectionObserver((entradas) => {
+              if (entradas.some((e) => e.isIntersecting)) {
+                io.disconnect();
+                carregar();
+              }
+            }, { rootMargin: '500px 0px' });
+            io.observe(caixa);
+          })();
+        </script>
+      </>
     ) : (
       <p class="vazio">{t.review.discussaoEmBreve}</p>
     )
@@ -66,6 +86,36 @@ const ativo = Boolean(GISCUS.repoId && GISCUS.categoryId);
     font-family: var(--mono);
     font-size: 0.8125rem;
     color: var(--texto-3);
+  }
+
+  /* A caixa fica num Shadow DOM: o CSS do site não entra, só as variáveis --garrul-* (e a --nog-mono,
+     que o nosso CSS dentro do Garrul usa para o texto de sistema). */
+  #garrul {
+    --garrul-font: var(--serifa);
+    --nog-mono: var(--mono);
+    --garrul-font-size: 16px;
+    --garrul-fg: var(--texto);
+    --garrul-bg: transparent;
+    --garrul-muted: var(--texto-3);
+    --garrul-border: var(--borda-forte);
+    --garrul-radius: 0px;
+    --garrul-input-bg: var(--painel-fundo);
+    --garrul-surface: var(--painel);
+    --garrul-hover: #221d16;
+    --garrul-accent: var(--ouro);
+    --garrul-accent-fg: var(--fundo);
+    --garrul-accent-hover: var(--ouro-forte);
+    --garrul-link: var(--ouro);
+    --garrul-error: var(--negativo);
+    --garrul-notice: var(--texto-2);
+    --garrul-badge-bg: #2a2214;
+    --garrul-badge-fg: var(--ouro);
+    --garrul-vote-active: #3a2e18;
+    --garrul-skel: var(--painel);
+    --garrul-shadow: none;
+    --garrul-motion: 180ms;
+    /* Reserva a altura da caixa: ela monta depois da página e empurraria o que vem embaixo. */
+    min-height: 220px;
   }
 
   /* Celular: nenhum texto abaixo de 13px e alvos de toque de 44px. */

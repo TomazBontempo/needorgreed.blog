@@ -68,7 +68,7 @@ Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed
 **No ar desde 2026-10-25** em `https://needorgreed.blog` (Cloudflare Workers, conta pessoal do Tomaz, que
 também tem os sites da agência dele). Domínio registrado na Hostinger, DNS na Cloudflare (nameservers
 `clarissa` e `vasilii.ns.cloudflare.com`, DNSSEC desligado). Sem e-mail no domínio. Próximo: fase D
-(tradução, Giscus, Keystatic), ver "Configuração externa".
+(tradução, comentários, Keystatic), ver "Configuração externa".
 
 ### Checklist para subir o site
 
@@ -80,7 +80,7 @@ também tem os sites da agência dele). Domínio registrado na Hostinger, DNS na
    outra língua; links diretos sem redirecionamento; seletor persistindo entre visitas (cookie `lang`).
 4. **Comprar o domínio** e criar o projeto na Cloudflare Workers ligado ao repositório (README, "Deploy").
 5. **Configurar segredos e serviços** (ver "Configuração externa"): `GITHUB_TOKEN` no build, token do
-   Workers AI na Action, Giscus, GitHub App do Keystatic.
+   Workers AI na Action, comentários (Garrul), GitHub App do Keystatic.
 6. **Apagar as reviews de exemplo** (inclusive `teste-do-snufu`): feito em 2026-10-25 (continuam no histórico do git).
 
 O **mobile** foi revisto em 2026-10-24 (header compacto, piso de 13px, toque de 44px, home empilhada sem
@@ -198,23 +198,22 @@ Ainda não existe aviso automático de vencimento (o Tomaz quer planejar um). O 
 antes de um token fine-grained vencer.
 
 **Fase D:**
-- **Comentários: em espera, decisão do Tomaz (2026-10-25).** Hoje a página da review mostra "Os comentários
-  abrem em breve" e a home mostra o link sem a contagem (`repoId` e `categoryId` vazios em `src/site.config.ts`).
-  Dois candidatos pesquisados:
-  - **Giscus** (o que o código já suporta): comentários viram GitHub Discussions do repositório; sem banco,
-    grátis, sem anúncio, moderação pelo GitHub, 5 minutos de configuração. Contra: quem comenta precisa de
-    conta do GitHub, barreira para o público de jogos, filmes e anime.
-  - **Garrul** (github.com/KingPin/Garrul, Apache 2.0): Worker próprio na conta da Cloudflare com D1, KV e
-    Turnstile, no plano Free. Login com Google, Discord, GitHub, Facebook e X (e anônimo opcional), interface
-    em pt e es, sem rastreamento, fila de moderação, anti-spam, bot no Telegram, exportar e apagar dados
-    (LGPD), exemplo para Astro, visual por variáveis CSS, importa de Disqus e Remark42. Contra: projeto novo
-    (maio de 2026, 52 estrelas) e de um autor só; uma auditoria achou 2 falhas críticas, já corrigidas. Os dados
-    ficam no D1 do Tomaz. Instalação de 1 a 2 horas (Worker, apps de login no Google Cloud e no Discord,
-    Turnstile, visual). Próximo passo sugerido: rodar o Garrul localmente (`npm run dev`) e mostrar screenshots
-    com o visual do site antes de criar algo nas contas.
-  - Descartados: Remark42 e Artalk (maduros, com Google e Discord, mas exigem servidor 24h, sem hospedagem
-    grátis sem cartão), Waline (login social por serviço intermediário), Isso e Cusdis (sem login social),
-    Disqus (anúncios e rastreamento).
+- **Comentários: Garrul, decidido pelo Tomaz em 2026-10-26, instalação em andamento.**
+  - Por quê: login com Google e Discord (o Giscus só aceita GitHub, o que afasta o público de jogos e anime).
+    Plano grátis da Cloudflare, sem cartão. Contra aceito: projeto novo e de um autor só (sai em JSON e CSV
+    se precisar trocar).
+  - Decisões: login só Google e Discord (sem GitHub, Facebook, X ou anônimo); votos e ordenação (Recentes,
+    Antigos, Mais votados) ficam; créditos "Comentários por Garrul" ficam; sem e-mail de aviso nem webhooks;
+    hash de IP apagado em 7 dias (`IP_HASH_RETENTION_DAYS`). LGPD: pedido de exclusão por e-mail, apagado à mão
+    no `/admin` (anonimiza o nome e mantém o texto, a não ser que o texto identifique a pessoa). O Marco Civil
+    (6 meses de registro de acesso) só vale para pessoa jurídica com fins econômicos: revisar se o blog virar negócio.
+  - Feito: teste local (etapa 0), visual aprovado (etapa 2) e integração no blog (etapa 3): `COMENTARIOS.api`
+    vazio em `src/site.config.ts`, então a review continua mostrando "Os comentários abrem em breve" até o deploy.
+  - Falta: etapa 4 (repositório `needorgreed-comentarios`, `wrangler login`, Turnstile, `npm run setup`, domínio
+    `comentarios.needorgreed.blog`, apps de login no Google Cloud e no Discord, `ALLOWED_ORIGINS`), etapa 5
+    (testes de verdade, inclusive Safari no iPhone) e etapa 6 (página de privacidade nas três línguas, com link
+    no rodapé).
+  - Descartados: Giscus (só GitHub), Remark42 e Artalk (servidor 24h), Waline, Isso, Cusdis e Disqus.
 - **Painel online (Keystatic):** GitHub App `needorgreed-keystatic` criado em 2026-10-25 na conta
   TomazBontempo, instalado só neste repositório (contents write). Secrets do Worker:
   `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`; build variable

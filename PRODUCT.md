@@ -20,7 +20,7 @@ Two independent axes, rarity (how good it is) and roll (Need, Greed or Pass: is 
 ## Operating Context
 - Reviews are long-form MDX, the product itself. Home shows the latest review in full, Reddit-post style, with a link to its discussion page.
 - Loot log: chronological system-message feed of events (review created, review updated, new author), derived from GitHub commit history at build.
-- Comments via Giscus (GitHub Discussions), shared across both languages per review.
+- Comments via Garrul (our own Cloudflare Worker, Google and Discord login), shared across all languages per review.
 - Bilingual: English at root, pt-BR under /pt/. Reviews are machine translated by Workers AI and marked as such.
 
 ## Capabilities and Constraints

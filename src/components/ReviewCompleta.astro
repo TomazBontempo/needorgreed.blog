@@ -60,7 +60,13 @@ const { eventos } = await getLootLog();
         </p>
       )
     }
-    <Comentarios idioma={idioma} slug={review.slug} />
+    <Comentarios
+      idioma={idioma}
+      slug={review.slug}
+      titulo={data.titulo}
+      publicado={data.data}
+      idiomaOriginal={versao.idiomaOriginal}
+    />
   </div>
 
   <aside class="log-lateral">
