@@ -46,7 +46,7 @@ const es: Dicionario = {
   },
 
   raridades: {
-    lixo: { nome: 'Basura de vendedor', faixa: '0 a 2.9' },
+    lixo: { nome: 'Basura', faixa: '0 a 2.9' },
     comum: { nome: 'Común', faixa: '3 a 4.9' },
     incomum: { nome: 'Poco común', faixa: '5 a 6.9' },
     raro: { nome: 'Raro', faixa: '7 a 8.9' },

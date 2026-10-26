@@ -3,89 +3,26 @@
 Documento de passagem para o próximo agente. Leia o `CLAUDE.md` primeiro (regras, decisões e padrões);
 este arquivo diz **onde paramos**, **o que falta** e **o que já deu errado**. Atualize-o ao fim de cada sessão.
 
-Última atualização: 2026-10-24 (fim do dia).
+Última atualização: 2026-10-26.
 
 ---
 
 ## Onde paramos
 
-O redesign seguiu um plano de 8 passos pedido pelo Tomaz:
+**O site está no ar e pronto para uso** em `https://needorgreed.blog` (desde 2026-10-25), com comentários em
+`https://comentarios.needorgreed.blog` (desde 2026-10-26). A primeira review real é
+`cyberpunk-edgerunners-2` (anime, Incomum 6.9, Greed), publicada pelo painel online em 2026-10-25.
 
-| Passo | O quê | Estado |
-|---|---|---|
-| 1 | `npm install` e build do protótipo | feito |
-| 2 | Skills e contexto da Impeccable (`PRODUCT.md`) | feito |
-| 3 | `motivoRoll` no schema/painel/exemplos; eventos do loot log via GitHub | feito |
-| 4 | Base de idiomas: i18n, dicionários, tradução automática, Action, Worker | feito |
-| 5 | Direção visual aprovada ("Fichário de Loot", sem nada de card game) | feito |
-| 6 | Home e página da review, com várias rodadas de ajustes do Tomaz | feito |
-| 7 | Jogos, Telas, Raridade, Autor, Arquivo, Sobre, 404, RSS | feito |
-| 8 | Auditoria e crítica da Impeccable, build, teste completo no `wrangler dev` | **em andamento**: crítica feita e corrigida em parte; falta `audit`, `DESIGN.md` e o `wrangler dev` |
+Linha do tempo resumida:
+- **Até 2026-10-24:** redesign em 8 passos ("Fichário de Loot"), três línguas, regra de idioma pelo navegador,
+  mídia na pasta da review, crítica e auditoria da Impeccable, mobile revisto.
+- **2026-10-25:** reviews de exemplo apagadas, SEO (dados estruturados, imagem de compartilhamento, regra para
+  IAs), domínio e deploy na Cloudflare, painel online (Keystatic com login do GitHub), tradução de verdade
+  pelo Workers AI, primeira review.
+- **2026-10-26:** correções do painel (imagem colada e imagem renomeada), tradução sem raciocínio do modelo,
+  comentários (Garrul) com login Google e Discord, página de privacidade, e-mail de contato, `DESIGN.md`.
 
-Depois do passo 7, a sessão de 2026-10-24 fez:
-- **Espanhol** (América Latina) como terceira língua, em `/es/`, com seletor de idioma no header,
-  faixa de sugestão, sitemap com as três línguas e tradução automática para N línguas.
-- **Regra de idioma nova** (decisão do Tomaz, depois de pesquisa sobre Google, Wikipedia e comunidades):
-  idioma do navegador em vez do país, só a home redireciona, links diretos nunca. Detalhes no CLAUDE.md.
-- Hero novo ("Cada obra é um loot: / Need, Greed ou Pass." + a descrição), nome do repositório corrigido
-  para `TomazBontempo/needorgreed.blog`, README atualizado.
-
-Ainda em 2026-10-24:
-- **Regras de mídia novas** (pedido do Tomaz). Tudo da review na pasta dela (`capa.<ext>`, `imagens/`,
-  `videos/`) e capa obrigatória. O build para só quando a página sairia quebrada (capa, caminho ou arquivo
-  errado, 25 MB); texto alternativo e descrição de clipe viraram só aviso, e o nome do arquivo é livre
-  (ver "Para rever no futuro"). Resolveu o bug da capa `./capa.jpg` apagada pelo painel.
-- **Links para fora do blog** abrem em nova guia, com seta e aviso para leitor de tela.
-- **Tooltip do loot log** corrigido no `astro dev` (fragmentos em `/fichas/<idioma>-<slug>/`).
-- **Painel:** logo d100, campos reordenados (obra, veredito, ficha, publicação), explicações curtas.
-- **Tudo commitado e enviado ao GitHub** (ver "Git"). A Action de tradução teve um bug no passo de commit,
-  corrigido e testado no próprio GitHub.
-
-No fim de 2026-10-24 (commits `d81f94b` em diante):
-- **Crítica da Impeccable** (só leitura, rodada num contexto só, sem sub-agentes): 29 de 32 nas heurísticas
-  aplicáveis. Corrigidos os dois P2: um h1 só por página (um `#` no texto da review vira h2, ver
-  `components/TituloDoTexto.astro`; fichas logo abaixo do h1 viram h2) e o motivo do roll sem repetir na
-  lateral da review. O resto ficou em "Problemas abertos". Screenshots e medidas em `.impeccable/review/`
-  (fora do git).
-- **Hero novo:** uma frase ("Cada obra é um loot.", em inglês "Every work is loot."), explicação em duas linhas e o link "Saiba mais sobre
-  nossas notas" na quarta linha. Respiro de até 65px que empurra a página em vez de espremer o destaque,
-  com limite no título de "Mais loot" e 32px de ficha (`--espiar-minimo` em `views/Home.astro`). Testamos
-  alinhar o hero com o destaque; o Tomaz preferiu o alinhamento com o logo do header.
-- **Re-roll no loot log:** edição aparece igual ao roll original (`re-rolled`, `re-rolou`, `re-tiró`), sem
-  contador. O filtro do Arquivo virou "Re-rolls".
-- **Raridade Herança removida** de tudo (lógica, painel, rotas, cores, textos). As reviews de exemplo ainda
-  têm a linha `heranca:` no frontmatter; ela é ignorada e some quando os exemplos forem apagados.
-- **Sobre:** chegou a ter um glossário no fim; o Tomaz achou redundante e ele foi removido.
-- **Espanhol:** "botín" trocado por "loot" em todo lugar.
-
-**Decisão do Tomaz: o site só sobe com o domínio.** Ele vai comprar o `needorgreed.blog` antes. A Cloudflare
-cobra domínio só em dólar (há IOF em cartão comum); o Tomaz vai usar um cartão sem IOF. Alternativas que
-ficaram registradas: subir antes no endereço gratuito `*.workers.dev` e ligar o domínio depois, sem refazer
-nada; ou registrar o domínio num registrador que cobre em reais e só apontar o DNS para a Cloudflare.
-Nada quebra para o leitor fora do domínio final; o que aponta para `needorgreed.blog` é o `site` do
-`astro.config.mjs` (canonical, hreflang, sitemap, RSS, imagem de compartilhamento) e o login do painel online.
-
-**No ar desde 2026-10-25** em `https://needorgreed.blog` (Cloudflare Workers, conta pessoal do Tomaz, que
-também tem os sites da agência dele). Domínio registrado na Hostinger, DNS na Cloudflare (nameservers
-`clarissa` e `vasilii.ns.cloudflare.com`, DNSSEC desligado). Sem e-mail no domínio. Próximo: fase D
-(tradução, comentários, Keystatic), ver "Configuração externa".
-
-### Checklist para subir o site
-
-1. **Testar o site vazio** (o mais importante): apagar as reviews de exemplo numa cópia e garantir que
-   home, destaque, loot log, "Mais loot", listagens, sitemap e RSS funcionam e que o build passa.
-2. **Passo 8 da Impeccable:** a `critique` já rodou; falta o `audit` no site todo (três línguas, desktop e
-   celular), corrigir, rodar o finish reviewer e gerar o `DESIGN.md` com o documenter.
-3. **Teste no `npx wrangler dev`:** redirecionamento da home com `Accept-Language` em português, espanhol e
-   outra língua; links diretos sem redirecionamento; seletor persistindo entre visitas (cookie `lang`).
-4. **Comprar o domínio** e criar o projeto na Cloudflare Workers ligado ao repositório (README, "Deploy").
-5. **Configurar segredos e serviços** (ver "Configuração externa"): `GITHUB_TOKEN` no build, token do
-   Workers AI na Action, comentários (Garrul), GitHub App do Keystatic.
-6. **Apagar as reviews de exemplo** (inclusive `teste-do-snufu`): feito em 2026-10-25 (continuam no histórico do git).
-
-O **mobile** foi revisto em 2026-10-24 (header compacto, piso de 13px, toque de 44px, home empilhada sem
-carrossel, fichas com uma moldura só, veredito e progresso na review). Também a faixa de idioma em uma linha e
-os filtros do Arquivo em fileiras. O desktop foi conferido pixel a pixel e não mudou.
+Pendente agora: só o que está em "Problemas abertos" (nada impede o uso).
 
 ---
 
@@ -93,183 +30,148 @@ os filtros do Arquivo em fileiras. O desktop foi conferido pixel a pixel e não 
 
 - **Páginas (inglês na raiz, português em `/pt/`, espanhol em `/es/`):** home, review, Jogos (`/games/`),
   Telas (`/screens/`, com filtro por tipo), Raridade (`/rarity/<slug>/`), Autor (`/authors/<slug>/`),
-  Arquivo (`/archive/`, loot log completo por mês com filtros de evento e roll), Sobre (`/about/`), 404 e
-  RSS por idioma. Fragmentos `/fichas/<idioma>-<slug>/` para o tooltip do log (noindex). 96 páginas no build.
-- **Idioma:** o Worker (`src/worker.ts`) decide antes de servir: `?lang=` (seletor ou faixa) grava o cookie;
-  com cookie, vale em qualquer página; sem cookie, só a home redireciona, pelo `Accept-Language`; bots nunca.
-  Nas outras páginas, a faixa de sugestão (fixa no pé da tela) oferece a troca. Testado no `wrangler dev` e
-  no Playwright (com `locale` no contexto) em 2026-10-24.
-- **SEO:** `hreflang` (en, pt-BR, es, x-default) e `canonical` em todas as páginas; `sitemap.xml` com 66 URLs
-  (22 páginas x 3 línguas) citado no `robots.txt`. JSON-LD `Review` em cada review (obra, tipo, nota de 0 a 10,
-  autor, data) e `WebSite` na home. Imagem de compartilhamento padrão `public/og.jpg` (1200x630, d100 do
-  placeholder, gerada pelo Codex) nas páginas sem capa. `robots.txt` com Content Signals
-  (`search=yes, ai-input=yes, ai-train=no`) e os robôs de treino bloqueados (GPTBot, ClaudeBot, CCBot,
-  Google-Extended, Applebot-Extended, meta-externalagent, Bytespider).
-- **Tradução:** `npm run translate` (Workers AI, modelo Gemma 4 26B), hash do original, respeita
-  `revisado: true`, traduz legendas e descrições dos componentes, trata cota esgotada sem quebrar.
-  Traduz o original para todas as outras línguas (en, pt, es; espanhol neutro da América Latina).
-  Action em `.github/workflows/translate.yml`. Testado só com `--mock` (sem token ainda).
-- **Loot log:** vem do histórico de commits do GitHub no build (`src/lib/lootlog.ts`), com fallback nas
-  próprias reviews. Com o nome do repositório corrigido, o build já consulta o GitHub de verdade: as reviews
-  que estão em algum commit enviado aparecem com a data do commit; as outras, com a data da própria review.
+  Arquivo (`/archive/`, loot log completo por mês com filtros), Sobre (`/about/`), Privacidade (`/privacy/`),
+  404 e RSS por idioma. Fragmentos `/fichas/<idioma>-<slug>/` para o tooltip do log (noindex).
+- **Rodapé:** Sobre, Privacidade, Contato (`mailto:` para `SITE.contato`) e Feed RSS.
+- **Home:** o "Mais loot" nunca repete o destaque, **exceto quando ele é a única review** (senão a seção some).
+- **Idioma:** o Worker (`src/worker.ts`) decide antes de servir: `?lang=` grava o cookie; com cookie, vale em
+  qualquer página; sem cookie, só a home redireciona, pelo `Accept-Language`; bots nunca. Nas outras páginas,
+  a faixa de sugestão (fixa no pé da tela) oferece a troca. Testado ao vivo em 2026-10-25.
+- **SEO:** `hreflang` (en, pt-BR, es, x-default) e `canonical` em todas as páginas; `sitemap.xml` citado no
+  `robots.txt`. JSON-LD `Review` em cada review e `WebSite` na home. Imagem de compartilhamento padrão
+  `public/og.jpg` (1200x630). `robots.txt` com Content Signals (`search=yes, ai-input=yes, ai-train=no`) e os
+  robôs de treino bloqueados (GPTBot, ClaudeBot, CCBot, Google-Extended, Applebot-Extended,
+  meta-externalagent, Bytespider). Testado ao vivo: robôs de treino recebem 403, os de busca e resposta 200.
+- **Painel online (`/keystatic`):** login com GitHub; cada "Salvar" vira commit e o site publica em 1 a 2
+  minutos. Duas correções no painel:
+  - imagem colada (Ctrl+V) chega sempre como `image.png` e uma sobrescrevia a outra: agora ganha um sufixo
+    único (`nomeDaImagem()` em `src/lib/nomes-de-arquivo.ts`);
+  - renomear a imagem na janela do painel gravava o nome cru, com espaço e fora de `imagens/`: corrigido com
+    `patch-package` no Keystatic 0.6.9 (`patches/@keystatic+core+0.6.9.patch`, aplicado no `postinstall`).
+    Se o Keystatic for atualizado e o patch não couber, a instalação para com erro: refazer o patch.
+- **Tradução:** `npm run translate` (Workers AI, Gemma 4 26B), com o raciocínio do modelo desligado
+  (`chat_template_kwargs: { enable_thinking: false }`: a review inteira em 3 línguas leva uns 3 minutos, antes
+  levava 18). Cada pedido vai para o log (tempo, `finish_reason`, tokens, se raciocinou). Trecho que volta
+  vazio ou sem trecho protegido é refeito até 2 vezes; campo curto que volta igual ao original vai num segundo
+  pedido. Traduz corpo, frase, motivo, duração, atributos, tags, legendas e o texto alternativo das imagens.
+  Respeita `revisado: true` (a versão em inglês da review do Edgerunners está revisada à mão: "must-watch").
+- **Comentários:** Garrul, ver "Configuração externa".
+- **Loot log:** histórico de commits do GitHub no build (`src/lib/lootlog.ts`).
 - **Mídia nas reviews:** tudo na pasta da review (`capa.<ext>` obrigatória, `imagens/`, `videos/`), caminhos
-  `../<slug>/...`. Imagens otimizadas, `<Figure>` com legenda, `<YouTube>`, `<Clipe>` (mp4/webm publicado em
-  `/_astro/`). O painel limpa o nome no upload. `src/integrations/midia.ts` para o build em capa ausente ou
-  fora do formato, mídia fora da pasta, arquivo inexistente, imagem escapada pelo painel e arquivo acima de
-  25 MB; só avisa sobre texto alternativo ou descrição de clipe faltando e arquivos soltos ou sem uso.
-- **Checagens que passavam no fim da sessão de 2026-10-24:** `npx astro check` com 0 erros, `npm run build`
-  sem erros, 2.678 links internos do build sem nenhum quebrado, detector da Impeccable sem achados,
-  nenhum travessão.
+  `../<slug>/...`. `src/integrations/midia.ts` para o build quando a página sairia quebrada e só avisa sobre
+  texto alternativo, descrição de clipe e arquivos soltos ou sem uso.
+- **Design:** `DESIGN.md` gerado em 2026-10-26 (tokens, tipos, componentes, regras), com o complemento
+  `.impeccable/design.json`.
 
 ---
 
 ## Problemas abertos
 
-- **Vocabulário em espanhol a revisar** por alguém que fale espanhol: "Pantallas", "Acerca", nomes das
-  raridades e a linha de roll ("Snufupugos tiró Need (94) por [Outer Wilds]").
-- **Auditoria da Impeccable (`audit`) feita em 2026-10-24: 16/20.** Só o item de polimento foi aplicado (cores
-  fixas viraram tokens, código morto removido). O Tomaz descartou o resto (links do log só por cor, contraste
-  dos eventos "lidos", texto em 200%, 11px no desktop, pré-carregamento das fontes): não reabrir sem ele pedir.
-- **Próximo passo (2026-10-25): limpar o site e subir na Cloudflare**, pelo checklist acima.
-- **Adiados pelo Tomaz (resolver mais à frente):** o `DESIGN.md`;
-  o logo (o d100 de traço ainda é placeholder). O mobile já foi revisto (ver "Onde paramos").
-- **Decidido não mexer:** o progresso de leitura mostra "1% lido" no topo de review longa e "100% lido"
-  de cara em review curta. Fica como está (decisão do Tomaz).
-- Resolvidos depois da crítica: raridade e nota no celular (na meta da review, abaixo de 900px), os
-  filtros do Arquivo com 24px de altura de toque e a marca de "lido" (virou carimbo na capa). No celular,
-  o veredito compacto da review também traz plataforma e duração.
-- **Pé da ficha no desktop** ainda quebra em duas linhas quando o nome da raridade é longo ("Lixo de vendedor
-  · 2.1" em 1280). No celular já fica sempre numa linha.
-- **Bio traduzida** (2026-10-24): implementada e testada com `--mock`; a primeira tradução de verdade sai
-  na Action quando houver token.
-- **Site vazio:** o Tomaz vai apagar todas as reviews de exemplo e publicar o site vazio para postar a primeira.
-  Ninguém testou o site sem nenhuma review (home, destaque, loot log, "Mais loot", sitemap, RSS):
-  fazer antes de apagar os exemplos (item 1 do checklist).
-- **Action de tradução** atualizada para `checkout@v7` e `setup-node@v7` em 2026-10-24 (testada no GitHub,
-  sem aviso de Node 20).
+- **Comentários de teste** na review do Edgerunners ("teste02" e outros): o Tomaz vai apagar pelo `/admin`.
+
+**Decididos (não reabrir sem o Tomaz pedir):**
+- **Logo:** o d100 de traço fica como logo definitivo (header e favicon).
+- **Raridade mais baixa:** "Lixo", "Trash" e "Basura" (2026-10-26), para o pé da ficha caber numa linha.
+  O endereço em inglês mudou de `/rarity/vendor-trash/` para `/rarity/trash/`.
+- **Espanhol:** vocabulário aprovado por um falante nativo amigo do Tomaz (2026-10-26).
+- **Auditoria da Impeccable (2026-10-24, 16/20):** o resto foi descartado pelo Tomaz (links do log só por cor,
+  contraste dos eventos "lidos", texto em 200%, 11px no desktop, pré-carregamento das fontes).
+- **Progresso de leitura:** "1% lido" no topo de review longa e "100% lido" de cara em review curta ficam.
+- **Alerta de vencimento de token:** não haverá (o GitHub avisa por e-mail). Ver a nota da Cloudflare em
+  "Tokens com validade".
 
 ---
 
 ## Para rever no futuro
 
-- **Nome dos arquivos de imagem (decisão de 2026-10-24).** O Tomaz abandonou qualquer regra de nome: o build
-  não avisa mais sobre nomes genéricos (`IMG_2034.jpg`, `image.png`), e o painel só limpa o nome no upload
-  (minúsculas, sem acento, hífens). Motivo: hoje só ele escreve e organiza os próprios arquivos. **Rever
-  quando entrar um autor novo.** O que já se sabe:
-  - O Google trata o nome do arquivo como pista leve; o texto alternativo e o texto ao redor pesam mais.
-  - O painel (Keystatic) não consegue obrigar nome nem texto alternativo na inserção da imagem: um bloco com
-    campos obrigatórios é salvo vazio sem aviso (testado em 2026-10-24). Desligar o botão de imagem nativo
-    impede colar (Ctrl+V) e arrastar imagens, mas não força o preenchimento.
-  - Opções levantadas e não escolhidas: (1) voltar com o aviso no build; (2) GitHub Action que renomeia
-    imagens de nome genérico a partir do texto alternativo e atualiza os caminhos; (3) a mesma Action gerar
-    um rascunho de texto alternativo com um modelo de visão do Workers AI (grátis), marcado para revisão;
-    (4) no `astro dev`, uma faixa na própria página da review listando os problemas de mídia.
-- **Texto alternativo e descrição de clipe viraram só aviso (decisão de 2026-10-24).** O Tomaz não quer
-  descrição esquecida segurando publicação. Sem eles a página funciona, mas fica pior para leitor de tela e
-  para o Google. Rever junto com o nome dos arquivos; as opções (3) e (4) acima ajudariam a não esquecer.
+- **Nome dos arquivos de imagem e texto alternativo (decisões de 2026-10-24).** O nome é livre (o painel só
+  limpa: minúsculas, sem acento, hífens) e o texto alternativo é só aviso no build. **Rever quando entrar um
+  autor novo.** O painel não consegue obrigar nome nem texto alternativo (testado). Opções levantadas: aviso no
+  build; Action que renomeia imagens genéricas pelo texto alternativo; Action que gera um rascunho de texto
+  alternativo com um modelo de visão do Workers AI; faixa de problemas de mídia no `astro dev`.
+- **Marco Civil:** se o blog virar negócio (anúncio, patrocínio ou operado pela agência, que é pessoa
+  jurídica), passa a ser preciso guardar o IP de acesso por 6 meses; o Garrul só guarda hash, por 7 dias.
 
 ---
 
-## Configuração externa (Cloudflare e GitHub)
+## Configuração externa (Cloudflare, GitHub, Google e Discord)
 
-Fica só nos painéis, não no código. Os valores dos tokens nunca entram no repositório.
+Fica só nos painéis, não no código. Os valores dos tokens e segredos nunca entram no repositório nem no chat.
 
 **Cloudflare, Worker `needorgreed`** (Workers Builds ligado ao repositório: cada push no `main` publica):
 - Build `npm run build`, deploy `npx wrangler deploy`, preview builds desligados.
-- Build variables: `GITHUB_TOKEN` (secret) e `NODE_VERSION=24`.
-- Custom domain `needorgreed.blog`. O endereço `needorgreed.tomaz-bontempo.workers.dev` está desligado
-  (evita cópia do site nos buscadores).
+- Build variables: `GITHUB_TOKEN` (secret), `NODE_VERSION=24` e `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=needorgreed-keystatic`.
+- Secrets: `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET` (valores também
+  no `.env` local do Tomaz, fora do git).
+- Custom domain `needorgreed.blog`. O endereço `*.workers.dev` está desligado.
 
-**Cloudflare, zona `needorgreed.blog`:**
+**Cloudflare, zona `needorgreed.blog`** (conta pessoal do Tomaz, a mesma dos sites da agência; Account ID
+`2dd64c7fa18094c6d65cae2025264e4c`):
 - **AI Crawl Control → Bot Preference Sync: desligado.** Ligado, a Cloudflare cola o robots.txt dela em cima
-  do nosso (duas regras `User-agent: *` que se contradizem). Os robôs de treino continuam barrados com 403.
-- **SSL/TLS → Edge Certificates → Always Use HTTPS: ligado.**
-- **Redirect Rule "www para needorgreed.blog":** `https://www.*` para `https://${1}`, 301, mantém a query
-  string. Registro DNS `A www 192.0.2.1` com proxy (endereço fictício, só para o `www` chegar à regra).
-- Bot Fight Mode desligado (desafiaria o Googlebot e os robôs de resposta de IA).
+  do nosso. Os robôs de treino continuam barrados com 403.
+- **Always Use HTTPS: ligado.** Redirect Rule `https://www.*` para `https://${1}` (301), com registro DNS
+  `A www 192.0.2.1` com proxy. Bot Fight Mode desligado.
+- **Email Routing:** `contato@needorgreed.blog` encaminha para o Gmail do Tomaz (grátis, só recebe). Catch-all
+  desligado (descarta o resto). Registros MX e SPF criados pela própria Cloudflare.
+- Domínio registrado na Hostinger; DNS na Cloudflare (`clarissa` e `vasilii.ns.cloudflare.com`), DNSSEC desligado.
+
+**Comentários: Garrul** (github.com/KingPin/Garrul, Apache 2.0):
+- **Worker `needorgreed-comentarios`** em `https://comentarios.needorgreed.blog`. Código no repositório privado
+  `TomazBontempo/needorgreed-comentarios`, pasta ao lado do blog, com `upstream` = KingPin/Garrul. Actions e
+  Dependabot desligados (gastariam minutos do plano grátis; o CodeQL nem roda em repositório privado).
+- D1 `garrul-db` e 4 KV. Turnstile `needorgreed-comentarios` (hostname `needorgreed.blog`, que cobre os
+  subdomínios). `ALLOWED_ORIGINS = https://needorgreed.blog`. `IP_HASH_RETENTION_DAYS = 7`.
+  `REACTIONS_ENABLED = false`. `ADMIN_EMAILS` = Gmail do Tomaz (toda conta Google ou Discord com esse e-mail
+  verificado vira administradora). A configuração fica no `wrangler.toml` (fora do git, só na máquina do Tomaz).
+- **Mudanças na nossa cópia**, todas marcadas "Need or Greed":
+  - **sem anônimo:** o servidor recusa comentário, voto e reação sem login (`src/routes/api.comments.ts`,
+    `src/lib/active-user.ts`) e nunca cria usuário anônimo; a caixa sem login só mostra "Entre para comentar";
+  - **visual** (fim de `src/widget/styles.css`): texto de sistema em mono (`--nog-mono`), cantos retos, 44px
+    de toque e 13px de texto no celular, tag GM em azul (`--nog-gm`), sem o selo do provedor de login, votos só
+    com o triângulo;
+  - **textos:** sem travessão; espanhol completado (14 frases faltavam).
+- **No blog:** `COMENTARIOS.api` em `src/site.config.ts`, a caixa e o tema em `src/components/Comentarios.astro`
+  (carrega só quando o leitor chega perto), a contagem da home em `src/lib/comentarios.ts`.
+- **Logins:** Discord (app "needorgreed.blog" no Developer Portal) e Google (projeto `needorgreed`
+  no Google Cloud, Google Auth Platform, External, **em produção**, sem logo para não exigir verificação,
+  política de privacidade `https://needorgreed.blog/privacy/`). Retorno: `/api/v1/auth/<serviço>/callback`.
+  Segredos só na Cloudflare (`wrangler secret put` na pasta dos comentários).
+- **Selo de equipe:** o texto "GM" está em `/admin` → Settings → staff badge label (vale para as três línguas).
+- **Moderação:** `https://comentarios.needorgreed.blog/admin`, entrando com o Google. Emergência:
+  `npm run owner-link` na pasta dos comentários (link de uso único, 10 minutos; nunca colar em chat).
+- **LGPD:** pedido de exclusão por e-mail, apagado à mão no `/admin` (anonimiza o nome e mantém o texto, a não
+  ser que o texto identifique a pessoa). Se mudar o que os comentários guardam, atualizar
+  `src/views/Privacidade.astro` e os dicionários.
+- **Atualizar o Garrul:** `git fetch upstream && git merge upstream/main` na pasta dos comentários, conferir os
+  trechos "Need or Greed", testar com `npx wrangler dev -c wrangler.toml.new.dev.toml` (cópia local sem a rota
+  de produção, fora do git) e `npm run deploy`.
 
 **Tokens com validade (renovar antes de vencer):**
 | Token | Onde fica | Permissão | Vence | Se vencer |
 |---|---|---|---|---|
-| GitHub fine-grained `needorgreed-build` | Cloudflare, build variable `GITHUB_TOKEN` | Contents e Metadata, leitura, só este repositório | por volta de 2027-10-25 (1 ano) | loot log e autoria caem no limite de 60 requisições por hora e no autor padrão; contagem de comentários some |
-| Cloudflare `needorgreed-traducao` | GitHub, secret `CLOUDFLARE_AI_TOKEN` (+ `CLOUDFLARE_ACCOUNT_ID`) | Workers AI Read e Edit | por volta de 2027-10-25 (1 ano) | reviews novas ficam sem tradução (a página mostra o original com aviso) |
+| GitHub fine-grained `needorgreed-build` | Cloudflare, build variable `GITHUB_TOKEN` | Contents e Metadata, leitura, só este repositório | por volta de 2027-10-25 | loot log e autoria caem no limite de 60 requisições por hora e no autor padrão |
+| Cloudflare `needorgreed-traducao` | GitHub, secret `CLOUDFLARE_AI_TOKEN` (+ `CLOUDFLARE_ACCOUNT_ID`) | Workers AI Read e Edit | por volta de 2027-10-25 | reviews novas ficam sem tradução (a página mostra o original com aviso) |
 
-Ainda não existe aviso automático de vencimento (o Tomaz quer planejar um). O GitHub manda e-mail alguns dias
-antes de um token fine-grained vencer.
+O GitHub manda e-mail alguns dias antes de um token fine-grained vencer (decisão do Tomaz: sem alerta próprio).
+**O token da Cloudflare não tem esse aviso garantido: olhar à mão** em dash.cloudflare.com → My Profile → API
+Tokens no começo de outubro de 2027, junto com o token de API do Workers Builds. O login do Wrangler na máquina
+do Tomaz (`npx wrangler login`) também expira de tempos em tempos; é só rodar de novo.
 
-**Fase D:**
-- **Comentários: Garrul, decidido pelo Tomaz em 2026-10-26, instalação em andamento.**
-  - Por quê: login com Google e Discord (o Giscus só aceita GitHub, o que afasta o público de jogos e anime).
-    Plano grátis da Cloudflare, sem cartão. Contra aceito: projeto novo e de um autor só (sai em JSON e CSV
-    se precisar trocar).
-  - Decisões: login só Google e Discord (sem GitHub, Facebook, X ou anônimo); votos e ordenação (Recentes,
-    Antigos, Mais votados) ficam; créditos "Comentários por Garrul" ficam; sem e-mail de aviso nem webhooks;
-    hash de IP apagado em 7 dias (`IP_HASH_RETENTION_DAYS`). LGPD: pedido de exclusão por e-mail, apagado à mão
-    no `/admin` (anonimiza o nome e mantém o texto, a não ser que o texto identifique a pessoa). O Marco Civil
-    (6 meses de registro de acesso) só vale para pessoa jurídica com fins econômicos: revisar se o blog virar negócio.
-  - **No ar desde 2026-10-26** em `https://comentarios.needorgreed.blog` (Worker `needorgreed-comentarios`, repositório
-    privado `TomazBontempo/needorgreed-comentarios`, pasta ao lado do blog, `upstream` = KingPin/Garrul, Actions e
-    Dependabot desligados). D1 `garrul-db`, 4 KV, Turnstile `needorgreed-comentarios` (hostname `needorgreed.blog`, que
-    cobre o subdomínio). Na nossa cópia: visual do site, textos sem travessão e **sem anônimo** (servidor recusa
-    comentário, voto e reação sem login; nunca cria usuário anônimo). Reações desligadas (`REACTIONS_ENABLED`).
-    `ADMIN_EMAILS` = Gmail do Tomaz; entrar no `/admin` pelo login do Google. Emergência: `npm run owner-link` na pasta
-    dos comentários (link de uso único, 10 minutos; nunca colar em chat).
-  - Logins: Discord (app "needorgreed.blog" no Developer Portal) e Google (projeto `needorgreed` no Google Cloud, Google
-    Auth Platform, External, **em produção**, sem logo para não exigir verificação, política de privacidade
-    `https://needorgreed.blog/privacy/`). Segredos só na Cloudflare (`wrangler secret put`).
-  - Privacidade: página `/privacy/`, `/pt/privacidade/`, `/es/privacidad/` e links Privacidade e Contato no rodapé.
-    Contato `contato@needorgreed.blog` (Email Routing da Cloudflare, grátis, só recebe, encaminha para o Gmail; catch-all
-    desligado). Se mudar o que os comentários guardam, atualizar `src/views/Privacidade.astro` e os dicionários.
-  - Atualizar o Garrul: `git fetch upstream && git merge upstream/main` na pasta dos comentários, conferir os trechos
-    marcados "Need or Greed" (CSS, `api.comments.ts`, `active-user.ts`, `embed.ts`, textos), testar com
-    `npx wrangler dev -c wrangler.toml.new.dev.toml` (cópia local sem a rota de produção) e `npm run deploy`.
-  - Descartados: Giscus (só GitHub), Remark42 e Artalk (servidor 24h), Waline, Isso, Cusdis e Disqus.
-- **Painel online (Keystatic):** GitHub App `needorgreed-keystatic` criado em 2026-10-25 na conta
-  TomazBontempo, instalado só neste repositório (contents write). Secrets do Worker:
-  `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`; build variable
-  `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=needorgreed-keystatic`. Os valores estão só no `.env` local do Tomaz
-  (fora do git) e na Cloudflare.
-- A cota grátis do Workers AI (10.000 neurons por dia) é por conta: dividida com os sites da agência se algum
-  deles usar Workers AI.
-
----
-
-## Conteúdo de exemplo (apagar antes de publicar)
-
-Todas as reviews em `src/content/reviews/` são exemplos, marcadas com um aviso no topo do texto. Seis têm
-títulos fictícios (Abyssal Tax Office, Os Últimos Dias de Verão, Starfall Remastered, Detetive Kumo,
-Lighthouse Keeper '98, Cidade de Concreto); Outer Wilds, Frieren e Survival Genérico 3 vieram do protótipo.
-
-- As traduções `index.en.mdx` e `index.es.mdx` dos exemplos foram escritas à mão (`modelo: exemplo`), não
-  pelo script; o script as reconhece como em dia.
-- Capas de exemplo em `src/content/reviews/<slug>/capa.jpg`; imagens de teste em
-  `src/content/reviews/outer-wilds/imagens/`; clipe em `src/content/reviews/outer-wilds/videos/`.
-- O avatar `src/assets/autores/snufupugos.png` é um placeholder ("S").
-- O YouTube dos exemplos usa um id de teste (`dQw4w9WgXcQ`).
+- A cota grátis do Workers AI (10.000 neurons por dia) e a dos Workers (100 mil pedidos por dia) são por
+  conta: divididas com os sites da agência.
 
 ---
 
 ## Git
 
-Repositório: `TomazBontempo/needorgreed.blog` (público). Tudo enviado; `main` local igual ao GitHub em
-2026-10-24:
-
-- `e7687cb` protótipo
-- `6bac050` redesign completo
-- `eb07ea4` espanhol, idioma pelo navegador e seletor de idioma
-- `c9f9c05` mídia na pasta da review, capa obrigatória e checagem no build
-- `500b536` tooltip no dev, links externos, painel reorganizado e mídia sem travas
-- `35155b5` correção do passo de commit da Action de tradução
-- `9bc7efe` ESTADO atualizado (domínio e checklist de estreia)
-- `d81f94b` hero novo, títulos, re-roll no log, glossário e fim da Herança
-- `57fcc8d` sem glossário e sem "drop" no hero
-- `a1196f6` ficha única com 2 atributos, bio traduzida, ajustes da crítica
-- `81b8f4f` Action em checkout e setup-node v7
-- `0726790` re-roll no Arquivo, "loot" no espanhol e documentos atualizados
+Repositórios:
+- `TomazBontempo/needorgreed.blog` (público): o blog.
+- `TomazBontempo/needorgreed-comentarios` (privado): a cópia do Garrul.
 
 O Tomaz autoriza commits e pushes pedindo; proponha um commit ao fim de cada rodada aprovada (ele pede
 reversões com frequência). Desfazer teste: guarde uma cópia antes; nunca `git checkout` em arquivo com
-mudança não commitada.
+mudança não commitada. A Action de tradução faz commits sozinha ("Tradução automática das reviews e bios"):
+dê `git pull` antes de mexer em reviews.
 
 ---
 
@@ -282,65 +184,63 @@ npm run build                                     # build de produção
 python3 -m http.server 4400 -d dist/client        # build estático (sem Worker) em http://localhost:4400
 npm run build && npx wrangler dev                 # com o Worker, em http://localhost:8787
 curl -I -A Firefox -H 'Accept-Language: es-MX,es;q=0.9' http://localhost:8787/   # 302 para /es/
-curl -I -A Firefox -H 'Accept-Language: es-MX' http://localhost:8787/reviews/frieren/   # 200, sem redirecionar
 npm run translate -- --mock                       # tradutor de mentira
 npx astro dev --background                        # dev + painel em /keystatic
 ```
 
-Screenshots e medidas foram feitos com Playwright (instalado fora do repositório) usando o Chromium que já
-está em `~/.cache/ms-playwright/chromium-1243`. A versão nova do pacote `playwright` pede outro build do
-Chromium: passe `executablePath` apontando para o instalado. Para testar a faixa de sugestão, crie o contexto
-com `locale: 'es-MX'` (ou `pt-BR`): isso muda o `navigator.languages`.
+**Comentários localmente** (pasta `needorgreed-comentarios`): `npm run migrate` (banco local),
+`npm run build:assets` e `npx wrangler dev -c wrangler.toml.new.dev.toml` (em `localhost:8787`). No blog,
+troque `COMENTARIOS.api` por `http://localhost:8787` só para o build de teste e desfaça depois. Para entrar como
+dono no servidor local: `npx tsx scripts/owner-link.ts --local --base-url http://localhost:8787`.
+
+Screenshots e medidas com Playwright (instalado fora do repositório, no scratchpad) usando o Chromium de
+`~/.cache/ms-playwright/chromium-1243` (passe `executablePath`). Para a faixa de sugestão, crie o contexto com
+`locale: 'es-MX'` (ou `pt-BR`); sem isso, a faixa cobre o rodapé nos screenshots.
 
 ---
 
 ## Armadilhas já encontradas (não repetir)
 
-- **`npx astro check` trava** se `@astrojs/check` não estiver instalado (fica esperando confirmação).
-  Já está nas devDependencies; rode com `< /dev/null` em scripts.
-- **O país não é mais usado** para escolher o idioma (era `request.cf.country`). Não reintroduzir: a regra
-  é o idioma do navegador. Ver CLAUDE.md, "Idiomas".
+- **`npx astro check` trava** se `@astrojs/check` não estiver instalado. Rode com `< /dev/null` em scripts.
+- **O país não é usado** para escolher o idioma. Não reintroduzir `request.cf.country`.
 - **`pkill -f "wrangler dev"` mata o próprio shell** quando o padrão aparece no comando. Guarde o PID.
 - **Fonte:** no Google Fonts a família é "Big Shoulders" (não "Big Shoulders Display").
 - **Keystatic:**
-  - um atributo no `.mdx` que o bloco do painel não declara faz o painel recusar a review inteira (foi o
-    `titulo` do YouTube);
-  - imagem escrita `./foto.jpg` aparece como texto no painel e é escapada ao salvar;
+  - um atributo no `.mdx` que o bloco do painel não declara faz o painel recusar a review inteira;
+  - imagem escrita `./foto.jpg` aparece como texto no painel e é escapada ao salvar; tudo usa `../<slug>/...`;
   - arquivos de bloco (`fields.file`) só são reconhecidos em `<directory>/<slug>/`;
-  - a capa (`fields.image` no frontmatter) também: `./capa.jpg` aparece vazia e é apagada ao salvar
-    (resolvido: tudo usa `../<slug>/...` e o build barra o formato errado);
-  - o painel não exige o texto alternativo da imagem do texto, mesmo marcado como obrigatório (o Tomaz
-    salvou imagens sem ele em 2026-10-24); depois disso o texto alternativo virou só aviso no build;
-  - a imagem entra onde está o cursor: com uma imagem selecionada, o upload a substitui (e o painel apaga
-    o arquivo antigo, que ficou sem uso).
-- **`git checkout -- <arquivo>` para desfazer um teste** volta ao último commit e apaga mudanças não
-  commitadas. Para desfazer teste, guarde uma cópia antes e restaure dela.
-- **Chromium headless esconde barras de rolagem** nos screenshots: use `ignoreDefaultArgs: ['--hide-scrollbars']`.
-- **Swipe em teste:** `Input.synthesizeScrollGesture` não move scroll-snap no headless; use
-  `Input.dispatchTouchEvent` (touchStart, touchMove em passos, touchEnd).
-- **Estilos da ficha precisam ser globais** (`src/styles/item.css`): a variante mini entra via `innerHTML`
-  no tooltip, em páginas que não renderizam ficha nenhuma.
-- **Classes genéricas colidem:** o loot log usa `.item` nos links; por isso a ficha usa o prefixo `it-`.
-- **`hreflang` não aceita `es-419`** (o Google só aceita país de duas letras como região): o espanhol usa
-  `es`. O espanhol latino-americano fica garantido no texto e no prompt de tradução.
-- **Fragmentos do tooltip com `/en/` no caminho davam 404 no `astro dev`** (o roteador do i18n do Astro
-  recusa qualquer trecho igual à língua padrão). Em produção funcionava porque os arquivos são estáticos.
-  Agora o endereço é `/fichas/<idioma>-<slug>/`. Teste sempre também no `astro dev`, não só no build.
-- **Plugins rehype/remark são ignorados** pelo processador padrão de Markdown do Astro 7 (Sätteri). Para
-  mudar como um elemento do texto sai, use o mapa de componentes do MDX (`src/components/mdx.ts`).
-- **O scratchpad do Playwright é apagado entre sessões:** reinstale com `npm i playwright` numa pasta fora
-  do repositório antes de tirar screenshots.
+  - o painel não exige o texto alternativo, mesmo marcado como obrigatório;
+  - a imagem entra onde está o cursor: com uma imagem selecionada, o upload a substitui;
+  - renomear imagem e colar várias imagens: resolvidos (ver "O que existe e funciona").
+- **`git checkout -- <arquivo>` para desfazer um teste** apaga mudanças não commitadas.
+- **Chromium headless esconde barras de rolagem:** use `ignoreDefaultArgs: ['--hide-scrollbars']`.
+- **Estilos da ficha precisam ser globais** (`src/styles/item.css`, prefixo `it-`).
+- **`hreflang` não aceita `es-419`:** o espanhol usa `es`.
+- **Fragmentos com `/en/` no caminho davam 404 no `astro dev`:** o endereço é `/fichas/<idioma>-<slug>/`.
+- **Plugins rehype/remark são ignorados** pelo Markdown do Astro 7 (Sätteri): use o mapa de componentes do MDX.
+- **O scratchpad do Playwright é apagado entre sessões:** reinstale `playwright` numa pasta fora do repositório.
+- **CSS de componente Astro sai num arquivo `/_astro/*.css`,** não no HTML: para conferir uma regra no ar,
+  baixe o CSS da página.
+- **Resolvedor de DNS local com resposta negativa em cache** depois de criar um domínio ou subdomínio novo: teste
+  com `curl --resolve <host>:443:172.67.178.163` (ou `--host-resolver-rules` no Chromium).
+- **Gemma 4 com raciocínio ligado** gastava o limite de tokens pensando e devolvia resposta vazia ou perdia os
+  marcadores `⟦n⟧`. O script desliga o raciocínio; não remover.
+- **Garrul:**
+  - o `wrangler dev` com a rota de produção no `wrangler.toml` responde com o host de produção, e o Garrul em
+    `ENV=dev` se recusa a servir: use a cópia `wrangler.toml.new.dev.toml`;
+  - o servidor só aceita pedidos de `ALLOWED_ORIGINS`, até os da própria página dele;
+  - o `embed.js` fica em cache por 1 hora: depois de um deploy, Ctrl+Shift+R;
+  - o link de dono é de uso único: gere outro a cada teste.
+- **`npm` 11** não roda scripts de instalação de dependências sem aprovação (`allow-scripts`); o `postinstall`
+  do próprio projeto roda normalmente.
 
 ---
 
 ## Impeccable
 
-- `PRODUCT.md` existe (público geral de cultura pop, sucesso é ler e comentar).
-- `.impeccable/config.json`: `buildPath: code` (sem imagens de referência geradas).
-- O contrato da direção visual está como comentário HTML no começo do `<body>` (`src/layouts/Base.astro`),
-  com a seed `763e2d68`.
-- **Faltam:** a revisão final (finish reviewer) e o `DESIGN.md`. Os dois fazem parte do passo 8.
-- O seletor de idioma e a faixa de sugestão foram construídos sem mockup (o Tomaz dispensou); a crítica do
-  passo 8 deve olhar os dois.
-- Há uma versão mais nova da Impeccable (v4.7.0; instalada v4.1.1). Atualizar só se o Tomaz pedir
-  (`npx impeccable update`, vale a partir da sessão seguinte).
+- `PRODUCT.md` existe. Está um pouco desatualizado (cita reviews de exemplo, só duas línguas e o logo em
+  aberto): atualizar quando o Tomaz pedir.
+- `DESIGN.md` e `.impeccable/design.json` gerados em 2026-10-26 a partir do site pronto.
+- `.impeccable/config.json`: `buildPath: code`. O contrato da direção visual está como comentário HTML no
+  começo do `<body>` (`src/layouts/Base.astro`), com a seed `763e2d68`.
+- Há uma versão mais nova da Impeccable (instalada v4.1.1). Atualizar só se o Tomaz pedir.

@@ -8,8 +8,8 @@ web
 
 ## Users
 Primary: general pop culture readers (games, films, series, anime) who may or may not have played an MMO. They arrive from a shared link or search, want an opinionated review, and decide whether a work deserves their time and money. The MMO loot metaphor must explain itself to someone who never played one; players who did get an extra layer of recognition.
-Secondary: Brazilian and Portuguese readers (served in pt-BR) and English speakers everywhere else.
-Writers: Snufupugos (Tomaz) and, later, invited partners who post through Keystatic or the IDE.
+Secondary: three language audiences. English is the default; Brazilian and Portuguese readers get pt-BR; Latin American Spanish readers get neutral es-419. The language follows the browser, never the country.
+Writers: Snufupugos (Tomaz) and, later, invited partners who post through the online panel (Keystatic, GitHub login) or the IDE.
 
 ## Product Purpose
 A review blog where every work is treated as MMO loot. Success in year one: people read reviews to the end and discuss them in the comments.
@@ -20,15 +20,17 @@ Two independent axes, rarity (how good it is) and roll (Need, Greed or Pass: is 
 ## Operating Context
 - Reviews are long-form MDX, the product itself. Home shows the latest review in full, Reddit-post style, with a link to its discussion page.
 - Loot log: chronological system-message feed of events (review created, review updated, new author), derived from GitHub commit history at build.
-- Comments via Garrul (our own Cloudflare Worker, Google and Discord login), shared across all languages per review.
-- Bilingual: English at root, pt-BR under /pt/. Reviews are machine translated by Workers AI and marked as such.
+- Comments via Garrul (our own Cloudflare Worker, Google and Discord login, no anonymous comments), shared across all languages per review. Team replies carry a "GM" tag.
+- Trilingual: English at root, pt-BR under /pt/, es-419 under /es/. Reviews are machine translated by Workers AI and marked as such.
+- Live at needorgreed.blog since 2026-10-25, comments since 2026-10-26.
 
 ## Capabilities and Constraints
 - Astro static site on Cloudflare Workers, Keystatic CMS, authorship from GitHub account login.
 - Translation must cost zero and need no credit card (Workers AI free tier).
 - Never use the em dash in any language or surface.
 - Never copy art, fonts, icons or exact visuals from Blizzard or any game; the item tooltip is a genre convention and must be drawn from scratch.
-- Open decisions: logo. (Hero copy and the roll number are decided; see CLAUDE.md.)
+- Privacy: no ads, no trackers, no analytics cookies. Comment data and its retention are described on /privacy/; any new data collection must update that page.
+- Logo: the line-drawn d100 is final. Hero copy and the roll number are decided; see CLAUDE.md.
 
 ## Brand Commitments
 - Name: Need or Greed. Main author nick: Snufupugos (WoW origin).
@@ -37,7 +39,7 @@ Two independent axes, rarity (how good it is) and roll (Need, Greed or Pass: is 
 - Approved palette in CLAUDE.md (dark tavern-night ground, gold accent, rarity colours, roll colours) as a starting point.
 
 ## Evidence on Hand
-Three example reviews (Outer Wilds, Frieren, a fictional Survival Generico 3) with placeholder covers, one author profile. No real reviews, testimonials or readership numbers yet; do not fabricate any.
+One real review so far (Cyberpunk: Edgerunners 2, published 2026-10-25) and one author profile (Snufupugos). No testimonials or readership numbers yet; do not fabricate any.
 
 ## Product Principles
 1. The review text is the product: legibility and reading rhythm beat decoration.

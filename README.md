@@ -71,7 +71,7 @@ Os dois jeitos geram o mesmo resultado. Não existe campo "autor": ele vem do Gi
 
 | Raridade | Nota |
 |---|---|
-| Lixo de vendedor | 0 a 2.9 |
+| Lixo | 0 a 2.9 |
 | Comum | 3 a 4.9 |
 | Incomum | 5 a 6.9 |
 | Raro | 7 a 8.9 |

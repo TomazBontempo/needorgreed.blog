@@ -32,7 +32,7 @@ export type Secao = keyof typeof SECOES;
 
 /** Slug de cada raridade na URL. A chave é o id interno (src/lib/raridade.ts). */
 export const SLUGS_RARIDADE = {
-  lixo: { en: 'vendor-trash', pt: 'lixo', es: 'basura' },
+  lixo: { en: 'trash', pt: 'lixo', es: 'basura' },
   comum: { en: 'common', pt: 'comum', es: 'comun' },
   incomum: { en: 'uncommon', pt: 'incomum', es: 'poco-comun' },
   raro: { en: 'rare', pt: 'raro', es: 'raro' },

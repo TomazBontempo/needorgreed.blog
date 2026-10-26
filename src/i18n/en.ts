@@ -46,7 +46,7 @@ const en = {
   },
 
   raridades: {
-    lixo: { nome: 'Vendor Trash', faixa: '0 to 2.9' },
+    lixo: { nome: 'Trash', faixa: '0 to 2.9' },
     comum: { nome: 'Common', faixa: '3 to 4.9' },
     incomum: { nome: 'Uncommon', faixa: '5 to 6.9' },
     raro: { nome: 'Rare', faixa: '7 to 8.9' },

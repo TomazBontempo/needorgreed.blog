@@ -71,7 +71,7 @@ Derivada da nota (0 a 10, uma casa decimal).
 
 | Raridade | Nota |
 |---|---|
-| Lixo de vendedor | 0 a 2.9 |
+| Lixo | 0 a 2.9 |
 | Comum | 3 a 4.9 |
 | Incomum | 5 a 6.9 |
 | Raro | 7 a 8.9 |
@@ -178,8 +178,8 @@ outros países lusófonos recebem o português do Brasil.
 - **SEO:** `hreflang` (en, pt-BR, es, x-default em inglês) e `canonical` em todas as páginas, e o mesmo
   conjunto no `sitemap.xml` (`src/pages/sitemap.xml.ts`), citado no `robots.txt`.
 - **Textos de interface:** dicionários `src/i18n/en.ts`, `pt.ts` e `es.ts` (nav, rótulos, nomes de raridade,
-  datas, 404, Sobre, seletor, faixa). Nomes de raridade em inglês: Vendor Trash, Common, Uncommon, Rare, Epic,
-  Legendary; em espanhol: Basura de vendedor, Común, Poco común, Raro, Épico, Legendario.
+  datas, 404, Sobre, seletor, faixa). Nomes de raridade em inglês: Trash, Common, Uncommon, Rare, Epic,
+  Legendary; em espanhol: Basura, Común, Poco común, Raro, Épico, Legendario.
   Need, Greed e Pass ficam iguais nas três línguas. Datas formatadas com o locale do idioma.
 - **Nova língua no futuro:** `IDIOMAS` em `rotas.ts` (e no `scripts/translate.mjs`), um dicionário novo,
   as seções e os slugs de raridade em `rotas.ts`, as rotas em `src/pages/<código>/`, o locale no
@@ -192,7 +192,7 @@ O Tomaz escreve em português; parceiros podem escrever em inglês ou espanhol. 
 - Cada review tem o campo `idioma` (`pt`, `en` ou `es`, padrão `pt`) indicando a língua original.
 - Um script (`npm run translate`) gera as versões nas outras línguas como arquivos ao lado do original:
   `src/content/reviews/<slug>/index.mdx` (original) e `index.en.mdx`, `index.pt.mdx`, `index.es.mdx` (traduções).
-  Traduz: corpo, `frase`, `motivoRoll`, nomes dos `atributos` e `tags`. Mantém: título da obra, números,
+  Traduz: corpo, `frase`, `motivoRoll`, `duracao`, nomes dos `atributos`, `tags`, legendas e texto alternativo. Mantém: título da obra, números,
   datas, imagens, componentes MDX (`<YouTube />`) e formatação Markdown intactos.
 - O script roda numa **GitHub Action** a cada push que mexe em reviews e **commita a tradução** no repositório.
   Assim ela é revisável, editável, versionada e não é refeita a cada build.
@@ -277,7 +277,7 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   Hover do bolso: sobe 4px, escala 1.02, borda na cor da raridade, sombra suave, 180ms, só em `(hover: hover)`;
   com movimento reduzido, só a cor da borda.
 - **Header fixo** (sticky, z-index 20) com container próprio: `--largura-cabecalho` (1600px), igual em todas
-  as páginas. A altura fica em `--cabecalho-h` (65px desktop, 81px celular) e é usada na primeira tela da
+  as páginas. A altura fica em `--cabecalho-h` (65px desktop, 57px celular) e é usada na primeira tela da
   home, nas laterais fixas, em `scroll-padding-top` e `scroll-margin-top`. Popovers ficam acima (z-index 50).
 - **Larguras:** layout padrão até 1600px (`--largura`). A home usa 1232px (`<Base largura="1232px">`).
   Na review, a coluna de texto para em 720px (~70 caracteres) e a largura extra vai para as laterais.
@@ -391,10 +391,14 @@ Tomadas (não reabrir sem o Tomaz pedir):
   não pelo país; só a home redireciona; faixa de sugestão fixa no pé da tela (no topo ela empurraria a
   página depois de carregar). Ver "Idiomas".
 
+- **Logo:** o d100 de traço é o logo definitivo (decisão do Tomaz em 2026-10-26).
+- **Raridade mais baixa:** "Lixo" / "Trash" / "Basura" (eram "Lixo de vendedor", "Vendor Trash" e "Basura de
+  vendedor", que quebravam o pé da ficha). Endereço em inglês: `/rarity/trash/`.
+- **Design documentado:** `DESIGN.md` (tokens, tipos, componentes e regras) gerado do site pronto em
+  2026-10-26, com o complemento `.impeccable/design.json`. Atualize os dois quando o visual mudar.
+
 Em aberto:
-- **Logo.** O d100 de traço é placeholder.
-- **Fechamento da Impeccable:** a crítica rodou em 2026-10-24 (ver ESTADO.md); falta a auditoria (`audit`)
-  e o `DESIGN.md` gerado do site pronto.
+- Nada no momento (ver "Problemas abertos" no ESTADO.md).
 
 ## Comandos
 

@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T23:13:38.615166+00:00",
+  "title": "Design System: Need or Greed",
+  "extensions": {
+    "colorMeta": {
+      "fundo-estalagem": {
+        "role": "neutral",
+        "displayName": "Noite de Estalagem"
+      },
+      "painel-cartao": {
+        "role": "neutral",
+        "displayName": "Papel-Cartão"
+      },
+      "ouro": {
+        "role": "primary",
+        "displayName": "Ouro de Estalagem"
+      },
+      "frase": {
+        "role": "primary",
+        "displayName": "Ouro de Frase"
+      },
+      "gm-azul": {
+        "role": "tertiary",
+        "displayName": "Azul do GM"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Título da review e do destaque da home, em caixa alta."
+      },
+      "body": {
+        "displayName": "Texto da review",
+        "purpose": "O produto: até 66ch, line-height 1.68."
+      },
+      "label": {
+        "displayName": "Sistema",
+        "purpose": "Loot log, linha de roll, datas, navegação e ações."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ficha-erguida",
+        "value": "0 10px 24px -8px rgb(0 0 0 / 0.6)",
+        "purpose": "Hover e foco da ficha bolso."
+      },
+      {
+        "name": "tooltip",
+        "value": "0 14px 32px -10px rgb(0 0 0 / 0.75)",
+        "purpose": "Ficha mini no tooltip do loot log."
+      },
+      {
+        "name": "popover",
+        "value": "0 12px 28px -10px rgb(0 0 0 / 0.7)",
+        "purpose": "Menu do seletor de idioma."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Curva padrão de todas as transições."
+      },
+      {
+        "name": "ficha-hover",
+        "value": "180ms",
+        "purpose": "Hover da ficha: sobe 4px e escala 1.02."
+      },
+      {
+        "name": "d100",
+        "value": "420ms",
+        "purpose": "Giro do dado ao sortear o Mais loot."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "celular",
+        "value": "720px"
+      },
+      {
+        "name": "gutter-celular",
+        "value": "640px"
+      },
+      {
+        "name": "uma-coluna",
+        "value": "900px"
+      },
+      {
+        "name": "review-duas-colunas",
+        "value": "1180px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ficha bolso",
+      "kind": "card",
+      "refersTo": "ficha-bolso",
+      "description": "O único card do site: item com borda na cor da raridade e segunda borda solta.",
+      "html": "<article class=\"ds-ficha\"><div class=\"ds-ficha-capa\"></div><h3 class=\"ds-ficha-nome\">Cyberpunk: Edgerunners 2</h3><ul class=\"ds-ficha-atr\"><li class=\"ds-pos\">+10 Cyberpunk</li><li class=\"ds-neg\">-21 Trilha sonora</li></ul><p class=\"ds-ficha-frase\">“Boa enquanto dura, só não é memorável.”</p><p class=\"ds-ficha-pe\"><span>Nº 001 · Telas</span><span class=\"ds-ficha-rar\">Incomum · 6.9</span></p></article>",
+      "css": ".ds-ficha{--cor:#3fcf6b;width:260px;background:#17140f;border:1px solid color-mix(in srgb,var(--cor) 55%,#2c261d);outline:1px solid #2c261d;outline-offset:3px;padding:10px;color:#e9e2d3;transition:transform 180ms cubic-bezier(0.16,1,0.3,1),border-color 180ms,box-shadow 180ms}.ds-ficha:hover,.ds-ficha:focus-visible{border-color:var(--cor);box-shadow:0 10px 24px -8px rgb(0 0 0 / 0.6);transform:translateY(-4px) scale(1.02)}.ds-ficha-capa{aspect-ratio:4/3;background:#120f0c;border:1px solid #2c261d}.ds-ficha-nome{margin:12px 0 8px;font-family:'Big Shoulders','Arial Narrow',sans-serif;font-weight:800;font-size:1.5rem;line-height:.95;text-transform:uppercase;color:var(--cor)}.ds-ficha-atr{list-style:none;margin:0;padding:8px 0;border-top:1px solid #2c261d;font-family:'Fragment Mono',monospace;font-size:.78125rem}.ds-pos{color:#5fd07a}.ds-neg{color:#e8735a}.ds-ficha-frase{margin:6px 0 12px;font-family:Literata,Georgia,serif;font-style:italic;font-size:.8125rem;color:#d9b866}.ds-ficha-pe{display:flex;justify-content:space-between;margin:0;padding-top:8px;border-top:1px solid #2c261d;font-family:'Fragment Mono',monospace;font-size:.6875rem;color:#8b816f}.ds-ficha-rar{color:var(--cor)}"
+    },
+    {
+      "name": "Linha de roll",
+      "kind": "custom",
+      "refersTo": "linha-roll",
+      "description": "Assinatura de cada review, como mensagem de sistema de loot.",
+      "html": "<p class=\"ds-roll\">Snufupugos rolou <span class=\"ds-roll-greed\">Greed</span> <span class=\"ds-roll-n\">(69)</span> para <span class=\"ds-roll-item\">[Cyberpunk: Edgerunners 2]</span></p>",
+      "css": ".ds-roll{font-family:'Fragment Mono',monospace;font-size:.8125rem;line-height:1.55;color:#a89e8a}.ds-roll-greed{color:#9fd36b}.ds-roll-n{color:#8b816f}.ds-roll-item{color:#3fcf6b}"
+    },
+    {
+      "name": "Link",
+      "kind": "custom",
+      "refersTo": "link",
+      "description": "Ouro com sublinhado fino afastado; hover em ouro polido.",
+      "html": "<a class=\"ds-link\" href=\"#\">Saiba mais sobre nossas notas</a>",
+      "css": ".ds-link{color:#e3b45c;text-decoration-thickness:1px;text-underline-offset:.2em;font-family:Literata,Georgia,serif;transition:color .2s cubic-bezier(0.16,1,0.3,1)}.ds-link:hover{color:#f0c878}.ds-link:focus-visible{outline:2px solid #e3b45c;outline-offset:3px}"
+    },
+    {
+      "name": "Botão d100",
+      "kind": "button",
+      "refersTo": "botao-d100",
+      "description": "Sorteia de novo as fichas do Mais loot.",
+      "html": "<button class=\"ds-d100\" aria-label=\"Rolar de novo\"><svg viewBox=\"0 0 26 26\" width=\"22\" height=\"22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M13 1.5 23.5 7.5v11L13 24.5 2.5 18.5v-11z\"/><path d=\"M13 1.5v8M2.5 7.5 13 9.5l10.5-2M13 9.5 7 18.5h12zM2.5 18.5 7 18.5M23.5 18.5H19M13 24.5 7 18.5M13 24.5l6-6\"/></svg></button>",
+      "css": ".ds-d100{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;background:transparent;border:1px solid #3d3428;color:#e3b45c;cursor:pointer;transition:border-color 150ms cubic-bezier(0.16,1,0.3,1)}.ds-d100:hover{border-color:#e3b45c}.ds-d100:focus-visible{outline:2px solid #e3b45c;outline-offset:3px}"
+    },
+    {
+      "name": "Rótulo de seção",
+      "kind": "custom",
+      "refersTo": "label-caps",
+      "description": "Título de bloco em mono caixa alta, com filete de ouro em cima.",
+      "html": "<h2 class=\"ds-rotulo\">Última crítica</h2>",
+      "css": ".ds-rotulo{margin:0;padding-top:14px;border-top:1px solid #e3b45c;font-family:'Fragment Mono',monospace;font-weight:400;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:#e3b45c}"
+    },
+    {
+      "name": "Tag GM",
+      "kind": "chip",
+      "refersTo": "tag-gm",
+      "description": "Selo de equipe nos comentários.",
+      "html": "<span class=\"ds-gm\">GM</span>",
+      "css": ".ds-gm{font-family:'Fragment Mono',monospace;font-size:.75rem;padding:.05em .4em;color:#38a0f0;background:color-mix(in srgb,#38a0f0 16%,transparent)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Fichário de Loot",
+    "overview": "Cada obra é um item que caiu numa raid e foi guardado numa ficha de colecionador. O site é uma noite de estalagem: fundo quase preto e quente, papel-cartão escuro, e o metal de cada item na cor da sua raridade. O MMO aparece só pelos elementos secundários do gênero (o dado de loot, a raridade, a mensagem de sistema do chat), nunca por personagens, logos ou pixel art.",
+    "keyCharacteristics": [
+      "Fundo escuro e quente; superfícies separadas por borda fina, não por sombra.",
+      "Cantos retos em tudo (0px), inclusive nos comentários.",
+      "Três fontes com papéis fixos: display condensada para nomes, serifa para ler, mono para o sistema.",
+      "Cor de raridade e cor de roll nunca se misturam: dois eixos, duas famílias de cor.",
+      "A ficha do item é o único card do site."
+    ],
+    "rules": [
+      {
+        "name": "The Gold Means Click Rule",
+        "body": "O ouro marca o que é clicável ou o destaque principal da tela. Texto corrido nunca é dourado.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Axes Rule",
+        "body": "Raridade e roll são dois eixos e nunca dividem cor: a raridade colore o item, o roll colore a decisão. Nenhum elemento soma os dois numa nota só.",
+        "section": "colors"
+      },
+      {
+        "name": "The System Speaks Mono Rule",
+        "body": "Tudo que é mensagem do jogo (loot log, linha de roll, número da ficha, datas, nicks e ações dos comentários) é Fragment Mono. Tudo que é leitura é Literata. Nunca o contrário.",
+        "section": "typography"
+      },
+      {
+        "name": "The 13px Floor Rule",
+        "body": "No celular (até 720px), nenhum texto fica abaixo de 13px, inclusive dentro da caixa de comentários.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Nada tem sombra em repouso. Sombra só aparece como resposta a estado (hover, foco) ou para o que flutua (tooltip, popover).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar a cor da raridade só no item (nome, borda, raridade no pé) e a cor do roll só na decisão (palavra, marca, traço do motivo).",
+      "Do manter o texto da review em Literata, até 66ch, line-height 1.68.",
+      "Do separar superfícies por borda de 1px e camada de tom, com cantos retos (0px).",
+      "Do usar Fragment Mono para tudo que é sistema: log, roll, datas, contadores, rótulos em caixa alta.",
+      "Do dar 44px de toque e no mínimo 13px de texto a tudo no celular, sem mudar o desktop.",
+      "Do respeitar `prefers-reduced-motion`: movimento só onde informa, e desligado quando o leitor pede."
+    ],
+    "donts": [
+      "Don't usar nada de card game: foil, holográfico ou carta de TCG.",
+      "Don't copiar arte, fontes, ícones ou o visual exato da Blizzard ou de qualquer jogo. O tooltip de item é convenção do gênero e tem desenho próprio.",
+      "Don't usar personagens, logos de jogo, pixel art ou controle de videogame como ícone.",
+      "Don't usar gradiente roxo ou azul, glassmorphism, brilho neon, pílulas arredondadas ou emoji como ícone.",
+      "Don't criar outro desenho de card: toda listagem usa a ficha.",
+      "Don't pôr sombra em repouso.",
+      "Don't usar travessão em nenhum texto, em nenhuma das três línguas."
+    ]
+  }
+}
