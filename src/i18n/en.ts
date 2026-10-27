@@ -231,6 +231,7 @@ const en = {
       'We keep your name and picture, shown next to your comments; your email and account ID, to recognize you when you come back; and the text of your comments and your votes. Your email is never shown to other readers, and we never email you.',
       'To fight spam, we also keep a scrambled version of your IP (a code that cannot be turned back into the IP) and your browser type. Both delete themselves after 7 days.',
       'When you sign in, your browser keeps a session cookie from the comments server, valid for 30 days.',
+      'Comments are machine translated into the other languages of the site by Cloudflare\'s translator (Workers AI), which only receives the comment text. Every translation is marked, with a link to the original.',
     ],
     ondeTitulo: 'Where it lives',
     ondeTexto: [

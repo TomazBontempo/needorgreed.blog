@@ -73,9 +73,8 @@ Pendente agora: só o que está em "Problemas abertos" (nada impede o uso).
    grátis, conta robôs e exige mais um token) e o limitador de Workers (status incerto no plano grátis, janela
    de no máximo 60 segundos, desaconselhado por IP). Para anunciante, o painel certo seria o Web Analytics da
    Cloudflare (grátis, sem cookie), a ligar só quando houver anúncio de verdade (pede uma linha na privacidade).
-2. **Os comentários não são traduzidos para as outras línguas.** Hoje o mesmo comentário aparece igual em
-   `/reviews/`, `/pt/reviews/` e `/es/reviews/`, na língua em que foi escrito. Levantar as opções (por exemplo,
-   um botão "traduzir" sob demanda com o Workers AI, dentro da cota grátis) e decidir com o Tomaz.
+2. ~~Tradução dos comentários~~ **feita em 2026-10-27** (opção A, ver "Comentários: Garrul" em "Configuração
+   externa"). Descartados: botão "traduzir" sob demanda (abuso e um clique a mais) e o tradutor do navegador.
 3. **Nome e descrição padrão para imagens.** Quando o autor não dá nome nem texto alternativo, entra um padrão
    que não quebra nada, numerado por review: `imagem-01`, `imagem-02`, `imagem-03`... (e um texto alternativo
    padrão no mesmo espírito). Hoje a imagem colada vira `image-<sufixo aleatório>` (`nomeDaImagem()` em
@@ -153,6 +152,13 @@ Chromium com `--disable-blink-features=AutomationControlled`, senão o filtro de
     de toque e 13px de texto no celular, tag GM em azul (`--nog-gm`), sem o selo do provedor de login, votos só
     com o triângulo;
   - **textos:** sem travessão; espanhol completado (14 frases faltavam).
+  - **tradução automática dos comentários** (2026-10-27): `src/lib/nog-translate.ts`, rota
+    `/api/v1/nog/translations` (`src/routes/nog-translations.ts`), caixa em `src/widget/nog-translate.ts`, tabelas
+    `nog_comment_lang` e `nog_comment_translations` (migração `0900_nog_comment_translations.sql`, numeração alta
+    para não colidir com as do Garrul, sem FOREIGN KEY de propósito) e o Workers AI ligado no `wrangler.toml`
+    (`[ai] binding = "AI"`). Traduz ao publicar e ao editar para as outras duas línguas (a de origem é a da
+    página, enviada como `nog_lang`; comentários antigos contam como português); a leitura completa até 3
+    faltantes por visita. Teto de 500 traduções por dia (UTC). Mesmo modelo das reviews, sem raciocínio.
 - **No blog:** `COMENTARIOS.api` em `src/site.config.ts`, a caixa e o tema em `src/components/Comentarios.astro`
   (carrega só quando o leitor chega perto), a contagem da home em `src/lib/comentarios.ts`.
 - **Logins:** Discord (app "needorgreed.blog" no Developer Portal) e Google (projeto `needorgreed`

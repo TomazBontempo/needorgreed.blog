@@ -230,6 +230,7 @@ const es: Dicionario = {
       'Guardamos el nombre y la foto, que aparecen junto a tus comentarios; el correo y el código de tu cuenta, para reconocerte cuando vuelvas; y el texto de tus comentarios y tus votos. Tu correo no se muestra a otros lectores, y no te enviamos correos.',
       'Contra el spam, guardamos también una versión revuelta de tu IP (un código que no vuelve a ser la IP) y el tipo de navegador. Los dos se borran solos a los 7 días.',
       'Al iniciar sesión, tu navegador guarda una cookie de sesión del servidor de comentarios, que dura 30 días.',
+      'Los comentarios se traducen automáticamente a los otros idiomas del sitio con el traductor de Cloudflare (Workers AI), que solo recibe el texto del comentario. Cada traducción aparece marcada, con el enlace al original.',
     ],
     ondeTitulo: 'Dónde quedan',
     ondeTexto: [
