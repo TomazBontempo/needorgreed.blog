@@ -67,6 +67,34 @@ Pendente agora: só o que está em "Problemas abertos" (nada impede o uso).
 
 ## Problemas abertos
 
+**Pendências para 2026-10-27 (pedidas pelo Tomaz):**
+1. **Contador de visualizações** nas reviews. Já decidido:
+   - conta **visualizações**, como o YouTube: cada vez que a página abre num navegador de verdade conta 1, e
+     rever conta de novo. Não é "leitura até o fim" (o Tomaz quer o número de exibições, pensando em anúncio);
+   - a contagem é feita por um script no navegador, então os robôs de busca ficam de fora; o mesmo navegador
+     conta no máximo 1 vez a cada 30 minutos por review (anotado só no navegador, sem nada no servidor);
+   - o número fica num banco D1 pequeno (review e número, nada sobre quem viu), ligado ao Worker do blog;
+   - **onde (prévia aprovada pelo Tomaz em 2026-10-27):** na linha de informações da review e do destaque da
+     home, entre o tempo de leitura e o autor ("25 de out. de 2026 · 13 min de leitura · 42 views · Escrito
+     por ..."), e na ficha, na linha do roll, alinhado à direita em `--texto-3` ("○ Greed (69) ··· 42 views").
+     A prévia mediu: desktop tudo em 1 linha; celular, a ficha continua com o roll numa linha só e o pé intacto;
+   - **texto:** "views" nas três línguas (economiza espaço); desde 1 ("1 view"); a partir de mil, abreviado
+     com K em todas as línguas ("1.2K" em inglês, "1,2K" em português e espanhol);
+   - acrescentar uma linha sobre o contador na página de privacidade, nas três línguas;
+   - descartado: puxar das métricas da Cloudflare (o histórico some com o tempo no plano grátis, conta robôs e
+     exige mais um token). Para anunciante, o painel certo seria o Web Analytics da Cloudflare (grátis, sem
+     cookie), a ligar só quando houver anúncio de verdade (também pede uma linha na página de privacidade).
+2. **Os comentários não são traduzidos para as outras línguas.** Hoje o mesmo comentário aparece igual em
+   `/reviews/`, `/pt/reviews/` e `/es/reviews/`, na língua em que foi escrito. Levantar as opções (por exemplo,
+   um botão "traduzir" sob demanda com o Workers AI, dentro da cota grátis) e decidir com o Tomaz.
+3. **Nome e descrição padrão para imagens.** Quando o autor não dá nome nem texto alternativo, entra um padrão
+   que não quebra nada, numerado por review: `imagem-01`, `imagem-02`, `imagem-03`... (e um texto alternativo
+   padrão no mesmo espírito). Hoje a imagem colada vira `image-<sufixo aleatório>` (`nomeDaImagem()` em
+   `src/lib/nomes-de-arquivo.ts`) e o texto alternativo vazio só gera aviso no build. Ponto de atenção: o painel
+   não enxerga os arquivos que já estão na pasta na hora do upload, então a numeração sequencial provavelmente
+   precisa ser feita depois (no build ou numa Action que renomeia e corrige os caminhos). Ver também "Para rever
+   no futuro", sobre nomes de arquivo e texto alternativo.
+
 - **Comentários de teste** na review do Edgerunners ("teste02" e outros): o Tomaz vai apagar pelo `/admin`.
 
 **Decididos (não reabrir sem o Tomaz pedir):**
