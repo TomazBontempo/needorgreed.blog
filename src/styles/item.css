@@ -290,3 +290,9 @@
     width: 88px;
   }
 }
+
+/* Contador de views na linha do roll, à direita (preenchido no navegador, ver Base.astro). */
+.it-views {
+  float: right;
+  color: var(--texto-3);
+}

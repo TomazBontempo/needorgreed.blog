@@ -77,6 +77,14 @@ const Titulo = variante === 'bolso' ? (`h${nivel}` as const) : 'p';
       <MarcaRoll roll={data.roll} />
       {t.rolls[data.roll].nome}
       <span class="it-valor"> ({review.valorRoll})</span>
+      <span
+        class="it-views"
+        data-views={review.slug}
+        data-views-um={t.review.views.singular}
+        data-views-varios={t.review.views.plural}
+        data-views-decimal={t.review.views.decimal}
+        hidden
+      />
     </p>
 
     <p class="it-pe mono">

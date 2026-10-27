@@ -251,7 +251,9 @@ O Tomaz escreve em português; parceiros podem escrever em inglês ou espanhol. 
 ### Estrutura (o protótipo já foi substituído; não existe mais pasta de protótipo)
 
 ```
-src/worker.ts              Worker: idioma (?lang=, cookie, Accept-Language só na home) e depois o handler do Astro
+src/worker.ts              Worker: contador de views (src/views-api.ts), idioma (?lang=, cookie, Accept-Language só
+                           na home) e depois o handler do Astro
+migrations/                tabelas do D1 `needorgreed-views` (binding VIEWS): npx wrangler d1 migrations apply VIEWS --remote
 src/i18n/                  en.ts, pt.ts, es.ts (dicionários), rotas.ts (URLs por idioma), deteccao.ts (regra),
                            preferencia.ts (idioma do navegador, usado no Worker e na faixa)
 src/views/                 páginas de verdade: Home, Review, Secao (Jogos/Telas), Raridade, Autor, Arquivo, Sobre, NaoEncontrado
@@ -315,6 +317,14 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   alternativo e `descricao` do `<Clipe>` são recomendados: sem eles o build só avisa (decisão do Tomaz;
   o painel também não consegue obrigar, testado). `src/integrations/midia.ts` faz o build parar quando a
   página sairia quebrada (capa, caminho ou arquivo errado, 25 MB) e avisa sobre o resto. Limite de 25 MB por arquivo (Cloudflare Workers). Detalhes no README.
+- **Contador de views** (decisão do Tomaz em 2026-10-27): conta exibições, como o YouTube. A página da review
+  manda `POST /api/views/<slug>` no máximo 1 vez a cada 30 minutos por navegador; o servidor repete a regra com
+  uma marca de 30 minutos no cache do Worker (código embaralhado do IP com o slug, nada no banco). O total fica
+  no D1 `needorgreed-views`, um número por review, somando as três línguas. Aparece como "42 views" (a palavra
+  "views" nas três línguas, "1 view" no singular, nada com 0, a partir de mil com K: "1.2K" e "1,2K") na linha de
+  informações da review e do destaque da home e na ficha, à direita da linha do roll. Preenchido no navegador
+  (`Base.astro`); navegador automatizado (`navigator.webdriver`) não conta nem vê. Se mudar o que se guarda,
+  atualizar a página de privacidade.
 - **Links para fora do blog abrem em nova guia** (regra do Tomaz: o leitor não sai do Need or Greed), com
   `rel="noopener noreferrer"` e o aviso "(abre em nova guia)" para leitor de tela (`aria-describedby`).
   No texto das reviews isso é automático: o MDX troca todo `a` pelo componente `Link`

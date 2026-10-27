@@ -117,6 +117,65 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           if (lidos.has(el.dataset.slug!) && el.dataset.slug !== atual) el.classList.add('lido');
         });
       } catch {}
+
+      // Contador de views (servidor em src/views-api.ts). Na página da review, conta a visita no máximo
+      // 1 vez a cada 30 minutos por navegador; depois busca os totais de todas as reviews que aparecem
+      // na página (e no loot log, para o tooltip) numa chamada só. Se algo falhar, o número só não aparece.
+      (async () => {
+        const totais: Record<string, number> = {};
+        const formatar = (el: HTMLElement, n: number) => {
+          const d = el.dataset.viewsDecimal ?? '.';
+          const curto = (v: number, s: string) => `${(Math.floor(v * 10) / 10).toFixed(1).replace(/\.0$/, '').replace('.', d)}${s}`;
+          const num = n >= 1e6 ? curto(n / 1e6, 'M') : n >= 1e3 ? curto(n / 1e3, 'K') : String(n);
+          return `${num} ${n === 1 ? el.dataset.viewsUm : el.dataset.viewsVarios}`;
+        };
+        const preencher = (raiz: ParentNode = document) =>
+          raiz.querySelectorAll<HTMLElement>('[data-views]').forEach((el) => {
+            const n = totais[el.dataset.views!];
+            // Zero não aparece: o contador surge a partir de 1 view.
+            if (!n) return;
+            el.textContent = formatar(el, n);
+            el.hidden = false;
+          });
+        (window as unknown as { nogViews?: typeof preencher }).nogViews = preencher;
+        if (navigator.webdriver) return;
+
+        const contar = document.querySelector<HTMLElement>('[data-views-contar]')?.dataset.views;
+        if (contar) {
+          const chave = `views:${contar}`;
+          let ultima = 0;
+          try {
+            ultima = Number(localStorage.getItem(chave) ?? 0);
+          } catch {}
+          if (Date.now() - ultima > 30 * 60 * 1000) {
+            try {
+              const r = await fetch(`/api/views/${contar}`, { method: 'POST' });
+              if (r.ok) {
+                totais[contar] = ((await r.json()) as { total: number }).total;
+                try {
+                  localStorage.setItem(chave, String(Date.now()));
+                } catch {}
+              }
+            } catch {}
+          }
+        }
+
+        const slugs = new Set<string>();
+        document.querySelectorAll<HTMLElement>('[data-views]').forEach((el) => slugs.add(el.dataset.views!));
+        document.querySelectorAll<HTMLElement>('[data-ficha]').forEach((el) => {
+          const m = el.dataset.ficha!.match(/^\/fichas\/[a-z]{2}-(.+)\/$/);
+          if (m) slugs.add(m[1]);
+        });
+        if (!slugs.size) return;
+        try {
+          const r = await fetch(`/api/views?slugs=${[...slugs].sort().join(',')}`);
+          if (r.ok) {
+            const { totais: lidos } = (await r.json()) as { totais: Record<string, number> };
+            for (const s of slugs) totais[s] = Math.max(totais[s] ?? 0, lidos[s] ?? 0);
+          }
+        } catch {}
+        preencher();
+      })();
     </script>
   </body>
 </html>

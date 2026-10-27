@@ -150,6 +150,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     if (!html || atual !== link) return;
     const tip = elemento();
     tip.innerHTML = html;
+    (window as unknown as { nogViews?: (raiz: ParentNode) => void }).nogViews?.(tip);
     tip.hidden = false;
     tip.classList.remove('visivel');
     posicionar(link, tip);

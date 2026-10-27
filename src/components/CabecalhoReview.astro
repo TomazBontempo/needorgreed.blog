@@ -64,6 +64,15 @@ const Titulo = href ? 'h3' : 'h1';
   <p class="meta">
     <time datetime={data.data.toISOString().slice(0, 10)}>{formatarData(idioma, data.data)}</time>
     <span>{t.review.leitura(minutosDeLeitura(versao.entry.body))}</span>
+    {/* Contador de views: preenchido no navegador (Base.astro). Na página da review, também conta a visita. */}
+    <span
+      data-views={review.slug}
+      data-views-contar={href ? undefined : ''}
+      data-views-um={t.review.views.singular}
+      data-views-varios={t.review.views.plural}
+      data-views-decimal={t.review.views.decimal}
+      hidden
+    />
     <span>
       {t.review.escritoPor} <a href={url(idioma, 'autores', review.autor.slug)}>{review.autor.nick}</a>
       {

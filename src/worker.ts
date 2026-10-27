@@ -7,12 +7,17 @@
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import { cookieDeIdioma, decidir } from './i18n/deteccao';
+import { views } from './views-api';
 
 type Handle = typeof handle;
 
 export default {
   async fetch(request: Request, env: Parameters<Handle>[1], ctx: Parameters<Handle>[2]) {
     const url = new URL(request.url);
+
+    // Contador de views das reviews (antes de tudo: não é página, não passa pela regra de idioma).
+    const api = await views(request, env as unknown as Parameters<typeof views>[1], ctx);
+    if (api) return api;
 
     const decisao = decidir({
       method: request.method,

@@ -87,6 +87,8 @@ const pt: Dicionario = {
   },
 
   review: {
+    /** Contador de views: "view(s)" nas três línguas (decisão do Tomaz); o número abrevia com K. */
+    views: { singular: 'view', plural: 'views', decimal: ',' },
     escritoPor: 'Escrito por',
     editadoPor: 'editado por',
     verDiscussao: (n: number) => (n === 1 ? 'Ver discussão (1 comentário)' : `Ver discussão (${n} comentários)`),
@@ -212,12 +214,13 @@ const pt: Dicionario = {
   privacidade: {
     titulo: 'Privacidade',
     intro: 'O que o Need or Greed guarda sobre você, e por quê. É curto, porque guardamos pouco.',
-    atualizado: 'Atualizado em 26 de outubro de 2026.',
+    atualizado: 'Atualizado em 27 de outubro de 2026.',
     leitorTitulo: 'Quem só lê',
     leitorTexto: [
       'Ler o blog não pede nada. Não há anúncios, rastreadores nem cookies de análise.',
       'O site usa um cookie só, o lang, que lembra a língua que você escolheu. O seu navegador também anota, só no seu aparelho, quais reviews você já leu, para apagar a capa delas nas listas.',
       'O site roda na Cloudflare, que registra dados técnicos de cada acesso, como o endereço IP, para manter o site no ar e protegido contra ataques.',
+      'Contamos quantas vezes cada review foi aberta, e só o número. Para não contar a mesma pessoa duas vezes seguidas, o servidor guarda por 30 minutos um código embaralhado do seu IP com o nome da review, que se apaga sozinho.',
     ],
     comentarioTitulo: 'Quem comenta',
     comentarioTexto: [

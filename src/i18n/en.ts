@@ -90,6 +90,8 @@ const en = {
   },
 
   review: {
+    /** Contador de views: "view(s)" nas três línguas (decisão do Tomaz); o número abrevia com K. */
+    views: { singular: 'view', plural: 'views', decimal: '.' },
     escritoPor: 'Written by',
     editadoPor: 'edited by',
     verDiscussao: (n: number) => (n === 1 ? 'See discussion (1 comment)' : `See discussion (${n} comments)`),
@@ -215,12 +217,13 @@ const en = {
   privacidade: {
     titulo: 'Privacy',
     intro: 'What Need or Greed keeps about you, and why. It is short, because we keep very little.',
-    atualizado: 'Updated on October 26, 2026.',
+    atualizado: 'Updated on October 27, 2026.',
     leitorTitulo: 'If you just read',
     leitorTexto: [
       'Reading the blog asks nothing of you. No ads, no trackers, no analytics cookies.',
       'The site uses a single cookie, lang, to remember the language you picked. Your browser also notes, only on your device, which reviews you have read, so their covers can fade in the lists.',
       'The site runs on Cloudflare, which logs technical data about each visit, such as the IP address, to keep the site up and protected from attacks.',
+      'We count how many times each review was opened, and only the number. To avoid counting the same person twice in a row, the server keeps a scrambled code of your IP and the review name for 30 minutes, and then it deletes itself.',
     ],
     comentarioTitulo: 'If you comment',
     comentarioTexto: [
