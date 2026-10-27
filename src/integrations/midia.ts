@@ -15,7 +15,7 @@
  *   - imagem escapada pelo painel (!\[...]\(...), que some do site sem erro;
  *   - arquivo acima de 25 MB (limite da Cloudflare Workers para arquivo estático).
  * Só avisam (decisão do Tomaz: descrição esquecida não segura publicação):
- *   - imagem sem texto alternativo e clipe sem descrição;
+ *   - clipe sem descrição (imagem sem texto alternativo ganha a descrição padrão, ver ImagemDoTexto.astro);
  *   - arquivo solto na pasta da review, fora de imagens/ e videos/;
  *   - arquivo que nenhuma versão da review usa.
  */
@@ -85,16 +85,14 @@ function conferirReview(pastaReviews: string, slug: string): Resultado {
 
     // Imagens do texto
     for (const m of corpo.matchAll(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)) {
-      const [, alt, caminho] = m;
+      const [, , caminho] = m;
       if (!new RegExp(`^\\.\\./${slug}/imagens/[^/]+$`).test(caminho)) {
         erros.push(`${onde}: imagem "${caminho}" fora da pasta imagens/ da review. Use: ![descrição](../${slug}/imagens/${basename(caminho)})`);
         continue;
       }
       if (!existe(caminho)) erros.push(`${onde}: a imagem não existe: ${caminho}`);
       else usados.add(caminho);
-      if (!alt.trim()) {
-        avisos.push(`${onde}: a imagem ${caminho} está sem texto alternativo (é o que o leitor de tela lê). Para descrever: ![o que aparece na imagem](${caminho})`);
-      }
+      // Sem texto alternativo não avisa mais: a página usa a descrição padrão (ImagemDoTexto.astro).
     }
 
     // Clipes

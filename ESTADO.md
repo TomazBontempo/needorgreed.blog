@@ -75,13 +75,11 @@ Pendente agora: só o que está em "Problemas abertos" (nada impede o uso).
    Cloudflare (grátis, sem cookie), a ligar só quando houver anúncio de verdade (pede uma linha na privacidade).
 2. ~~Tradução dos comentários~~ **feita em 2026-10-27** (opção A, ver "Comentários: Garrul" em "Configuração
    externa"). Descartados: botão "traduzir" sob demanda (abuso e um clique a mais) e o tradutor do navegador.
-3. **Nome e descrição padrão para imagens.** Quando o autor não dá nome nem texto alternativo, entra um padrão
-   que não quebra nada, numerado por review: `imagem-01`, `imagem-02`, `imagem-03`... (e um texto alternativo
-   padrão no mesmo espírito). Hoje a imagem colada vira `image-<sufixo aleatório>` (`nomeDaImagem()` em
-   `src/lib/nomes-de-arquivo.ts`) e o texto alternativo vazio só gera aviso no build. Ponto de atenção: o painel
-   não enxerga os arquivos que já estão na pasta na hora do upload, então a numeração sequencial provavelmente
-   precisa ser feita depois (no build ou numa Action que renomeia e corrige os caminhos). Ver também "Para rever
-   no futuro", sobre nomes de arquivo e texto alternativo.
+3. ~~Nome e descrição padrão para imagens~~ **feito em 2026-10-27**: imagem colada sem nome vira
+   `imagem-01`, `imagem-02`... (o painel escolhe o próximo número livre entre as imagens do texto, no patch do
+   Keystatic); imagem enviada com o nome do arquivo mantém o nome (decisão do Tomaz). Sem texto alternativo, a
+   página mostra "Imagem 2 de <título>" na língua dela (`ImagemDoTexto.astro`, ordem pelo texto, título e ordem
+   passados por `Astro.locals.nogImagensDoTexto`), e o build não avisa mais.
 
 - **Comentários de teste** na review do Edgerunners ("teste02" e outros): o Tomaz vai apagar pelo `/admin`.
 
@@ -100,11 +98,10 @@ Pendente agora: só o que está em "Problemas abertos" (nada impede o uso).
 
 ## Para rever no futuro
 
-- **Nome dos arquivos de imagem e texto alternativo (decisões de 2026-10-24).** O nome é livre (o painel só
-  limpa: minúsculas, sem acento, hífens) e o texto alternativo é só aviso no build. **Rever quando entrar um
-  autor novo.** O painel não consegue obrigar nome nem texto alternativo (testado). Opções levantadas: aviso no
-  build; Action que renomeia imagens genéricas pelo texto alternativo; Action que gera um rascunho de texto
-  alternativo com um modelo de visão do Workers AI; faixa de problemas de mídia no `astro dev`.
+- **Descrição de verdade para as imagens.** Hoje a imagem sem texto alternativo ganha só "Imagem 2 de <título>"
+  (2026-10-27), o que informa pouco para leitor de tela. Opção levantada e não escolhida: uma Action que gera um
+  rascunho de descrição com um modelo de visão do Workers AI, marcado para revisão. O nome do arquivo
+  continua livre quando a imagem vem com nome (decisão do Tomaz).
 - **Marco Civil:** se o blog virar negócio (anúncio, patrocínio ou operado pela agência, que é pessoa
   jurídica), passa a ser preciso guardar o IP de acesso por 6 meses; o Garrul só guarda hash, por 7 dias.
 

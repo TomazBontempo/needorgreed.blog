@@ -15,6 +15,7 @@ import CabecalhoReview from './CabecalhoReview.astro';
 import AvisoTraducao from './AvisoTraducao.astro';
 import Prosa from './Prosa.astro';
 import { componentesMdx } from './mdx';
+import { ordemDasImagens } from '../lib/imagens-do-texto';
 import { dicionario, url, type Idioma } from '../i18n';
 import type { ReviewCompleta, VersaoReview } from '../lib/reviews';
 import { contarComentarios } from '../lib/comentarios';
@@ -30,6 +31,8 @@ const { idioma, review, versao, class: classe } = Astro.props;
 const t = dicionario(idioma);
 const { data } = versao;
 const { Content } = await render(versao.entry);
+// Para a descrição padrão das imagens sem texto alternativo (ImagemDoTexto.astro).
+Astro.locals.nogImagensDoTexto = { titulo: data.titulo, ordem: ordemDasImagens(versao.entry.body ?? '') };
 const href = url(idioma, 'reviews', review.slug);
 const comentarios = await contarComentarios(review.slug);
 ---

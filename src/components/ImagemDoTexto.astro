@@ -1,0 +1,30 @@
+---
+/**
+ * Imagem do texto da review (o MDX troca todo `img` por este componente, ver mdx.ts).
+ * Mesma saída do Astro (imagem otimizada em webp), mais a descrição padrão quando o autor não
+ * escreveu texto alternativo: "Imagem 2 de <título>" (ver src/lib/imagens-do-texto.ts).
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { dicionario, idiomaDe } from '../i18n';
+import { radical } from '../lib/imagens-do-texto';
+
+type Props = { src: ImageMetadata | string; alt?: string; title?: string };
+const { src, alt, title } = Astro.props;
+const t = dicionario(idiomaDe(Astro));
+const pagina = Astro.locals.nogImagensDoTexto;
+
+let descricao = alt ?? '';
+if (!descricao.trim() && pagina) {
+  const posicao = pagina.ordem.indexOf(radical(typeof src === 'string' ? src : src.src)) + 1;
+  descricao = t.review.imagemPadrao(posicao || null, pagina.titulo);
+}
+---
+
+{
+  typeof src === 'string' ? (
+    <img src={src} alt={descricao} title={title} loading="lazy" decoding="async" />
+  ) : (
+    <Image src={src} alt={descricao} title={title} />
+  )
+}

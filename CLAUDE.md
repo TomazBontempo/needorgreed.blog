@@ -313,9 +313,11 @@ ESTADO.md                  o que está pronto, o que falta, como testar. Leia de
   `imagens/`, clipes e seus quadros em `videos/`; 2) **capa obrigatória** (schema, painel e build; não existe
   ficha sem imagem); 3) **nenhum erro silencioso**. Caminhos sempre `../<slug>/...` (o único formato que o
   painel reconhece: `./foto.jpg` é apagado ou escapado ao salvar pelo painel). O painel limpa o nome do arquivo
-  no upload (`src/lib/nomes-de-arquivo.ts`); o nome é livre (sem regra nem aviso, decisão do Tomaz). Texto
-  alternativo e `descricao` do `<Clipe>` são recomendados: sem eles o build só avisa (decisão do Tomaz;
-  o painel também não consegue obrigar, testado). `src/integrations/midia.ts` faz o build parar quando a
+  no upload (`src/lib/nomes-de-arquivo.ts`); o nome é livre (sem regra nem aviso, decisão do Tomaz). Imagem
+  colada sem nome vira `imagem-01`, `imagem-02`... (próximo número livre no texto, no patch do Keystatic,
+  `nogNomeDaImagem`). Imagem sem texto alternativo ganha na página "Imagem 2 de <título>" na língua da página
+  (`src/components/ImagemDoTexto.astro`, que o MDX usa no lugar de `img`), sem aviso no build; a `descricao`
+  do `<Clipe>` continua recomendada e só avisa. `src/integrations/midia.ts` faz o build parar quando a
   página sairia quebrada (capa, caminho ou arquivo errado, 25 MB) e avisa sobre o resto. Limite de 25 MB por arquivo (Cloudflare Workers). Detalhes no README.
 - **Contador de views** (decisão do Tomaz em 2026-10-27): conta exibições, como o YouTube. A página da review
   manda `POST /api/views/<slug>` no máximo 1 vez a cada 30 minutos por navegador; o servidor repete a regra com

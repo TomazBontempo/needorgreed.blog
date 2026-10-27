@@ -87,6 +87,8 @@ const pt: Dicionario = {
   },
 
   review: {
+    /** Texto alternativo padrão das imagens do texto sem descrição (ImagemDoTexto.astro). */
+    imagemPadrao: (n: number | null, titulo: string) => (n ? `Imagem ${n} de ${titulo}` : `Imagem de ${titulo}`),
     /** Contador de views: "view(s)" nas três línguas (decisão do Tomaz); o número abrevia com K. */
     views: { singular: 'view', plural: 'views', decimal: ',' },
     escritoPor: 'Escrito por',
