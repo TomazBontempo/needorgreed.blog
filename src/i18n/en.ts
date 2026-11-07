@@ -167,7 +167,6 @@ const en = {
   autor: {
     reviews: 'Reviews',
     atividade: 'Activity',
-    github: 'GitHub',
     desde: (data: string) => `In the party since ${data}`,
   },
 

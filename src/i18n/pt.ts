@@ -164,7 +164,6 @@ const pt: Dicionario = {
   autor: {
     reviews: 'Reviews',
     atividade: 'Atividade',
-    github: 'GitHub',
     desde: (data: string) => `No grupo desde ${data}`,
   },
 

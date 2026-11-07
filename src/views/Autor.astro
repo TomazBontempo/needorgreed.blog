@@ -9,7 +9,6 @@ import { dicionario, formatarData, idiomaDe } from '../i18n';
 import { getReviews, versaoEm } from '../lib/reviews';
 import { getLootLog } from '../lib/lootlog';
 import { bioEm, type Autor } from '../lib/autores';
-import { ATRIBUTOS_LINK_EXTERNO, relCom } from '../lib/links-externos';
 
 interface Props {
   slug: string;
@@ -37,9 +36,6 @@ const bio = await bioEm(autor, idioma);
           <p class="meta mono">
             <span>{t.paginas.contagem(reviews.length)}</span>
             {entrada && <span>{t.autor.desde(formatarData(idioma, entrada.data))}</span>}
-            <a href={`https://github.com/${login}`} {...ATRIBUTOS_LINK_EXTERNO} rel={relCom('me')}>
-              {t.autor.github}: {login}
-            </a>
           </p>
         </div>
       </div>
